@@ -14,6 +14,7 @@ const pool = new Pool({
 });
 
 const fddpdb = require('./interfaces/queries');
+const {response} = require("express");
 
 const app = express();
 const port = 2999;
@@ -36,43 +37,7 @@ let scryfalldata = JSON.parse(rawscryfalldata);
 
 getCardInfo = (request, response) => {
     const card_name = request.body.name;
-    console.log('getting ' + card_name);
-    let out_card = {};
-    out_card.name = card_name;
-    out_card.images = [];
-    for (let card of scryfalldata) {
-        if (card.name === card_name) {
-            console.log(card);
-            out_card.mana_cost = card.mana_cost;
-            out_card.types = card.type_line.replace(/[^a-zA-Z0-9 ]/g, '').split(' ').filter(element => element);
-            out_card.oracle_text = card.oracle_text;
-            out_card.power = card.power ? card.power: null;
-            out_card.toughness = card.toughness ? card.toughness: null;
-            out_card.loyalty = card.loyalty ? card.loyalty: null;
-            out_card.cmc = card.cmc;
-            if (card.all_parts) {
-                let tokens = [];
-                for (let part of card.all_parts) {
-                    if (part.component === 'token' || part.type_line.includes('Emblem')) {
-                        tokens.push(
-                            {
-                                name: part.name,
-                                types: part.type_line.replace(/[^a-zA-Z0-9 ]/g, '').split(' ').filter(element => element),
-                            }
-                        )
-                    }
-                }
-                if (tokens.length > 0) {
-                    out_card.tokens = tokens;
-                }
-            }
-            if (card.related_uris && card.related_uris.gatherer) {
-                out_card.gatherer = card.related_uris.gatherer;
-            }
-            return response.json(out_card);
-        }
-    }
-    return response.json({message: 'card not found'});
+    response.json(getCardScryfallData(card_name));
 }
 
 getCardImages = (request, response) => {
@@ -107,6 +72,85 @@ getCardImages = (request, response) => {
 
 }
 
+function getCardScryfallData(card_name) {
+    console.log('getting ' + card_name);
+    let out_card = {};
+    out_card.name = card_name;
+    out_card.images = [];
+    for (let card of scryfalldata) {
+        if (card.name === card_name) {
+            out_card.mana_cost = card.mana_cost;
+            out_card.types = card.type_line.replace(/[^a-zA-Z0-9 ]/g, '').split(' ').filter(element => element);
+            out_card.oracle_text = card.oracle_text;
+            out_card.power = card.power ? card.power: null;
+            out_card.toughness = card.toughness ? card.toughness: null;
+            out_card.loyalty = card.loyalty ? card.loyalty: null;
+            out_card.cmc = card.cmc;
+            if (card.all_parts) {
+                let tokens = [];
+                for (let part of card.all_parts) {
+                    if (part.component === 'token' || part.type_line.includes('Emblem')) {
+                        tokens.push(
+                            {
+                                name: part.name,
+                                types: part.type_line.replace(/[^a-zA-Z0-9 ]/g, '').split(' ').filter(element => element),
+                            }
+                        )
+                    }
+                }
+                if (tokens.length > 0) {
+                    out_card.tokens = tokens;
+                }
+            }
+            if (card.related_uris && card.related_uris.gatherer) {
+                out_card.gatherer = card.related_uris.gatherer;
+            }
+            return out_card;
+        }
+    }
+    return {};
+}
+
+getDeckForPlay = (request, response) => {
+    const id = parseInt(request.params.id);
+    pool.query('SELECT * FROM decks where id = $1', [id], (error, results) => {
+        if (error) {
+            console.log('Error getting deck: ');
+            console.log(error);
+            return response.json({errors: [error]});
+        }
+        if (results.rows.length > 0) {
+            let deck = results.rows[0];
+            pool.query('SELECT * FROM deck_cards WHERE deckid = $1', [id], (err, res) => {
+                if (err) {
+                    console.log('Error getting cards for deck: ' + id);
+                    console.log(err);
+                    return response.json({deck: deck, errors: [err]});
+                }
+                deck.cards = res.rows;
+                deck.cards.forEach((card) => {
+                    let card_data = getCardScryfallData(card.name);
+                    card.mana_cost = card_data.mana_cost;
+                    card.types = card_data.types;
+                    card.oracle_text = card_data.oracle_text;
+                    card.power = card_data.power;
+                    card.toughness = card_data.toughness;
+                    card.loyalty = card_data.loyalty;
+                    card.cmc = card_data.cmc;
+                    card.tokens = card_data.tokens;
+                    card.gatherer = card_data.gatherer;
+                });
+                console.log('compiled deck');
+                return response.json(deck);
+            })
+        }
+        else {
+            console.log('deck returned null value');
+            return response.json({});
+        }
+    });
+}
+
 app.post('/api/cards', getCardInfo);
 app.post('/api/cards/images', getCardImages);
 
@@ -115,6 +159,8 @@ app.get('/api/decks/:id', fddpdb.getDeck);
 
 app.post('/api/custom_cards', fddpdb.createCustomCard);
 app.get('/api/custom_cards', fddpdb.getCustomCards);
+
+app.get('/api/game/deck/:id', getDeckForPlay);
 
 app.listen(port, () => {
     console.log(`App running on port ${port}.`);
