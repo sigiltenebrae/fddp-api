@@ -66,8 +66,9 @@ getCardInfo = (request, response) => {
                     out_card.tokens = tokens;
                 }
             }
-
-            out_card.collector_number = card.collector_number;
+            if (card.related_uris && card.related_uris.gatherer) {
+                out_card.gatherer = card.related_uris.gatherer;
+            }
             return response.json(out_card);
         }
     }
