@@ -131,6 +131,7 @@ getDeckForPlay = (request, response) => {
                 let commander = [];
                 deck.cards.forEach((card) => {
                     let card_data = getCardScryfallData(card.name);
+
                     card.mana_cost = card_data.mana_cost;
                     card.types = card_data.types;
                     card.oracle_text = card_data.oracle_text;
@@ -149,6 +150,20 @@ getDeckForPlay = (request, response) => {
                 });
                 deck.commander = commander;
                 console.log('compiled deck');
+                let temp_sideboard = [];
+                deck.cards.forEach((card) => {
+                    if (card.count > 1) {
+                        for (let i = 1; i < card.count; i++) {
+                            temp_sideboard.push(card);
+                        }
+                    }
+                });
+                temp_sideboard.forEach((temp_card) => {
+                    deck.cards.push(temp_card);
+                });
+                deck.cards.forEach((card) => {
+                    card.count = 1;
+                })
                 return response.json(deck);
             })
         }
