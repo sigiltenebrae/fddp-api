@@ -44,14 +44,32 @@ getCardInfo = (request, response) => {
         if (card.name === card_name) {
             console.log(card);
             out_card.mana_cost = card.mana_cost;
-            out_card.types = card.type_line.replace(/[^a-zA-Z0-9 ]/g, '').split(' ');
+            out_card.types = card.type_line.replace(/[^a-zA-Z0-9 ]/g, '').split(' ').filter(element => element);
             out_card.oracle_text = card.oracle_text;
             out_card.power = card.power ? card.power: null;
             out_card.toughness = card.toughness ? card.toughness: null;
+            if (card.all_parts) {
+                let tokens = [];
+                for (let part of card.all_parts) {
+                    if (part.component === 'token' || part.type_line.includes('Emblem')) {
+                        tokens.push(
+                            {
+                                name: part.name,
+                                types: part.type_line.replace(/[^a-zA-Z0-9 ]/g, '').split(' ').filter(element => element),
+                            }
+                        )
+                    }
+                }
+                if (tokens.length > 0) {
+                    out_card.tokens = tokens;
+                }
+            }
+
             out_card.collector_number = card.collector_number;
             return response.json(out_card);
         }
     }
+    return response.json({message: 'card not found'});
 }
 
 getCardImages = (request, response) => {
