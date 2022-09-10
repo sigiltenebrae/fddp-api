@@ -128,6 +128,7 @@ getDeckForPlay = (request, response) => {
                     return response.json({deck: deck, errors: [err]});
                 }
                 deck.cards = res.rows;
+                let commander = [];
                 deck.cards.forEach((card) => {
                     let card_data = getCardScryfallData(card.name);
                     card.mana_cost = card_data.mana_cost;
@@ -139,7 +140,14 @@ getDeckForPlay = (request, response) => {
                     card.cmc = card_data.cmc;
                     card.tokens = card_data.tokens;
                     card.gatherer = card_data.gatherer;
+                    if (card.iscommander) {
+                        commander.push(card);
+                    }
                 });
+                commander.forEach((com) => {
+                    deck.cards.splice(deck.cards.indexOf(com), 1);
+                });
+                deck.commander = commander;
                 console.log('compiled deck');
                 return response.json(deck);
             })
