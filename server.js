@@ -3,6 +3,16 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 const fs = require('fs');
 
+const config = require('./config/db.config');
+const Pool = require('pg').Pool
+const pool = new Pool({
+    user: config.USER,
+    host: config.HOST,
+    database: config.DB,
+    password: config.PASSWORD,
+    port: 5432,
+});
+
 const fddpdb = require('./interfaces/queries');
 
 const app = express();
@@ -57,7 +67,23 @@ getCardImages = (request, response) => {
             }
         }
     }
-    return response.json(out_card);
+    pool.query('SELECT * FROM custom_cards WHERE name = $1', [card_name], (error, results) => {
+        if (error) {
+            console.log('Error getting custom cards for ' + card_name);
+            console.log(error);
+            return response.json(out_card);
+        }
+        if (!results.rows || results.rows.length === 0) {
+            return response.json(out_card);
+        }
+        else {
+            results.rows.forEach((card) => {
+                out_card.images.push(card.image);
+            });
+            return response.json(out_card);
+        }
+    })
+
 }
 
 app.post('/api/cards', getCardInfo);
@@ -67,6 +93,7 @@ app.post('/api/decks', fddpdb.createDeck);
 app.get('/api/decks/:id', fddpdb.getDeck);
 
 app.post('/api/custom_cards', fddpdb.createCustomCard);
+app.get('/api/custom_cards', fddpdb.getCustomCards);
 
 app.listen(port, () => {
     console.log(`App running on port ${port}.`);

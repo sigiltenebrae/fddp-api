@@ -97,3 +97,14 @@ exports.createCustomCard = (request, response) => {
         }
     }
 }
+
+exports.getCustomCards = (request, response) => {
+    pool.query('SELECT * FROM custom_cards', (error, results) => {
+        if (error) {
+            console.log('Error getting custom cards');
+            console.log(error);
+            return response.json({errors: [error]});
+        }
+        return response.json(results.rows);
+    });
+}
