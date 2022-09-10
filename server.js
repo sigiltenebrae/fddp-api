@@ -48,6 +48,8 @@ getCardInfo = (request, response) => {
             out_card.oracle_text = card.oracle_text;
             out_card.power = card.power ? card.power: null;
             out_card.toughness = card.toughness ? card.toughness: null;
+            out_card.loyalty = card.loyalty ? card.loyalty: null;
+            out_card.cmc = card.cmc;
             if (card.all_parts) {
                 let tokens = [];
                 for (let part of card.all_parts) {
