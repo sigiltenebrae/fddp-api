@@ -9,6 +9,17 @@ const pool = new Pool({
     port: 5432,
 });
 
+exports.getUsers = (request, response) => {
+    pool.query('SELECT * FROM users', (error, results) => {
+        if (error) {
+            console.log('Error getting users');
+            console.log(error);
+            return response.json({errors: [error]});
+        }
+        return response.json(results.rows);
+    });
+}
+
 exports.createDeck = (request, response) => {
     console.log('attempting to create deck');
     if (request.body && request.body.deck) {

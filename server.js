@@ -15,6 +15,7 @@ const pool = new Pool({
 
 const fddpdb = require('./interfaces/queries');
 const {response} = require("express");
+const {getUsers} = require("./interfaces/queries");
 
 const app = express();
 const port = 2999;
@@ -172,6 +173,8 @@ getDeckForPlay = (request, response) => {
         }
     });
 }
+
+app.get('/api/users', getUsers);
 
 app.post('/api/cards', getCardInfo);
 app.post('/api/cards/images', getCardImages);
