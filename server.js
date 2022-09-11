@@ -178,7 +178,8 @@ app.post('/api/cards/images', getCardImages);
 
 app.post('/api/decks', fddpdb.createDeck);
 app.get('/api/decks/:id', fddpdb.getDeck);
-app.put('/api/decks/:id', fddpdb.updateDeck)
+app.put('/api/decks/:id', fddpdb.updateDeck);
+app.delete('/api/decks/:id', fddpdb.deleteDeck);
 
 app.post('/api/custom_cards', fddpdb.createCustomCard);
 app.get('/api/custom_cards', fddpdb.getCustomCards);
