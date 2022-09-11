@@ -15,7 +15,7 @@ const pool = new Pool({
 
 const fddpdb = require('./interfaces/queries');
 const {response} = require("express");
-const {getUsers} = require("./interfaces/queries");
+const {getUsers, deleteCustomCard} = require("./interfaces/queries");
 
 const app = express();
 const port = 2999;
@@ -186,6 +186,7 @@ app.delete('/api/decks/:id', fddpdb.deleteDeck);
 
 app.post('/api/custom_cards', fddpdb.createCustomCard);
 app.get('/api/custom_cards', fddpdb.getCustomCards);
+app.delete('/api/custom_cards/:id', deleteCustomCard)
 
 app.get('/api/game/deck/:id', getDeckForPlay);
 

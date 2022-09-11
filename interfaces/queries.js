@@ -196,3 +196,17 @@ exports.getCustomCards = (request, response) => {
     });
 }
 
+exports.deleteCustomCard = (request, response) => {
+    const id = parseInt(request.params.id);
+    pool.query('DELETE FROM custom_cards WHERE id = $1', [id],
+        (error, results) => {
+            if (error) {
+                console.log('Error deleting custom card with id: ' + id);
+                return response.json({errors: [error]})
+            }
+            else {
+                return response.json({message: 'Deleted custom card with id: ' + id});
+            }
+        })
+}
+
