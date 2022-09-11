@@ -73,7 +73,6 @@ getCardImages = (request, response) => {
 }
 
 function getCardScryfallData(card_name) {
-    console.log('getting ' + card_name);
     let out_card = {};
     out_card.name = card_name;
     out_card.images = [];
@@ -132,13 +131,13 @@ getDeckForPlay = (request, response) => {
                 deck.cards.forEach((card) => {
                     let card_data = getCardScryfallData(card.name);
 
-                    card.mana_cost = card_data.mana_cost;
+                    card.mana_cost = card_data.mana_cost? card_data.mana_cost.replace(/[^a-zA-Z0-9 ]/g, '').split('').filter(element => element): null;
                     card.types = card_data.types;
                     card.oracle_text = card_data.oracle_text;
-                    card.power = card_data.power;
-                    card.toughness = card_data.toughness;
-                    card.loyalty = card_data.loyalty;
-                    card.cmc = card_data.cmc;
+                    card.power = Number(card_data.power);
+                    card.toughness = Number(card_data.toughness);
+                    card.loyalty = Number(card_data.loyalty);
+                    card.cmc = Number(card_data.cmc);
                     card.tokens = card_data.tokens;
                     card.gatherer = card_data.gatherer;
                     if (card.iscommander) {
@@ -179,6 +178,7 @@ app.post('/api/cards/images', getCardImages);
 
 app.post('/api/decks', fddpdb.createDeck);
 app.get('/api/decks/:id', fddpdb.getDeck);
+app.put('/api/decks/:id', fddpdb.updateDeck)
 
 app.post('/api/custom_cards', fddpdb.createCustomCard);
 app.get('/api/custom_cards', fddpdb.getCustomCards);

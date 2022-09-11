@@ -1,4 +1,5 @@
 const config = require("../config/db.config.js");
+const {request} = require("express");
 const Pool = require('pg').Pool
 const pool = new Pool({
     user: config.USER,
@@ -14,8 +15,8 @@ exports.createDeck = (request, response) => {
         console.log('creating deck');
         const deck = request.body.deck;
         let deck_errors = [];
-        pool.query('INSERT INTO decks (name, owner, sleeves, image, link) VALUES ($1, $2, $3, $4, $5) RETURNING *',
-            [deck.name, deck.owner, deck.sleeves, deck.image, deck.link],
+        pool.query('INSERT INTO decks (name, owner, sleeves, image, link, rating) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
+            [deck.name, deck.owner, deck.sleeves, deck.image, deck.link, deck.rating],
             (error, results) => {
                 if (error) {
                     console.log('deck creation failed');
@@ -31,6 +32,7 @@ exports.createDeck = (request, response) => {
                                 [new_id, card.name, card.image, card.count, card.iscommander],
                                 (err, res) => {
                                     if (err) {
+                                        console.log('Card create failed for deck with id: ' + new_id);
                                         console.log(err);
                                         deck_errors.push(err);
                                     }
@@ -46,6 +48,62 @@ exports.createDeck = (request, response) => {
         console.log('request body incomplete for create deck');
         if (request.body) {
             console.log('missing deck in body');
+        }
+    }
+}
+
+exports.updateDeck = (request, response) => {
+    const id = parseInt(request.params.id);
+    let errors = [];
+    if (request.body && request.body.deck) {
+        const deck = request.body.deck;
+        pool.query('UPDATE decks SET name = $1, owner = $2, sleeves = $3, image = $4, link = $5, $rating = $6 WHERE id = $7',
+            [deck.name, deck.owner, deck.sleeves, deck.image, deck.link, deck.rating, id],
+            (error, results) => {
+                if (error) {
+                    console.log('Deck update failed for deck with id: ' + id);
+                    console.log(error);
+                    return response.json({errors: [error]});
+                }
+            });
+        if (deck.cards && deck.cards.length > 0) {
+            for (let card of deck.cards) {
+                if (card.id) {
+                    pool.query('UPDATE deck_cards SET name = $1, image = $2, count = $3, iscommander = $4 WHERE id = $5',
+                        [card.name, card.image, card.count, card.iscommander, card.id],
+                        (err, res) => {
+                            if (err) {
+                                console.log('Card update failed for card with id: ' + card.id + 'in deck with id: ' + id);
+                                console.log(err);
+                                errors.push(err);
+                            }
+                        });
+                }
+                else {
+                    pool.query('INSERT INTO deck_cards (deckid, name, image, count, iscommander) VALUES($1, $2, $3, $4, $5)',
+                        [id, card.name, card.image, card.count, card.iscommander],
+                        (err, res) => {
+                            if (err) {
+                                console.log('Card create failed for deck with id: ' + id);
+                                console.log(err);
+                                errors.push(err);
+                            }
+                        });
+                }
+            }
+            if (deck.delete && deck.delete.length > 0) {
+                for (let card of deck.delete) {
+                    pool.query('DELETE FROM deck_cards WHERE id = $1', [card.id],
+                        (err, res) => {
+                            if (err) {
+                                console.log('Delete failed for card with id: ' + card.id + 'in deck with id: ' + id);
+                                console.log(err);
+                                errors.push(err);
+                            }
+                        });
+                }
+            }
+            return response.json({errors});
         }
     }
 }
@@ -108,3 +166,4 @@ exports.getCustomCards = (request, response) => {
         return response.json(results.rows);
     });
 }
+
