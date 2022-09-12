@@ -47,10 +47,19 @@ getCardImages = (request, response) => {
     let out_card = {};
     out_card.name = card_name;
     out_card.images = [];
+    out_card.back_images = [];
     for (let card of scryfalldata) {
         if (card.name === card_name) {
             if (card.image_uris && card.image_uris.png) {
                 out_card.images.push(card.image_uris.png);
+            }
+            else if (card.card_faces && card.card_faces.length === 2) {
+                if (card.card_faces[0].image_uris && card.card_faces[0].image_uris.png) {
+                    out_card.images.push(card.card_faces[0].image_uris.png);
+                }
+                if (card.card_faces[1].image_uris && card.card_faces[1].image_uris.png) {
+                    out_card.images.push(card.card_faces[1].image_uris.png);
+                }
             }
         }
     }
@@ -66,6 +75,9 @@ getCardImages = (request, response) => {
         else {
             results.rows.forEach((card) => {
                 out_card.images.push(card.image);
+                if (out_card.back_images.length > 0) {
+                    out_card.back_images.push(card.image);
+                }
             });
             return response.json(out_card);
         }
@@ -77,14 +89,40 @@ function getCardScryfallData(card_name) {
     let out_card = {};
     out_card.name = card_name;
     out_card.images = [];
+    out_card.back_images = [];
     for (let card of scryfalldata) {
         if (card.name === card_name) {
-            out_card.mana_cost = card.mana_cost;
-            out_card.types = card.type_line.replace(/[^a-zA-Z0-9 ]/g, '').split(' ').filter(element => element);
-            out_card.oracle_text = card.oracle_text;
-            out_card.power = card.power ? card.power: null;
-            out_card.toughness = card.toughness ? card.toughness: null;
-            out_card.loyalty = card.loyalty ? card.loyalty: null;
+            //console.log(card);
+            if (card.card_faces && card.card_faces.length === 2){
+                out_card.back_face = false;
+                out_card.mana_cost = card.mana_cost? card.mana_cost.replace(/[^a-zA-Z0-9 ]/g, '').split('').filter(element => element): null;
+                out_card.back_mana_cost = null;
+                out_card.types = card.type_line.replace(/[^a-zA-Z0-9 ]/g, '').split(' ').filter(element => element);
+                out_card.back_types = null;
+                out_card.oracle_text = card.oracle_text;
+                out_card.back_oracle_text = null;
+                out_card.power = card.power ? card.power: null;
+                out_card.back_power = null;
+                out_card.toughness = card.toughness ? card.toughness: null;
+                out_card.back_toughness = null;
+                out_card.loyalty = card.loyalty ? card.loyalty: null;
+                out_card.back_loyalty = null;
+            }
+            else {
+                out_card.back_face = true;
+                out_card.mana_cost = card.card_faces[0].mana_cost? card.card_faces[0].mana_cost.replace(/[^a-zA-Z0-9 ]/g, '').split('').filter(element => element): null;
+                out_card.back_mana_cost = card.card_faces[1].mana_cost? card.card_faces[1].mana_cost.replace(/[^a-zA-Z0-9 ]/g, '').split('').filter(element => element): null;
+                out_card.types = card.card_faces[0].type_line.replace(/[^a-zA-Z0-9 ]/g, '').split(' ').filter(element => element);
+                out_card.back_types = card.card_faces[1].type_line.replace(/[^a-zA-Z0-9 ]/g, '').split(' ').filter(element => element);
+                out_card.oracle_text = card.card_faces[0].oracle_text;
+                out_card.back_oracle_text = card.card_faces[1].oracle_text;
+                out_card.power = card.card_faces[0].power ? card.card_faces[0].power: null;
+                out_card.back_power = card.card_faces[1].power ? card.card_faces[1].power: null;
+                out_card.toughness = card.card_faces[0].toughness ? card.card_faces[0].toughness: null;
+                out_card.back_toughness = card.card_faces[1].toughness ? card.card_faces[1].toughness: null;
+                out_card.loyalty = card.card_faces[0].loyalty ? card.card_faces[0].loyalty: null;
+                out_card.back_loyalty = card.card_faces[1].loyalty ? card.card_faces[1].loyalty: null;
+            }
             out_card.cmc = card.cmc;
             if (card.all_parts) {
                 let tokens = [];
@@ -132,12 +170,18 @@ getDeckForPlay = (request, response) => {
                 deck.cards.forEach((card) => {
                     let card_data = getCardScryfallData(card.name);
 
-                    card.mana_cost = card_data.mana_cost? card_data.mana_cost.replace(/[^a-zA-Z0-9 ]/g, '').split('').filter(element => element): null;
+                    card.mana_cost = card_data.mana_cost;
+                    card.back_mana_cost = card_data.back_mana_cost;
                     card.types = card_data.types;
+                    card.back_types = card_data.back_types;
                     card.oracle_text = card_data.oracle_text;
+                    card.back_oracle_text = card_data.back_oracle_text;
                     card.power = Number(card_data.power);
+                    card.back_power = Number(card_data.back_power);
                     card.toughness = Number(card_data.toughness);
+                    card.back_toughness = Number(card_data.back_toughness);
                     card.loyalty = Number(card_data.loyalty);
+                    card.back_loyalty = Number(card_data.back_loyalty);
                     card.cmc = Number(card_data.cmc);
                     card.tokens = card_data.tokens;
                     card.gatherer = card_data.gatherer;
