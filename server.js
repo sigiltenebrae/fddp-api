@@ -101,12 +101,12 @@ function getCardScryfallData(card_name) {
                 out_card.back_types = card.card_faces[1].type_line.replace(/[^a-zA-Z0-9 ]/g, '').split(' ').filter(element => element);
                 out_card.oracle_text = card.card_faces[0].oracle_text;
                 out_card.back_oracle_text = card.card_faces[1].oracle_text;
-                out_card.power = card.card_faces[0].power ? card.card_faces[0].power: null;
-                out_card.back_power = card.card_faces[1].power ? card.card_faces[1].power: null;
-                out_card.toughness = card.card_faces[0].toughness ? card.card_faces[0].toughness: null;
-                out_card.back_toughness = card.card_faces[1].toughness ? card.card_faces[1].toughness: null;
-                out_card.loyalty = card.card_faces[0].loyalty ? card.card_faces[0].loyalty: null;
-                out_card.back_loyalty = card.card_faces[1].loyalty ? card.card_faces[1].loyalty: null;
+                out_card.power = card.card_faces[0].power ? Number(card.card_faces[0].power): null;
+                out_card.back_power = card.card_faces[1].power ? Number(card.card_faces[1].power): null;
+                out_card.toughness = card.card_faces[0].toughness ? Number(card.card_faces[0].toughness): null;
+                out_card.back_toughness = card.card_faces[1].toughness ? Number(card.card_faces[1].toughness): null;
+                out_card.loyalty = card.card_faces[0].loyalty ? Number(card.card_faces[0].loyalty): null;
+                out_card.back_loyalty = card.card_faces[1].loyalty ? Number(card.card_faces[1].loyalty): null;
             }
             else{
                 out_card.back_face = false;
@@ -116,11 +116,11 @@ function getCardScryfallData(card_name) {
                 out_card.back_types = null;
                 out_card.oracle_text = card.oracle_text;
                 out_card.back_oracle_text = null;
-                out_card.power = card.power ? card.power: null;
+                out_card.power = card.power ? Number(card.power): null;
                 out_card.back_power = null;
-                out_card.toughness = card.toughness ? card.toughness: null;
+                out_card.toughness = card.toughness ? Number(card.toughness): null;
                 out_card.back_toughness = null;
-                out_card.loyalty = card.loyalty ? card.loyalty: null;
+                out_card.loyalty = card.loyalty ? Number(card.loyalty): null;
                 out_card.back_loyalty = null;
             }
             out_card.cmc = card.cmc;
