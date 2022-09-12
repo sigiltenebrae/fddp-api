@@ -166,26 +166,42 @@ getDeckForPlay = (request, response) => {
                     return response.json({deck: deck, errors: [err]});
                 }
                 deck.cards = res.rows;
-                let commander = [];
                 deck.cards.forEach((card) => {
                     let card_data = getCardScryfallData(card.name);
 
-                    card.back_face = card_data.back_face;
-                    card.mana_cost = card_data.mana_cost;
-                    card.back_mana_cost = card_data.back_mana_cost;
-                    card.types = card_data.types;
-                    card.back_types = card_data.back_types;
-                    card.oracle_text = card_data.oracle_text;
-                    card.back_oracle_text = card_data.back_oracle_text;
-                    card.power = Number(card_data.power);
-                    card.back_power = Number(card_data.back_power);
-                    card.toughness = Number(card_data.toughness);
-                    card.back_toughness = Number(card_data.back_toughness);
-                    card.loyalty = Number(card_data.loyalty);
-                    card.back_loyalty = Number(card_data.back_loyalty);
-                    card.cmc = Number(card_data.cmc);
-                    card.tokens = card_data.tokens;
-                    card.gatherer = card_data.gatherer;
+                    card.back_face = card_data.back_face ? card_data.back_face: false;
+                    card.mana_cost = card_data.mana_cost ? card_data.mana_cost: [];
+                    card.back_mana_cost = card_data.back_mana_cost ? card_data.back_mana_cost: [];
+                    card.types = card_data.types ? card_data.types: [];
+                    card.back_types = card_data.back_types ? card_data.back_types: [];
+                    card.oracle_text = card_data.oracle_text ? card_data.oracle_text: '';
+                    card.back_oracle_text = card_data.back_oracle_text ? card_data.back_oracle_text: '';
+                    card.power = card_data.power ? Number(card_data.power): null;
+                    card.back_power = card_data.back_power ? Number(card_data.back_power): null;
+                    card.toughness = card_data.toughness ? Number(card_data.toughness): null;
+                    card.back_toughness = card_data.back_toughness ? Number(card_data.back_toughness): null;
+                    card.loyalty = card_data.loyalty ? Number(card_data.loyalty): null;
+                    card.back_loyalty = card_data.back_loyalty ? Number(card_data.back_loyalty): null;
+                    card.cmc = card_data.cmc ? Number(card_data.cmc): null;
+                    card.tokens = card_data.tokens ? card_data.tokens: [];
+                    card.gatherer = card_data.gatherer ? card_data.gatherer: null;
+                });
+
+                pool.query('SELECT * FROM deck_tokens WHERE deckid = $1', [id], (er, re) => {
+                    if (er) {
+                        console.log('Error getting tokens for deck ' + id);
+                        console.log(er);
+                        return response.json({deck: deck, errors: [er]});
+                    }
+                    deck.tokens = re.rows;
+                    deck.tokens.forEach((token) => {
+                        let token_data = getCardScryfallData(token.name);
+
+                        token.types = token_data.types ? token_data.types: [];
+                        token.oracle_text = token_data.oracle_text ? token_data.oracle_text: null;
+                        token.power = token_data.power ? token_data.power: null;
+                        token.toughness = token_data.toughness ? token_data.toughness: null;
+                    });
                 });
                 console.log('compiled deck');
                 return response.json(deck);

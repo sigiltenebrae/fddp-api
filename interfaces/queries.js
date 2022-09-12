@@ -50,6 +50,17 @@ exports.createDeck = (request, response) => {
                                     }
                                 });
                         }
+                        for (let token of deck.tokens) {
+                            pool.query('INSERT INTO deck_tokens (deckid, name, image) VALUES($1, $2, $3)',
+                                [new_id, token.name, token.image],
+                                (err, res) => {
+                                    if (err) {
+                                        console.log('Token create failed for deck with id: ' + new_id);
+                                        console.log(err);
+                                        deck_errors.push(err);
+                                    }
+                                });
+                        }
                         console.log('deck created with id: ' + new_id);
                         return response.json({ id: new_id, errors: deck_errors });
                     }
@@ -104,16 +115,56 @@ exports.updateDeck = (request, response) => {
                                     });
                             }
                         }
-                        if (deck.delete && deck.delete.length > 0) {
-                            for (let card of deck.delete) {
-                                pool.query('DELETE FROM deck_cards WHERE id = $1', [card.id],
+                        for (let token of deck.tokens) {
+                            if (token.id) {
+                                pool.query('UPDATE deck_tokens SET name = $1, image = $2 WHERE id = $3',
+                                    [token.name, token.image, token.id],
                                     (err, res) => {
                                         if (err) {
-                                            console.log('Delete failed for card with id: ' + card.id + 'in deck with id: ' + id);
+                                            console.log('Token update failed for deck with id: ' + id);
                                             console.log(err);
                                             errors.push(err);
                                         }
                                     });
+                            }
+                            else {
+                                pool.query('INSERT INTO deck_tokens (deckid, name, image) VALUES($1, $2, $3)',
+                                    [id, token.name, token.image],
+                                    (err, res) => {
+                                        if (err) {
+                                            console.log('Token create failed for deck with id: ' + id);
+                                            console.log(err);
+                                            errors.push(err);
+                                        }
+                                    });
+                            }
+                        }
+                        if (deck.delete && deck.delete.length > 0) {
+                            for (let card of deck.delete) {
+                                if (card.id) {
+                                    pool.query('DELETE FROM deck_cards WHERE id = $1', [card.id],
+                                        (err, res) => {
+                                            if (err) {
+                                                console.log('Delete failed for card with id: ' + card.id + ' in deck with id: ' + id);
+                                                console.log(err);
+                                                errors.push(err);
+                                            }
+                                        });
+                                }
+                            }
+                        }
+                        if (deck.token_delete && deck.token_delete.length > 0) {
+                            for (let token of deck.token_delete) {
+                                if (token.id) {
+                                    pool.query('DELETE FROM deck_tokens WHERE id = $1', [token.id],
+                                        (err, res) => {
+                                            if (err) {
+                                                console.log('Delete failed for token with id ' + token.id + ' in deck with id: ' + id);
+                                                console.log(err);
+                                                errors.push(err);
+                                            }
+                                        });
+                                }
                             }
                         }
                         return response.json({errors});
