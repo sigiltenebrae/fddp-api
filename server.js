@@ -198,8 +198,8 @@ getDeckForPlay = (request, response) => {
 
                         token.types = token_data.types ? token_data.types: [];
                         token.oracle_text = token_data.oracle_text ? token_data.oracle_text: null;
-                        token.power = token_data.power ? token_data.power: null;
-                        token.toughness = token_data.toughness ? token_data.toughness: null;
+                        token.power = token_data.power ? Number(token_data.power): null;
+                        token.toughness = token_data.toughness ? Number(token_data.toughness): null;
                     });
                     console.log('compiled deck');
                     return response.json(deck);
