@@ -186,7 +186,6 @@ getDeckForPlay = (request, response) => {
                     card.tokens = card_data.tokens ? card_data.tokens: [];
                     card.gatherer = card_data.gatherer ? card_data.gatherer: null;
                 });
-
                 pool.query('SELECT * FROM deck_tokens WHERE deckid = $1', [id], (er, re) => {
                     if (er) {
                         console.log('Error getting tokens for deck ' + id);
@@ -202,10 +201,10 @@ getDeckForPlay = (request, response) => {
                         token.power = token_data.power ? token_data.power: null;
                         token.toughness = token_data.toughness ? token_data.toughness: null;
                     });
+                    console.log('compiled deck');
+                    return response.json(deck);
                 });
-                console.log('compiled deck');
-                return response.json(deck);
-            })
+            });
         }
         else {
             console.log('deck returned null value');
