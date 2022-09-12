@@ -137,12 +137,92 @@ exports.deleteDeck = (request, response) => {
         });
 }
 
+exports.getDecksForUser = (request, response) => {
+    const userid = parseInt(request.params.id);
+    let errors = [];
+    pool.query('SELECT * FROM decks WHERE owner = $1', [userid],
+        (error, results) => {
+            if (error) {
+                console.log('Error getting decks for user: ' + userid);
+                console.log(error);
+                return response.json({decks: [], errors: [error]});
+            }
+            else {
+                if (results.rows && results.rows.length > 0) {
+                   let decks = [];
+                   for (let deck_data of results.rows) {
+                       let deck = deck_data;
+                       pool.query('SELECT * FROM deck_cards WHERE deckid = $1', [deck.id],
+                           (err, res) => {
+                               if (err) {
+                                   console.log('Error getting cards for deck: ' + id);
+                                   console.log(err);
+                                   errors.push(err);
+                                   deck.cards = [];
+                                   decks.push(deck);
+                               }
+                               else {
+                                   deck.cards = res.rows;
+                                   decks.push(deck);
+                               }
+                           });
+                   }
+                   return response.json({decks: decks, errors: errors});
+                }
+                else {
+                    return response.json({decks: [], errors: []});
+                }
+            }
+        })
+}
+
+exports.getDecksForUserBasic = (request, response) => {
+    const userid = parseInt(request.params.id);
+    let errors = [];
+    pool.query('SELECT * FROM decks WHERE owner = $1', [userid],
+        (error, results) => {
+            if (error) {
+                console.log('Error getting decks for user: ' + userid);
+                console.log(error);
+                return response.json({decks: [], errors: [error]});
+            }
+            else {
+                if (results.rows && results.rows.length > 0) {
+                    return response.json({decks: results.rows, errors: errors});
+                }
+                else {
+                    return response.json({decks: [], errors: []});
+                }
+            }
+        });
+}
+
+exports.getAllDecksBasic = (request, response) => {
+    let errors = [];
+    pool.query('SELECT * FROM decks',
+        (error, results) => {
+            if (error) {
+                console.log('Error getting all decks');
+                console.log(error);
+                return response.json({decks: [], errors: [error]});
+            }
+            else {
+                if (results.rows && results.rows.length > 0) {
+                    return response.json({decks: results.rows, errors: errors});
+                }
+                else {
+                    return response.json({decks: [], errors: []});
+                }
+            }
+        });
+}
+
 exports.getDeck = (request, response) => {
     const id = parseInt(request.params.id);
 
     pool.query('SELECT * FROM decks where id = $1', [id], (error, results) => {
         if (error) {
-            console.log('Error getting deck: ');
+            console.log('Error getting deck: ' + id);
             console.log(error);
             return response.json({errors: [error]});
         }

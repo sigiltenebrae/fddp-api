@@ -179,6 +179,9 @@ app.get('/api/users', getUsers);
 app.post('/api/cards', getCardInfo);
 app.post('/api/cards/images', getCardImages);
 
+app.get('/api/userdecks/basic/:id', fddpdb.getDecksForUserBasic);
+app.get('/api/decks/basic', fddpdb.getAllDecksBasic);
+
 app.post('/api/decks', fddpdb.createDeck);
 app.get('/api/decks/:id', fddpdb.getDeck);
 app.put('/api/decks/:id', fddpdb.updateDeck);
