@@ -58,7 +58,7 @@ getCardImages = (request, response) => {
                     out_card.images.push(card.card_faces[0].image_uris.png);
                 }
                 if (card.card_faces[1].image_uris && card.card_faces[1].image_uris.png) {
-                    out_card.images.push(card.card_faces[1].image_uris.png);
+                    out_card.back_images.push(card.card_faces[1].image_uris.png);
                 }
             }
         }

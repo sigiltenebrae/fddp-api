@@ -38,9 +38,10 @@ exports.createDeck = (request, response) => {
                 if (new_id > -1) {
                     if (deck.cards && deck.cards.length > 0) {
                         for (let card of deck.cards) {
+                            if (!card.back_image) {card.back_image = null}
                             //console.log('inserting card: ' + JSON.stringify(card));
-                            pool.query('INSERT INTO deck_cards (deckid, name, image, count, iscommander) VALUES($1, $2, $3, $4, $5)',
-                                [new_id, card.name, card.image, card.count, card.iscommander],
+                            pool.query('INSERT INTO deck_cards (deckid, name, image, back_image, count, iscommander) VALUES($1, $2, $3, $4, $5, $6)',
+                                [new_id, card.name, card.image, card.back_image, card.count, card.iscommander],
                                 (err, res) => {
                                     if (err) {
                                         console.log('Card create failed for deck with id: ' + new_id);
@@ -80,8 +81,9 @@ exports.updateDeck = (request, response) => {
                     if (deck.cards && deck.cards.length > 0) {
                         for (let card of deck.cards) {
                             if (card.id) {
-                                pool.query('UPDATE deck_cards SET name = $1, image = $2, count = $3, iscommander = $4 WHERE id = $5',
-                                    [card.name, card.image, card.count, card.iscommander, card.id],
+                                if (!card.back_image) { card.back_image = null }
+                                pool.query('UPDATE deck_cards SET name = $1, image = $2, back_image = $3, count = $4, iscommander = $5 WHERE id = $6',
+                                    [card.name, card.image, card.back_image, card.count, card.iscommander, card.id],
                                     (err, res) => {
                                         if (err) {
                                             console.log('Card update failed for card with id: ' + card.id + 'in deck with id: ' + id);
