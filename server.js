@@ -186,29 +186,8 @@ getDeckForPlay = (request, response) => {
                     card.cmc = Number(card_data.cmc);
                     card.tokens = card_data.tokens;
                     card.gatherer = card_data.gatherer;
-                    if (card.iscommander) {
-                        commander.push(card);
-                    }
                 });
-                commander.forEach((com) => {
-                    deck.cards.splice(deck.cards.indexOf(com), 1);
-                });
-                deck.commander = commander;
                 console.log('compiled deck');
-                let temp_sideboard = [];
-                deck.cards.forEach((card) => {
-                    if (card.count > 1) {
-                        for (let i = 1; i < card.count; i++) {
-                            temp_sideboard.push(card);
-                        }
-                    }
-                });
-                temp_sideboard.forEach((temp_card) => {
-                    deck.cards.push(temp_card);
-                });
-                deck.cards.forEach((card) => {
-                    card.count = 1;
-                })
                 return response.json(deck);
             })
         }
