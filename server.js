@@ -33,7 +33,7 @@ app.post('/', (request, response) => {
     response.json({ info: 'API endpoint for EDFDDP' });
 });
 
-let rawscryfalldata = fs.readFileSync('assets/default-cards-20220905210954.json');
+let rawscryfalldata = fs.readFileSync('assets/default-cards.json');
 let scryfalldata = JSON.parse(rawscryfalldata);
 
 getCardInfo = (request, response) => {
@@ -87,12 +87,12 @@ getCardImages = (request, response) => {
 
 function getCardScryfallData(card_name) {
     let out_card = {};
-    out_card.name = card_name;
     out_card.images = [];
     out_card.back_images = [];
     for (let card of scryfalldata) {
-        if (card.name === card_name) {
+        if (card.name.toLowerCase() === card_name.toLowerCase()) {
             //console.log(card);
+            out_card.name = card.name;
             if (card.card_faces && card.card_faces.length === 2){
                 out_card.back_face = true;
                 out_card.mana_cost = card.card_faces[0].mana_cost? card.card_faces[0].mana_cost.replace(/[^a-zA-Z0-9 ]/g, '').split('').filter(element => element): null;
