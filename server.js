@@ -45,11 +45,11 @@ getCardImages = (request, response) => {
     const card_name = request.body.name;
     console.log('Getting images for: ' + card_name);
     let out_card = {};
-    out_card.name = card_name;
     out_card.images = [];
     out_card.back_images = [];
     for (let card of scryfalldata) {
-        if (card.name === card_name) {
+        if (card.name.toLowerCase() === card_name.toLowerCase()) {
+            out_card.name = card.name;
             if (card.image_uris && card.image_uris.png) {
                 out_card.images.push(card.image_uris.png);
             }
