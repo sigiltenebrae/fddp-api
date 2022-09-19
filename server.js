@@ -234,6 +234,14 @@ app.delete('/api/custom_cards/:id', deleteCustomCard)
 
 app.get('/api/game/deck/:id', getDeckForPlay);
 
+app.get('/api/games/types', fddpdb.getGameTypes);
+app.get('/api/games/', fddpdb.getGames);
+app.get('/api/games/active', fddpdb.getActiveGames);
+app.get('/api/games/:id', fddpdb.getGameById);
+app.post('/api/games', fddpdb.createGame);
+app.put('/api/games/start/:id', fddpdb.startGame);
+app.put('/api/games/:id', fddpdb.updateGame);
+
 app.listen(port, () => {
     console.log(`App running on port ${port}.`);
 });
