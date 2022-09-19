@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const fs = require('fs');
+const axios = require('axios');
 
 const config = require('./config/db.config');
 const Pool = require('pg').Pool
@@ -16,6 +17,8 @@ const pool = new Pool({
 const fddpdb = require('./interfaces/queries');
 const {response} = require("express");
 const {getUsers, deleteCustomCard} = require("./interfaces/queries");
+const http = require("http");
+const https = require("https");
 
 const app = express();
 const port = 2999;
@@ -32,6 +35,29 @@ app.use(
 app.post('/', (request, response) => {
     response.json({ info: 'API endpoint for EDFDDP' });
 });
+
+axios.get('https://api.scryfall.com/bulk-data').then( res => {
+    console.log(res.data);
+    let update_url = '';
+    for (let bulk of res.data.data) {
+        if (bulk.type === 'default_cards') {
+            update_url = bulk.download_uri;
+            break;
+        }
+    }
+    if (update_url !== '') {
+        console.log(update_url);
+        const update_file = fs.createWriteStream("assets/default-cards-updated.json");
+        const update_request = https.get(update_url, function(response) {
+            response.pipe(update_file);
+            update_file.on("finish", () => {
+                update_file.close();
+                console.log('scryfall update downloaded');
+            })
+        });
+    }
+});
+
 
 let rawscryfalldata = fs.readFileSync('assets/default-cards.json');
 let scryfalldata = JSON.parse(rawscryfalldata);
