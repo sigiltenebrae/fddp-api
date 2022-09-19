@@ -36,31 +36,31 @@ app.post('/', (request, response) => {
     response.json({ info: 'API endpoint for EDFDDP' });
 });
 
-axios.get('https://api.scryfall.com/bulk-data').then( res => {
-    console.log(res.data);
-    let update_url = '';
-    for (let bulk of res.data.data) {
-        if (bulk.type === 'default_cards') {
-            update_url = bulk.download_uri;
-            break;
+
+function updateDB() {
+    axios.get('https://api.scryfall.com/bulk-data').then( res => {
+        let update_url = '';
+        for (let bulk of res.data.data) {
+            if (bulk.type === 'default_cards') {
+                update_url = bulk.download_uri;
+                break;
+            }
         }
-    }
-    if (update_url !== '') {
-        console.log(update_url);
-        const update_file = fs.createWriteStream("assets/default-cards-updated.json");
-        const update_request = https.get(update_url, function(response) {
-            response.pipe(update_file);
-            update_file.on("finish", () => {
-                update_file.close();
-                console.log('scryfall update downloaded');
-            })
-        });
-    }
-});
-
-
-let rawscryfalldata = fs.readFileSync('assets/default-cards.json');
-let scryfalldata = JSON.parse(rawscryfalldata);
+        if (update_url !== '') {
+            console.log(update_url);
+            const update_file = fs.createWriteStream("assets/default-cards.json");
+            const update_request = https.get(update_url, function(response) {
+                response.pipe(update_file);
+                update_file.on("finish", () => {
+                    update_file.close();
+                    console.log('scryfall update downloaded');
+                    rawscryfalldata = fs.readFileSync('assets/default-cards.json');
+                    scryfalldata = JSON.parse(rawscryfalldata);
+                });
+            });
+        }
+    });
+}
 
 getCardInfo = (request, response) => {
     const card_name = request.body.name;
@@ -268,6 +268,12 @@ app.post('/api/games', fddpdb.createGame);
 app.put('/api/games/start/:id', fddpdb.startGame);
 app.put('/api/games/:id', fddpdb.updateGame);
 
+
+
+let rawscryfalldata = fs.readFileSync('assets/default-cards.json');
+let scryfalldata = JSON.parse(rawscryfalldata);
+updateDB();
+setInterval(updateDB, 60000 * 60 * 24);
 app.listen(port, () => {
     console.log(`App running on port ${port}.`);
 });
