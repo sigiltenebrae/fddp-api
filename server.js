@@ -91,11 +91,11 @@ function getCardScryfallData(card_name) {
     out_card.back_images = [];
     for (let card of scryfalldata) {
         if (card.name.toLowerCase() === card_name.toLowerCase()) {
-            //console.log(card);
             out_card.name = card.name;
             if (card.card_faces && card.card_faces.length === 2){
                 out_card.back_face = true;
                 out_card.mana_cost = card.card_faces[0].mana_cost? card.card_faces[0].mana_cost.replace(/[^a-zA-Z0-9 ]/g, '').split('').filter(element => element): null;
+                out_card.color_identity = card.card_faces[0].color_identity? card.card_faces[0].color_identity.join('').replace(/[^a-zA-Z0-9 ]/g, '').split('').filter(element => element): null;
                 out_card.back_mana_cost = card.card_faces[1].mana_cost? card.card_faces[1].mana_cost.replace(/[^a-zA-Z0-9 ]/g, '').split('').filter(element => element): null;
                 out_card.types = card.card_faces[0].type_line.replace(/[^a-zA-Z0-9 ]/g, '').split(' ').filter(element => element);
                 out_card.back_types = card.card_faces[1].type_line.replace(/[^a-zA-Z0-9 ]/g, '').split(' ').filter(element => element);
@@ -110,6 +110,7 @@ function getCardScryfallData(card_name) {
             }
             else{
                 out_card.back_face = false;
+                out_card.color_identity = card.color_identity? card.color_identity.join('').replace(/[^a-zA-Z0-9 ]/g, '').split('').filter(element => element): null;
                 out_card.mana_cost = card.mana_cost? card.mana_cost.replace(/[^a-zA-Z0-9 ]/g, '').split('').filter(element => element): null;
                 out_card.back_mana_cost = null;
                 out_card.types = card.type_line.replace(/[^a-zA-Z0-9 ]/g, '').split(' ').filter(element => element);
@@ -171,6 +172,7 @@ getDeckForPlay = (request, response) => {
 
                     card.back_face = card_data.back_face ? card_data.back_face: false;
                     card.mana_cost = card_data.mana_cost ? card_data.mana_cost: [];
+                    card.color_identity = card_data.color_identity ? card_data.color_identity: [];
                     card.back_mana_cost = card_data.back_mana_cost ? card_data.back_mana_cost: [];
                     card.types = card_data.types ? card_data.types: [];
                     card.back_types = card_data.back_types ? card_data.back_types: [];
