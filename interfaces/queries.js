@@ -1,5 +1,5 @@
 const config = require("../config/db.config.js");
-const {request} = require("express");
+const {request, response} = require("express");
 const Pool = require('pg').Pool
 const pool = new Pool({
     user: config.USER,
@@ -423,7 +423,7 @@ exports.createGame = (request, response) => {
     if (request.body && request.body.game) {
         console.log('creating game');
         const game = request.body.game;
-        pool.query('INSERT INTO games (name, type, max_players) VALUES ($1, $2, $3) RETURNING *',
+        pool.query('INSERT INTO games (name, type, max_players, active) VALUES ($1, $2, $3, true) RETURNING *',
             [game.name, game.type, game.max_players],
             (error, results) => {
                 if (error) {
@@ -468,12 +468,12 @@ exports.updateGame = (request, response) => {
             [game.active, game.winner, game.winner_two, game.game_data, game.id],
             (error, results) => {
                 if (error) {
-                    console.log('Game update failed for deck with id: ' + id);
+                    console.log('Game update failed for deck with id: ' + game.id);
                     console.log(error);
                     return response.json({errors: [error]});
                 }
                 else {
-                    console.log('game updated with id ' + id)
+                    console.log('game updated with id ' + game.id)
                     return response.json({message: 'game update successful'});
                 }
             })
