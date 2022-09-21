@@ -59,6 +59,8 @@ function updateDB() {
                 });
             });
         }
+    }).catch(function (error) {
+        console.log('error updating the local scryfall db');
     });
 }
 
@@ -121,7 +123,7 @@ function getCardScryfallData(card_name) {
             if (card.card_faces && card.card_faces.length === 2){
                 out_card.back_face = true;
                 out_card.mana_cost = card.card_faces[0].mana_cost? card.card_faces[0].mana_cost.replace(/[^a-zA-Z0-9 ]/g, '').split('').filter(element => element): null;
-                out_card.color_identity = card.card_faces[0].color_identity? card.card_faces[0].color_identity.join('').replace(/[^a-zA-Z0-9 ]/g, '').split('').filter(element => element): null;
+                out_card.color_identity = card.color_identity? card.color_identity.join('').replace(/[^a-zA-Z0-9 ]/g, '').split('').filter(element => element): null;
                 out_card.back_mana_cost = card.card_faces[1].mana_cost? card.card_faces[1].mana_cost.replace(/[^a-zA-Z0-9 ]/g, '').split('').filter(element => element): null;
                 out_card.types = card.card_faces[0].type_line.replace(/[^a-zA-Z0-9 ]/g, '').split(' ').filter(element => element);
                 out_card.back_types = card.card_faces[1].type_line.replace(/[^a-zA-Z0-9 ]/g, '').split(' ').filter(element => element);
@@ -229,7 +231,7 @@ getDeckForPlay = (request, response) => {
                         token.power = token_data.power ? Number(token_data.power): null;
                         token.toughness = token_data.toughness ? Number(token_data.toughness): null;
                     });
-                    console.log('compiled deck');
+                    console.log('compiled deck ' + deck.name);
                     return response.json(deck);
                 });
             });
