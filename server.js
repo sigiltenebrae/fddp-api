@@ -69,6 +69,10 @@ getCardInfo = (request, response) => {
     response.json(getCardScryfallData(card_name));
 }
 
+getPlanesApi = (request, response) => {
+    return response.json(getPlanes());
+}
+
 getCardImages = (request, response) => {
     const card_name = request.body.name;
     console.log('Getting images for: ' + card_name);
@@ -111,6 +115,22 @@ getCardImages = (request, response) => {
         }
     })
 
+}
+
+function getPlanes() {
+    console.log('getting planes');
+    let planes = [];
+    for (let card of scryfalldata) {
+        if (card.type_line) {
+            let types = card.type_line.replace(/[^a-zA-Z0-9 ]/g, '').split(' ').filter(element => element);
+            if (types.includes('Plane')) {
+                planes.push(card.name);
+            }
+        }
+    }
+    console.log('got planes');
+    console.log(planes);
+    return planes;
 }
 
 function getCardScryfallData(card_name) {
@@ -269,6 +289,8 @@ app.get('/api/games/:id', fddpdb.getGameById);
 app.post('/api/games', fddpdb.createGame);
 app.put('/api/games/start/:id', fddpdb.startGame);
 app.put('/api/games/:id', fddpdb.updateGame);
+
+app.get('/api/planes', getPlanesApi);
 
 
 
