@@ -128,8 +128,6 @@ function getPlanes() {
             }
         }
     }
-    console.log('got planes');
-    console.log(planes);
     return planes;
 }
 
