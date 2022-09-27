@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
+const https = require("https");
 const fs = require('fs');
 const axios = require('axios');
 
@@ -14,11 +15,11 @@ const pool = new Pool({
     port: 5432,
 });
 
-const fddpdb = require('./interfaces/queries');
-const {response} = require("express");
-const {getUsers, deleteCustomCard} = require("./interfaces/queries");
-const http = require("http");
-const https = require("https");
+const decksdb = require('./interfaces/decks');
+const gamesdb = require('./interfaces/games');
+const usersdb = require('./interfaces/users');
+const customsdb = require('./interfaces/custom_cards');
+const authdb = require('./interfaces/auth');
 
 const app = express();
 const port = 2999;
@@ -261,32 +262,36 @@ getDeckForPlay = (request, response) => {
     });
 }
 
-app.get('/api/users', getUsers);
+app.post('/api/auth/signup', authdb.signup);
+app.post('/api/auth/signin', authdb.signin);
+app.post('/api/auth/change_password', authdb.changepassword);
+
+app.get('/api/users', usersdb.getUsers);
 
 app.post('/api/cards', getCardInfo);
 app.post('/api/cards/images', getCardImages);
 
-app.get('/api/userdecks/basic/:id', fddpdb.getDecksForUserBasic);
-app.get('/api/decks/basic', fddpdb.getAllDecksBasic);
+app.get('/api/userdecks/basic/:id', decksdb.getDecksForUserBasic);
+app.get('/api/decks/basic', decksdb.getAllDecksBasic);
 
-app.post('/api/decks', fddpdb.createDeck);
-app.get('/api/decks/:id', fddpdb.getDeck);
-app.put('/api/decks/:id', fddpdb.updateDeck);
-app.delete('/api/decks/:id', fddpdb.deleteDeck);
-
-app.post('/api/custom_cards', fddpdb.createCustomCard);
-app.get('/api/custom_cards', fddpdb.getCustomCards);
-app.delete('/api/custom_cards/:id', deleteCustomCard)
-
+app.post('/api/decks', decksdb.createDeck);
+app.get('/api/decks/:id', decksdb.getDeck);
+app.put('/api/decks/:id', decksdb.updateDeck);
+app.delete('/api/decks/:id', decksdb.deleteDeck);
 app.get('/api/game/deck/:id', getDeckForPlay);
 
-app.get('/api/games/types', fddpdb.getGameTypes);
-app.get('/api/games/', fddpdb.getGames);
-app.get('/api/games/active', fddpdb.getActiveGames);
-app.get('/api/games/:id', fddpdb.getGameById);
-app.post('/api/games', fddpdb.createGame);
-app.put('/api/games/start/:id', fddpdb.startGame);
-app.put('/api/games/:id', fddpdb.updateGame);
+
+app.post('/api/custom_cards', customsdb.createCustomCard);
+app.get('/api/custom_cards', customsdb.getCustomCards);
+app.delete('/api/custom_cards/:id', customsdb.deleteCustomCard)
+
+app.get('/api/games/types', gamesdb.getGameTypes);
+app.get('/api/games/', gamesdb.getGames);
+app.get('/api/games/active', gamesdb.getActiveGames);
+app.get('/api/games/:id', gamesdb.getGameById);
+app.post('/api/games', gamesdb.createGame);
+app.put('/api/games/start/:id', gamesdb.startGame);
+app.put('/api/games/:id', gamesdb.updateGame);
 
 app.get('/api/planes', getPlanesApi);
 
