@@ -65,6 +65,78 @@ function updateDB() {
     });
 }
 
+
+
+getCheapCards = (request, response) => {
+    response.json(getCheapCardsList());
+}
+
+getCheapCommanders = (request, response) => {
+    response.json(getCommandersFromList(getCheapCardsList()));
+}
+
+function getCheapCardsList() {
+    let cheaps = [];
+    for (let card of scryfalldata) {
+        if (card.prices != null && card.prices) {
+            let cheapest = 5000;
+            cheapest = card.prices.usd != null && Number(card.prices.usd) > 0 && Number(card.prices.usd) < cheapest ? Number(card.prices.usd) : cheapest
+            cheapest = card.prices.usd_foil != null && Number(card.prices.usd_foil) > 0 && Number(card.prices.usd_foil) < cheapest ? Number(card.prices.usd_foil) : cheapest
+            cheapest = card.prices.usd_etched != null && Number(card.prices.usd_etched) > 0 && Number(card.prices.usd_etched) < cheapest ? Number(card.prices.usd_etched) : cheapest
+            if (cheapest > 0 && cheapest < 0.5) {
+                const inArray = cheaps.some(element => {
+                    return element.name === card.name;
+                });
+                if (!inArray) {
+                    if (card.legalities != null && card.legalities.commander != null && card.legalities.commander === 'legal') {
+                        cheaps.push(card);
+                    }
+                }
+            }
+        }
+    }
+    return cheaps;
+}
+
+function getCommandersFromList(list) {
+    let commanders = [];
+    for (let card of list) {
+        if (card.type_line != null && card.type_line.includes("Legendary") && card.type_line.includes("Creature")) {
+            commanders.push(card);
+        }
+        else if (card.type_line != null && card.type_line.includes("Background")) {
+            commanders.push(card);
+        }
+        else if (card.card_faces != null && card.card_faces.length > 0 && card.card_faces[0].type_line != null &&
+            card.card_faces[0].type_line.includes("Legendary") && card.card_faces[0].type_line.includes("Creature")) {
+            commanders.push(card);
+        }
+        else if (card.oracle_text != null && card.oracle_text.includes("can be your commander")) {
+            commanders.push(card);
+        }
+        else if (card.card_faces != null && card.card_faces.length > 0 && card.card_faces[0].oracle_text != null &&
+            card.card_faces[0].oracle_text.includes("can be your commander")) {
+            commanders.push(card);
+        }
+    }
+    return commanders;
+}
+
+function getAllOfCard(card_name) {
+    let card_data = [];
+    for (let card of scryfalldata) {
+        if (card.name.toLowerCase() === card_name.toLowerCase()) {
+            card_data.push(card);
+        }
+    }
+    return card_data;
+}
+
+debugGetCard = (request, response) => {
+    const card_name = request.body.name;
+    response.json(getAllOfCard(card_name));
+}
+
 getCardInfo = (request, response) => {
     const card_name = request.body.name;
     response.json(getCardScryfallData(card_name));
@@ -141,34 +213,34 @@ function getCardScryfallData(card_name) {
             out_card.name = card.name;
             if (card.card_faces && card.card_faces.length === 2){
                 out_card.back_face = true;
-                out_card.mana_cost = card.card_faces[0].mana_cost? card.card_faces[0].mana_cost.replace(/[^a-zA-Z0-9 ]/g, '').split('').filter(element => element): null;
-                out_card.color_identity = card.color_identity? card.color_identity.join('').replace(/[^a-zA-Z0-9 ]/g, '').split('').filter(element => element): null;
-                out_card.back_mana_cost = card.card_faces[1].mana_cost? card.card_faces[1].mana_cost.replace(/[^a-zA-Z0-9 ]/g, '').split('').filter(element => element): null;
+                out_card.mana_cost = card.card_faces[0].mana_cost != null? card.card_faces[0].mana_cost.replace(/[^a-zA-Z0-9 ]/g, '').split('').filter(element => element): null;
+                out_card.color_identity = card.color_identity != null? card.color_identity.join('').replace(/[^a-zA-Z0-9 ]/g, '').split('').filter(element => element): null;
+                out_card.back_mana_cost = card.card_faces[1].mana_cost != null ? card.card_faces[1].mana_cost.replace(/[^a-zA-Z0-9 ]/g, '').split('').filter(element => element): null;
                 out_card.types = card.card_faces[0].type_line.replace(/[^a-zA-Z0-9 ]/g, '').split(' ').filter(element => element);
                 out_card.back_types = card.card_faces[1].type_line.replace(/[^a-zA-Z0-9 ]/g, '').split(' ').filter(element => element);
                 out_card.oracle_text = card.card_faces[0].oracle_text;
                 out_card.back_oracle_text = card.card_faces[1].oracle_text;
-                out_card.power = card.card_faces[0].power ? Number(card.card_faces[0].power): null;
-                out_card.back_power = card.card_faces[1].power ? Number(card.card_faces[1].power): null;
-                out_card.toughness = card.card_faces[0].toughness ? Number(card.card_faces[0].toughness): null;
-                out_card.back_toughness = card.card_faces[1].toughness ? Number(card.card_faces[1].toughness): null;
-                out_card.loyalty = card.card_faces[0].loyalty ? Number(card.card_faces[0].loyalty): null;
-                out_card.back_loyalty = card.card_faces[1].loyalty ? Number(card.card_faces[1].loyalty): null;
+                out_card.power = card.card_faces[0].power != null ? Number(card.card_faces[0].power): null;
+                out_card.back_power = card.card_faces[1].power != null ? Number(card.card_faces[1].power): null;
+                out_card.toughness = card.card_faces[0].toughness != null ? Number(card.card_faces[0].toughness): null;
+                out_card.back_toughness = card.card_faces[1].toughness != null ? Number(card.card_faces[1].toughness): null;
+                out_card.loyalty = card.card_faces[0].loyalty != null ? Number(card.card_faces[0].loyalty): null;
+                out_card.back_loyalty = card.card_faces[1].loyalty != null ? Number(card.card_faces[1].loyalty): null;
             }
             else{
                 out_card.back_face = false;
-                out_card.color_identity = card.color_identity? card.color_identity.join('').replace(/[^a-zA-Z0-9 ]/g, '').split('').filter(element => element): null;
-                out_card.mana_cost = card.mana_cost? card.mana_cost.replace(/[^a-zA-Z0-9 ]/g, '').split('').filter(element => element): null;
+                out_card.color_identity = card.color_identity != null? card.color_identity.join('').replace(/[^a-zA-Z0-9 ]/g, '').split('').filter(element => element): null;
+                out_card.mana_cost = card.mana_cost != null ? card.mana_cost.replace(/[^a-zA-Z0-9 ]/g, '').split('').filter(element => element): null;
                 out_card.back_mana_cost = null;
                 out_card.types = card.type_line.replace(/[^a-zA-Z0-9 ]/g, '').split(' ').filter(element => element);
                 out_card.back_types = null;
                 out_card.oracle_text = card.oracle_text;
                 out_card.back_oracle_text = null;
-                out_card.power = card.power ? Number(card.power): null;
+                out_card.power = card.power != null ? Number(card.power): null;
                 out_card.back_power = null;
-                out_card.toughness = card.toughness ? Number(card.toughness): null;
+                out_card.toughness = card.toughness != null ? Number(card.toughness): null;
                 out_card.back_toughness = null;
-                out_card.loyalty = card.loyalty ? Number(card.loyalty): null;
+                out_card.loyalty = card.loyalty != null ? Number(card.loyalty): null;
                 out_card.back_loyalty = null;
             }
             out_card.cmc = card.cmc;
@@ -269,7 +341,11 @@ app.post('/api/auth/change_password', authdb.changepassword);
 app.get('/api/users', usersdb.getUsers);
 
 app.post('/api/cards', getCardInfo);
+app.post('/api/debug/cards', debugGetCard);
 app.post('/api/cards/images', getCardImages);
+
+app.get('/api/cheap/cards', getCheapCards);
+app.get('/api/cheap/commanders', getCheapCommanders);
 
 app.get('/api/userdecks/basic/:id', decksdb.getDecksForUserBasic);
 app.get('/api/decks/basic', decksdb.getAllDecksBasic);
