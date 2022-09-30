@@ -13,8 +13,9 @@ exports.createCustomCard = (request, response) => {
     if (request.body && request.body.image && request.body.name) {
         const image = request.body.image;
         const name = request.body.name;
-        pool.query('INSERT INTO custom_cards (name, image) VALUES($1, $2)',
-            [name, image],
+        const creator = request.body.creator;
+        pool.query('INSERT INTO custom_cards (name, image, creator) VALUES($1, $2, $3)',
+            [name, image, creator],
             (error, results) => {
                 if (error) {
                     console.log('custom card creation failed');
@@ -22,7 +23,7 @@ exports.createCustomCard = (request, response) => {
                     return response.json({errors: [error]});
                 }
                 console.log('custom card created successfully');
-                return response.json({message: 'custom card created successfully'});
+                return response.status(200).send({message: 'custom card created successfully'});
             });
     }
     else {

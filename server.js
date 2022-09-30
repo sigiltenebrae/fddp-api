@@ -20,6 +20,7 @@ const gamesdb = require('./interfaces/games');
 const usersdb = require('./interfaces/users');
 const customsdb = require('./interfaces/custom_cards');
 const authdb = require('./interfaces/auth');
+const {request} = require("express");
 
 const app = express();
 const port = 2999;
@@ -63,16 +64,6 @@ function updateDB() {
     }).catch(function (error) {
         console.log('error updating the local scryfall db');
     });
-}
-
-
-
-getCheapCards = (request, response) => {
-    response.json(getCheapCardsList());
-}
-
-getCheapCommanders = (request, response) => {
-    response.json(getCommandersFromList(getCheapCardsList()));
 }
 
 function getCheapCardsList() {
@@ -122,6 +113,161 @@ function getCommandersFromList(list) {
     return commanders;
 }
 
+function getRandomCardsForCommander(commander, list) {
+    let deck = [];
+    while (deck.length < 59) {
+        let random_card = list[Math.floor(Math.random() * list.length)];
+        if (random_card.color_identity != null) {
+            let bad_card = false;
+            for (let color of random_card.color_identity) {
+                if (!commander.color_identity.includes(color)) {
+                    bad_card = true;
+                    break;
+                }
+            }
+            if (!bad_card) {
+                if (random_card.type_line != null && !random_card.type_line.includes("Land")) {
+                    const inArray = deck.some(element => {
+                        return element.name === random_card.name;
+                    });
+                    if (!inArray) {
+                        deck.push(random_card);
+                    }
+                }
+            }
+        }
+    }
+    return deck;
+}
+
+function getRandomLandsForCommander(commander, list) {
+    let land_list = [];
+    let random_lands = [];
+    for (let card of list) {
+        if (card.type_line != null && card.type_line.includes("Land")  && !card.type_line.includes("Basic")) {
+            land_list.push(card);
+        }
+    }
+    while (random_lands.length < 10) {
+        let random_land = land_list[Math.floor(Math.random() * land_list.length)];
+        if (random_land.color_identity != null) {
+            let bad_card = false;
+            for (let color of random_land.color_identity) {
+                if (!commander.color_identity.includes(color)) {
+                    bad_card = true;
+                    break;
+                }
+            }
+            if (!bad_card) {
+                const inArray = random_lands.some(element => {
+                    return element.name === random_land.name;
+                });
+                if (!inArray) {
+                    random_lands.push(random_land);
+                }
+            }
+        }
+    }
+    return random_lands;
+}
+
+function getBasicsForDeck(deck) {
+    let basics = [];
+    let w_count = 0;
+    let u_count = 0;
+    let b_count = 0;
+    let r_count = 0;
+    let g_count = 0;
+    for (let card of deck) {
+        if (card.mana_cost != null) {
+            w_count += (card.mana_cost.match(/{W}/g) || []).length;
+            u_count += (card.mana_cost.match(/{U}/g) || []).length;
+            b_count += (card.mana_cost.match(/{B}/g) || []).length;
+            r_count += (card.mana_cost.match(/{R}/g) || []).length;
+            g_count += (card.mana_cost.match(/{G}/g) || []).length;
+        }
+    }
+    let total_count = w_count + u_count + b_count + r_count + g_count;
+    if (w_count > 0) {
+        let plains = justGetCard('plains');
+        for (let i = 0; i < Math.floor((w_count / total_count) * 30); i++) {
+            basics.push(plains);
+        }
+    }
+    if (u_count > 0) {
+        let island = justGetCard('island');
+        for (let i = 0; i < Math.floor((u_count / total_count) * 30); i++) {
+            basics.push(island);
+        }
+    }
+    if (b_count > 0) {
+        let swamp = justGetCard('swamp');
+        for (let i = 0; i < Math.floor((b_count / total_count) * 30); i++) {
+            basics.push(swamp);
+        }
+    }
+    if (r_count > 0) {
+        let mountain = justGetCard('mountain');
+        for (let i = 0; i < Math.floor((r_count / total_count) * 30); i++) {
+            basics.push(mountain);
+        }
+    }
+    if (g_count > 0) {
+        let forest = justGetCard('forest');
+        for (let i = 0; i < Math.floor((g_count / total_count) * 30); i++) {
+            basics.push(forest);
+        }
+    }
+    if (basics.length < 30) {
+        let wastes = justGetCard('wastes');
+        for (let i = basics.length; i < 30; i++) {
+            basics.push(wastes);
+        }
+    }
+    return basics;
+}
+
+function getRandomDeck() {
+    let cheapList = getCheapCardsList();
+    let commanders_list = getCommandersFromList(cheapList);
+    let random_commander = commanders_list[Math.floor(Math.random() * commanders_list.length)];
+    let random_deck = getRandomCardsForCommander(random_commander, cheapList);
+    let random_lands = getRandomLandsForCommander(random_commander, cheapList);
+    for (let land of random_lands) {
+        random_deck.push(land);
+    }
+    let basic_lands = getBasicsForDeck(random_deck);
+    for (let land of basic_lands) {
+        random_deck.push(land);
+    }
+    random_deck.unshift(random_commander);
+    return random_deck;
+}
+
+function format_deck(deck) {
+    let card_list = [];
+    for (let card of deck) {
+        card_list.push(card.name);
+    }
+    return card_list;
+}
+
+getCheapCards = (request, response) => {
+    response.json(getCheapCardsList());
+}
+
+getCheapCommanders = (request, response) => {
+    response.json(getCommandersFromList(getCheapCardsList()));
+}
+
+getCheapDeck = (request, response) => {
+    response.json(getRandomDeck());
+}
+
+getCheapDeckList = (request, response) => {
+    response.json(format_deck(getRandomDeck()));
+}
+
 function getAllOfCard(card_name) {
     let card_data = [];
     for (let card of scryfalldata) {
@@ -130,6 +276,14 @@ function getAllOfCard(card_name) {
         }
     }
     return card_data;
+}
+
+function justGetCard(card_name) {
+    for (let card of scryfalldata) {
+        if (card.name.toLowerCase() === card_name.toLowerCase()) {
+            return card;
+        }
+    }
 }
 
 debugGetCard = (request, response) => {
@@ -341,11 +495,13 @@ app.post('/api/auth/change_password', authdb.changepassword);
 app.get('/api/users', usersdb.getUsers);
 
 app.post('/api/cards', getCardInfo);
-app.post('/api/debug/cards', debugGetCard);
+app.post('/api/cards/all', debugGetCard);
 app.post('/api/cards/images', getCardImages);
 
 app.get('/api/cheap/cards', getCheapCards);
 app.get('/api/cheap/commanders', getCheapCommanders);
+app.get('/api/cheap/randomdeck', getCheapDeck);
+app.get('/api/cheap/randomdecklist', getCheapDeckList);
 
 app.get('/api/userdecks/basic/:id', decksdb.getDecksForUserBasic);
 app.get('/api/decks/basic', decksdb.getAllDecksBasic);
