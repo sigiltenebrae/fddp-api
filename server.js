@@ -360,6 +360,14 @@ function getPlanes() {
     return planes;
 }
 
+function getCardById(id) {
+    for (let card of scryfalldata) {
+        if (card.id === id) {
+            return card;
+        }
+    }
+}
+
 function getCardScryfallData(card_name) {
     let out_card = {};
     out_card.images = [];
@@ -404,10 +412,17 @@ function getCardScryfallData(card_name) {
                 let tokens = [];
                 for (let part of card.all_parts) {
                     if (part.component === 'token' || part.type_line.includes('Emblem')) {
+                        //tokens.push({name: part.name, types: part.type_line.replace(/[^a-zA-Z0-9 ]/g, '').split(' ').filter(element => element),})
+                        let token_data = getCardById(part.id);
                         tokens.push(
                             {
-                                name: part.name,
-                                types: part.type_line.replace(/[^a-zA-Z0-9 ]/g, '').split(' ').filter(element => element),
+                                name: token_data.name,
+                                types: token_data.type_line.replace(/[^a-zA-Z0-9 ]/g, '').split(' ').filter(element => element),
+                                oracle_text: token_data.oracle_text,
+                                power: token_data.power != null? token_data.power : null,
+                                toughness: token_data.toughness != null? token_data.toughness : null,
+                                colors: token_data.colors,
+                                image: token_data.image_uris.png
                             }
                         )
                     }
