@@ -49,7 +49,6 @@ function updateDB() {
             }
         }
         if (update_url !== '') {
-            console.log(update_url);
             const update_file = fs.createWriteStream("assets/default-cards.json");
             const update_request = https.get(update_url, function(response) {
                 response.pipe(update_file);
@@ -528,9 +527,10 @@ app.put('/api/games/:id', gamesdb.updateGame);
 app.get('/api/planes', getPlanesApi);
 
 
-
-let rawscryfalldata = fs.readFileSync('assets/default-cards.json');
-let scryfalldata = JSON.parse(rawscryfalldata);
+if (fs.existsSync('assets/default-cards.json')) {
+    let rawscryfalldata = fs.readFileSync('assets/default-cards.json');
+    let scryfalldata = JSON.parse(rawscryfalldata);
+}
 updateDB();
 setInterval(updateDB, 60000 * 60 * 24);
 app.listen(port, () => {
