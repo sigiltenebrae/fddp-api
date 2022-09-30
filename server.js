@@ -49,6 +49,9 @@ function updateDB() {
             }
         }
         if (update_url !== '') {
+            if (!fs.existsSync('assets')){
+                fs.mkdirSync('assets');
+            }
             const update_file = fs.createWriteStream("assets/default-cards.json");
             const update_request = https.get(update_url, function(response) {
                 response.pipe(update_file);
