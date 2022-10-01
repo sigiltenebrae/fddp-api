@@ -502,6 +502,13 @@ function getCardScryfallData(card_name) {
     return {};
 }
 
+getArchidektDeck = (request, response) =>{
+    const id = request.params.id;
+    axios.get('https://archidekt.com/api/decks/' + id + '/').then( res => {
+        response.json(res.data);
+    })
+}
+
 getDeckForPlay = (request, response) => {
     const id = parseInt(request.params.id);
     pool.query('SELECT * FROM decks where id = $1', [id], (error, results) => {
@@ -589,6 +596,8 @@ app.get('/api/cheap/randomdecklist', getCheapDeckList);
 
 app.get('/api/userdecks/basic/:id', decksdb.getDecksForUserBasic);
 app.get('/api/decks/basic', decksdb.getAllDecksBasic);
+
+app.get('/api/archidekt/deck/:id', getArchidektDeck);
 
 app.post('/api/decks', decksdb.createDeck);
 app.get('/api/decks/:id', decksdb.getDeck);
