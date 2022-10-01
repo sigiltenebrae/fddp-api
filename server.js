@@ -419,8 +419,8 @@ function getCardScryfallData(card_name) {
                                 name: token_data.name,
                                 types: token_data.type_line.replace(/[^a-zA-Z0-9 ]/g, '').split(' ').filter(element => element),
                                 oracle_text: token_data.oracle_text,
-                                power: token_data.power != null? token_data.power : null,
-                                toughness: token_data.toughness != null? token_data.toughness : null,
+                                power: token_data.power != null? Number(token_data.power) : null,
+                                toughness: token_data.toughness != null? Number(token_data.toughness) : null,
                                 colors: token_data.colors,
                                 image: token_data.image_uris.png
                             }
