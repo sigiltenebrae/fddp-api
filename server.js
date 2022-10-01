@@ -330,12 +330,12 @@ getAllOfToken = (request, response) => {
                         name: card.name,
                         image: card.image,
                         types: card.type_line.replace(/[^a-zA-Z0-9 ]/g, '').split(' ').filter(element => element),
-                        power: card.power != null? Number(card_data.power): null,
-                        toughness: card.toughness != null? Number(card_data.toughness): null,
+                        power: card.power != null? Number(card.power): null,
+                        toughness: card.toughness != null? Number(card.toughness): null,
                         oracle_text: card.oracle_text,
                         colors: colors
                     }
-                )
+                );
             });
             return response.json(card_data);
         }
@@ -596,6 +596,10 @@ app.get('/api/game/deck/:id', getDeckForPlay);
 app.post('/api/custom_cards', customsdb.createCustomCard);
 app.get('/api/custom_cards', customsdb.getCustomCards);
 app.delete('/api/custom_cards/:id', customsdb.deleteCustomCard)
+
+app.post('/api/custom_tokens', customsdb.createCustomToken);
+app.get('/api/custom_tokens', customsdb.getCustomTokens);
+app.delete('/api/custom_tokens/:id', customsdb.deleteCustomToken);
 
 app.get('/api/games/types', gamesdb.getGameTypes);
 app.get('/api/games/', gamesdb.getGames);
