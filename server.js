@@ -292,8 +292,8 @@ function getAllOfCardFormatted(card_name) {
                 name: card.name,
                 image: card.image_uris != null && card.image_uris.png != null? card.image_uris.png: null,
                 types: card.type_line.replace(/[^a-zA-Z0-9 ]/g, '').split(' ').filter(element => element),
-                power: card.power != null? Number(card.power): null,
-                toughness: card.toughness != null? Number(card.toughness): null,
+                power: card.power != null && card.power !== '*'? Number(card.power): card.power === '*'? 0: null,
+                toughness: card.toughness != null && card.toughness !== '*'? Number(card.toughness): card.toughness === '*'? 0: null,
                 oracle_text: card.oracle_text,
                 colors: card.colors
             });
@@ -330,8 +330,8 @@ getAllOfToken = (request, response) => {
                         name: card.name,
                         image: card.image,
                         types: card.type_line.replace(/[^a-zA-Z0-9 ]/g, '').split(' ').filter(element => element),
-                        power: card.power != null? Number(card.power): null,
-                        toughness: card.toughness != null? Number(card.toughness): null,
+                        power: card.power != null && card.power !== '*'? Number(card.power): card.power === '*' ? 0: null,
+                        toughness: card.toughness != null && card.toughness !== '*'? Number(card.toughness): card.toughness === '*' ? 0: null,
                         oracle_text: card.oracle_text,
                         colors: colors
                     }
@@ -446,10 +446,10 @@ function getCardScryfallData(card_name) {
                 out_card.back_types = card.card_faces[1].type_line.replace(/[^a-zA-Z0-9 ]/g, '').split(' ').filter(element => element);
                 out_card.oracle_text = card.card_faces[0].oracle_text;
                 out_card.back_oracle_text = card.card_faces[1].oracle_text;
-                out_card.power = card.card_faces[0].power != null ? Number(card.card_faces[0].power): null;
-                out_card.back_power = card.card_faces[1].power != null ? Number(card.card_faces[1].power): null;
-                out_card.toughness = card.card_faces[0].toughness != null ? Number(card.card_faces[0].toughness): null;
-                out_card.back_toughness = card.card_faces[1].toughness != null ? Number(card.card_faces[1].toughness): null;
+                out_card.power = card.card_faces[0].power != null && card.card_faces[0].power !== '*' ? Number(card.card_faces[0].power): card.card_faces[0].power === '*'? 0: null;
+                out_card.back_power = card.card_faces[1].power != null && card.card_faces[1].power !== '*' ? Number(card.card_faces[1].power): card.card_faces[1].power === '*'? 0: null;
+                out_card.toughness = card.card_faces[0].toughness != null && card.card_faces[0].toughness !== '*' ? Number(card.card_faces[0].toughness): card.card_faces[0].toughness === '*'? 0: null;
+                out_card.back_toughness = card.card_faces[1].toughness != null && card.card_faces[1].toughness !== '*' ? Number(card.card_faces[1].toughness): card.card_faces[1].toughness === '*' ? 0: null;
                 out_card.loyalty = card.card_faces[0].loyalty != null ? Number(card.card_faces[0].loyalty): null;
                 out_card.back_loyalty = card.card_faces[1].loyalty != null ? Number(card.card_faces[1].loyalty): null;
             }
@@ -462,9 +462,9 @@ function getCardScryfallData(card_name) {
                 out_card.back_types = null;
                 out_card.oracle_text = card.oracle_text;
                 out_card.back_oracle_text = null;
-                out_card.power = card.power != null ? Number(card.power): null;
+                out_card.power = card.power != null && card.power !== '*' ? Number(card.power): card.power === '*' ? 0: null;
                 out_card.back_power = null;
-                out_card.toughness = card.toughness != null ? Number(card.toughness): null;
+                out_card.toughness = card.toughness != null && card.toughness !== '*' ? Number(card.toughness): card.toughness === '*'? 0: null;
                 out_card.back_toughness = null;
                 out_card.loyalty = card.loyalty != null ? Number(card.loyalty): null;
                 out_card.back_loyalty = null;
@@ -481,8 +481,8 @@ function getCardScryfallData(card_name) {
                                 name: token_data.name,
                                 types: token_data.type_line.replace(/[^a-zA-Z0-9 ]/g, '').split(' ').filter(element => element),
                                 oracle_text: token_data.oracle_text,
-                                power: token_data.power != null? Number(token_data.power) : null,
-                                toughness: token_data.toughness != null? Number(token_data.toughness) : null,
+                                power: token_data.power != null && token_data.power !== '*' ? Number(token_data.power) : token_data.power === '*'? 0: null,
+                                toughness: token_data.toughness != null && token_data.toughness !== '*' ? Number(token_data.toughness) : token_data.toughness === '*'? 0: null,
                                 colors: token_data.colors,
                                 image: token_data.image_uris.png
                             }
@@ -530,13 +530,13 @@ getDeckForPlay = (request, response) => {
                     card.back_types = card_data.back_types ? card_data.back_types: [];
                     card.oracle_text = card_data.oracle_text ? card_data.oracle_text: '';
                     card.back_oracle_text = card_data.back_oracle_text ? card_data.back_oracle_text: '';
-                    card.power = card_data.power ? Number(card_data.power): null;
-                    card.back_power = card_data.back_power ? Number(card_data.back_power): null;
-                    card.toughness = card_data.toughness ? Number(card_data.toughness): null;
-                    card.back_toughness = card_data.back_toughness ? Number(card_data.back_toughness): null;
-                    card.loyalty = card_data.loyalty ? Number(card_data.loyalty): null;
-                    card.back_loyalty = card_data.back_loyalty ? Number(card_data.back_loyalty): null;
-                    card.cmc = card_data.cmc ? Number(card_data.cmc): null;
+                    card.power = card_data.power != null && card_data.power !== '*' ? Number(card_data.power): card_data.power === '*' ? 0: null;
+                    card.back_power = card_data.back_power != null && card_data.back_power !== '*' ? Number(card_data.back_power): card_data.back_power === '*'? 0: null;
+                    card.toughness = card_data.toughness != null && card_data.toughness !== '*' ? Number(card_data.toughness): card_data.toughness === '*'? 0: null;
+                    card.back_toughness = card_data.back_toughness != null && card_data.back_toughness !== '*'? Number(card_data.back_toughness): card_data.back_toughness === '*' ? 0:  null;
+                    card.loyalty = card_data.loyalty != null ? Number(card_data.loyalty): null;
+                    card.back_loyalty = card_data.back_loyalty != null ? Number(card_data.back_loyalty): null;
+                    card.cmc = card_data.cmc != null ? Number(card_data.cmc): null;
                     card.tokens = card_data.tokens ? card_data.tokens: [];
                     card.gatherer = card_data.gatherer ? card_data.gatherer: null;
                 });
@@ -548,12 +548,16 @@ getDeckForPlay = (request, response) => {
                     }
                     deck.tokens = re.rows;
                     deck.tokens.forEach((token) => {
-                        let token_data = getCardScryfallData(token.name);
-
-                        token.types = token_data.types ? token_data.types: [];
-                        token.oracle_text = token_data.oracle_text ? token_data.oracle_text: null;
-                        token.power = token_data.power ? Number(token_data.power): null;
-                        token.toughness = token_data.toughness ? Number(token_data.toughness): null;
+                        token.types = token.type_line.replace(/[^a-zA-Z0-9 ]/g, '').split(' ').filter(element => element);
+                        token.power = token.power != null && token.power !== '*' ? Number(token.power) : token.power === '*' ? 0: null;
+                        token.toughness = token.toughness != null && token.toughness !== '*' ? Number(token.toughness) : token.toughness === '*'? 0: null;
+                        let colors = [];
+                        if (token.w) { colors.push("W")}
+                        if (token.u) { colors.push("U")}
+                        if (token.b) { colors.push("B")}
+                        if (token.r) { colors.push("R")}
+                        if (token.g) { colors.push("G")}
+                        token.colors = colors;
                     });
                     console.log('compiled deck ' + deck.name);
                     return response.json(deck);
