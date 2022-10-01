@@ -40,32 +40,36 @@ app.post('/', (request, response) => {
 
 
 function updateDB() {
-    axios.get('https://api.scryfall.com/bulk-data').then( res => {
-        let update_url = '';
-        for (let bulk of res.data.data) {
-            if (bulk.type === 'default_cards') {
-                update_url = bulk.download_uri;
-                break;
-            }
-        }
-        if (update_url !== '') {
-            if (!fs.existsSync('assets')){
-                fs.mkdirSync('assets');
-            }
-            const update_file = fs.createWriteStream("assets/default-cards.json");
-            const update_request = https.get(update_url, function(response) {
-                response.pipe(update_file);
-                update_file.on("finish", () => {
-                    update_file.close();
-                    console.log('scryfall update downloaded');
-                    rawscryfalldata = fs.readFileSync('assets/default-cards.json');
-                    scryfalldata = JSON.parse(rawscryfalldata);
-                });
+    return new Promise ((resolve) => {
+            axios.get('https://api.scryfall.com/bulk-data').then( res => {
+                let update_url = '';
+                for (let bulk of res.data.data) {
+                    if (bulk.type === 'default_cards') {
+                        update_url = bulk.download_uri;
+                        break;
+                    }
+                }
+                if (update_url !== '') {
+                    if (!fs.existsSync('assets')){
+                        fs.mkdirSync('assets');
+                    }
+                    const update_file = fs.createWriteStream("assets/default-cards.json");
+                    const update_request = https.get(update_url, function(response) {
+                        response.pipe(update_file);
+                        update_file.on("finish", () => {
+                            update_file.close();
+                            console.log('scryfall update downloaded');
+                            rawscryfalldata = fs.readFileSync('assets/default-cards.json');
+                            scryfalldata = JSON.parse(rawscryfalldata);
+                            resolve();
+                        });
+                    });
+                }
+            }).catch(function (error) {
+                console.log('error updating the local scryfall db');
+                resolve();
             });
-        }
-    }).catch(function (error) {
-        console.log('error updating the local scryfall db');
-    });
+        });
 }
 
 function getCheapCardsList() {
@@ -278,6 +282,64 @@ function getAllOfCard(card_name) {
         }
     }
     return card_data;
+}
+
+function getAllOfCardFormatted(card_name) {
+    let card_data = [];
+    for (let card of scryfalldata) {
+        if (card.name.toLowerCase() === card_name.toLowerCase()) {
+            card_data.push({
+                name: card.name,
+                image: card.image_uris != null && card.image_uris.png != null? card.image_uris.png: null,
+                type_line: card.type_line.replace(/[^a-zA-Z0-9 ]/g, '').split(' ').filter(element => element),
+                power: card.power != null? Number(card.power): null,
+                toughness: card.toughness != null? Number(card.toughness): null,
+                oracle_text: card.oracle_text,
+                colors: card.colors
+            });
+        }
+    }
+    return card_data;
+}
+
+/**
+ * Gets all instances of a token in Scryfall and the local db
+ */
+getAllOfToken = (request, response) => {
+    const card_name = request.body.name;
+    let card_data = getAllOfCardFormatted(card_name);
+    pool.query("SELECT * FROM custom_tokens WHERE name ILIKE '" + card_name + "'", (error, results) => {
+        if (error) {
+            console.log('Error getting custom cards for ' + card_name);
+            console.log(error);
+            return response.json(card_data);
+        }
+        if (!results.rows || results.rows.length === 0) {
+            return response.json(card_data);
+        }
+        else {
+            results.rows.forEach((card) => {
+                let colors = [];
+                if (card.w) { colors.push("W")}
+                if (card.u) { colors.push("U")}
+                if (card.b) { colors.push("B")}
+                if (card.r) { colors.push("R")}
+                if (card.g) { colors.push("G")}
+                card_data.push(
+                    {
+                        name: card.name,
+                        image: card.image,
+                        types: card.type_line.replace(/[^a-zA-Z0-9 ]/g, '').split(' ').filter(element => element),
+                        power: card.power != null? Number(card_data.power): null,
+                        toughness: card.toughness != null? Number(card_data.toughness): null,
+                        oracle_text: card.oracle_text,
+                        colors: colors
+                    }
+                )
+            });
+            return response.json(card_data);
+        }
+    });
 }
 
 function justGetCard(card_name) {
@@ -513,6 +575,7 @@ app.get('/api/users', usersdb.getUsers);
 
 app.post('/api/cards', getCardInfo);
 app.post('/api/cards/all', debugGetCard);
+app.post('/api/tokens/all', getAllOfToken);
 app.post('/api/cards/images', getCardImages);
 
 app.get('/api/cheap/cards', getCheapCards);
@@ -549,8 +612,10 @@ if (fs.existsSync('assets/default-cards.json')) {
     let rawscryfalldata = fs.readFileSync('assets/default-cards.json');
     let scryfalldata = JSON.parse(rawscryfalldata);
 }
-updateDB();
+updateDB().then(() => {
+    app.listen(port, () => {
+        console.log(`App running on port ${port}.`);
+    });
+    }
+);
 setInterval(updateDB, 60000 * 60 * 24);
-app.listen(port, () => {
-    console.log(`App running on port ${port}.`);
-});
