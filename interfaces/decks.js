@@ -40,8 +40,11 @@ exports.createDeck = (request, response) => {
                                 });
                         }
                         for (let token of deck.tokens) {
-                            pool.query('INSERT INTO deck_tokens (deckid, name, image) VALUES($1, $2, $3)',
-                                [new_id, token.name, token.image],
+                            pool.query('INSERT INTO deck_tokens (deckid, name, image, type_line, oracle_text, power, toughness, w, u, b, r, g) ' +
+                                'VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)',
+                                [new_id, token.name, token.image, token.types.join(' '), token.oracle_text, token.power, token.toughness,
+                                    token.colors.includes("W"), token.colors.includes("U"), token.colors.includes("B"),
+                                    token.colors.includes("R"), token.colors.includes("G")],
                                 (err, res) => {
                                     if (err) {
                                         console.log('Token create failed for deck with id: ' + new_id);
@@ -105,28 +108,18 @@ exports.updateDeck = (request, response) => {
                             }
                         }
                         for (let token of deck.tokens) {
-                            if (token.id) {
-                                pool.query('UPDATE deck_tokens SET name = $1, image = $2 WHERE id = $3',
-                                    [token.name, token.image, token.id],
-                                    (err, res) => {
-                                        if (err) {
-                                            console.log('Token update failed for deck with id: ' + id);
-                                            console.log(err);
-                                            errors.push(err);
-                                        }
-                                    });
-                            }
-                            else {
-                                pool.query('INSERT INTO deck_tokens (deckid, name, image) VALUES($1, $2, $3)',
-                                    [id, token.name, token.image],
-                                    (err, res) => {
-                                        if (err) {
-                                            console.log('Token create failed for deck with id: ' + id);
-                                            console.log(err);
-                                            errors.push(err);
-                                        }
-                                    });
-                            }
+                            pool.query('INSERT INTO deck_tokens (deckid, name, image, type_line, oracle_text, power, toughness, w, u, b, r, g) ' +
+                                'VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)',
+                                [id, token.name, token.image, token.types.join(' '), token.oracle_text, token.power, token.toughness,
+                                    token.colors.includes("W"), token.colors.includes("U"), token.colors.includes("B"),
+                                    token.colors.includes("R"), token.colors.includes("G")],
+                                (err, res) => {
+                                if (err) {
+                                    console.log('Token create failed for deck with id: ' + id);
+                                    console.log(err);
+                                    errors.push(err);
+                                }
+                            });
                         }
                         if (deck.delete && deck.delete.length > 0) {
                             for (let card of deck.delete) {

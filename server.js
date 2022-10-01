@@ -291,7 +291,7 @@ function getAllOfCardFormatted(card_name) {
             card_data.push({
                 name: card.name,
                 image: card.image_uris != null && card.image_uris.png != null? card.image_uris.png: null,
-                type_line: card.type_line.replace(/[^a-zA-Z0-9 ]/g, '').split(' ').filter(element => element),
+                types: card.type_line.replace(/[^a-zA-Z0-9 ]/g, '').split(' ').filter(element => element),
                 power: card.power != null? Number(card.power): null,
                 toughness: card.toughness != null? Number(card.toughness): null,
                 oracle_text: card.oracle_text,
