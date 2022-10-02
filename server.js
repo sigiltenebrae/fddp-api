@@ -142,6 +142,7 @@ function getRandomCardsForCommander(commander, commander2, list) {
                         return element.name === random_card.name;
                     });
                     if (!inArray) {
+                        //let formatted_card = formatRandomCardData(random_card.name);
                         deck.push(random_card);
                     }
                 }
@@ -149,6 +150,20 @@ function getRandomCardsForCommander(commander, commander2, list) {
         }
     }
     return deck;
+}
+
+function formatRandomCardData(card_name) {
+    let card_data = getCardScryfallData(card_name);
+    let random_card_images = getAllCardImages(card_name);
+    card_data.image = random_card_images[Math.floor(Math.random() * random_card_images.length)];
+    card_data.power = card_data.power != null && card_data.power !== '*' ? Number(card_data.power): card_data.power === '*' ? 0: null;
+    card_data.back_power = card_data.back_power != null && card_data.back_power !== '*' ? Number(card_data.back_power): card_data.back_power === '*'? 0: null;
+    card_data.toughness = card_data.toughness != null && card_data.toughness !== '*' ? Number(card_data.toughness): card_data.toughness === '*'? 0: null;
+    card_data.back_toughness = card_data.back_toughness != null && card_data.back_toughness !== '*'? Number(card_data.back_toughness): card_data.back_toughness === '*' ? 0:  null;
+    card_data.loyalty = card_data.loyalty != null ? Number(card_data.loyalty): null;
+    card_data.back_loyalty = card_data.back_loyalty != null ? Number(card_data.back_loyalty): null;
+    card_data.cmc = card_data.cmc != null ? Number(card_data.cmc): null;
+    return card_data;
 }
 
 function getRandomLandsForCommander(commander, commander2, list) {
@@ -178,6 +193,7 @@ function getRandomLandsForCommander(commander, commander2, list) {
                     return element.name === random_land.name;
                 });
                 if (!inArray) {
+                    //let formatted_land = formatRandomCardData(random_land.name);
                     random_lands.push(random_land);
                 }
             }
@@ -204,37 +220,58 @@ function getBasicsForDeck(deck) {
     }
     let total_count = w_count + u_count + b_count + r_count + g_count;
     if (w_count > 0) {
-        let plains = justGetCard('plains');
+        //let plains = justGetCard('plains');
+        let plains = formatRandomCardData('Plains');
+        if (Math.floor(Math.random() * 100) > 75) {
+            plains = formatRandomCardData('Snow-Covered Plains');
+        }
         for (let i = 0; i < Math.floor((w_count / total_count) * 30); i++) {
             basics.push(plains);
         }
     }
     if (u_count > 0) {
-        let island = justGetCard('island');
+        //let island = justGetCard('island');
+        let island = formatRandomCardData('Island');
+        if (Math.floor(Math.random() * 100) > 75) {
+            island = formatRandomCardData('Snow-Covered Island');
+        }
         for (let i = 0; i < Math.floor((u_count / total_count) * 30); i++) {
             basics.push(island);
         }
     }
     if (b_count > 0) {
-        let swamp = justGetCard('swamp');
+        //let swamp = justGetCard('swamp');
+        let swamp = formatRandomCardData('Swamp');
+        if (Math.floor(Math.random() * 100) > 75) {
+            swamp = formatRandomCardData('Snow-Covered Swamp');
+        }
         for (let i = 0; i < Math.floor((b_count / total_count) * 30); i++) {
             basics.push(swamp);
         }
     }
     if (r_count > 0) {
-        let mountain = justGetCard('mountain');
+        //let mountain = justGetCard('mountain');
+        let mountain = formatRandomCardData('Mountain');
+        if (Math.floor(Math.random() * 100) > 75) {
+            mountain = formatRandomCardData('Snow-Covered Mountain');
+        }
         for (let i = 0; i < Math.floor((r_count / total_count) * 30); i++) {
             basics.push(mountain);
         }
     }
     if (g_count > 0) {
-        let forest = justGetCard('forest');
+        //let forest = justGetCard('forest');
+        let forest = formatRandomCardData('Forest');
+        if (Math.floor(Math.random() * 100) > 75) {
+            forest = formatRandomCardData('Snow-Covered Forest');
+        }
         for (let i = 0; i < Math.floor((g_count / total_count) * 30); i++) {
             basics.push(forest);
         }
     }
     if (basics.length < 30) {
-        let wastes = justGetCard('wastes');
+        //let wastes = justGetCard('wastes');
+        let wastes = formatRandomCardData('Wastes');
         for (let i = basics.length; i < 30; i++) {
             basics.push(wastes);
         }
@@ -376,14 +413,18 @@ function getRandomDeck() {
         random_deck.push(land);
     }
     let basic_lands = getBasicsForDeck(random_deck);
+    let final_random_deck = [];
+    for (let card of random_deck) {
+        final_random_deck.push(formatRandomCardData(card.name));
+    }
     for (let land of basic_lands) {
-        random_deck.push(land);
+        final_random_deck.push(land);
     }
     if (random_commander_2 != null) {
-        random_deck.unshift(random_commander_2);
+        final_random_deck.unshift(formatRandomCardData(random_commander_2.name));
     }
-    random_deck.unshift(random_commander);
-    return random_deck;
+    final_random_deck.unshift(formatRandomCardData(random_commander.name));
+    return final_random_deck;
 }
 
 function format_deck(deck) {
@@ -498,6 +539,34 @@ getCardInfo = (request, response) => {
 
 getPlanesApi = (request, response) => {
     return response.json(getPlanes());
+}
+
+function getAllCardImages(card_name) {
+    let images = [];
+    for (let card of scryfalldata) {
+        if (card_name.toLowerCase() === card.name.toLowerCase()) {
+            if (card.image_uris && card.image_uris.png) {
+                images.push(card.image_uris.png);
+            }
+        }
+    }
+    pool.query('SELECT * FROM custom_cards WHERE name = $1', [card_name], (error, results) => {
+        if (error) {
+            console.log('Error getting custom cards for ' + card_name);
+            console.log(error);
+            return images;
+        }
+        if (!results.rows || results.rows.length === 0) {
+            return images;
+        }
+        else {
+            results.rows.forEach((card) => {
+                images.push(card.image);
+            });
+            return images;
+        }
+    })
+    return images;
 }
 
 getCardImages = (request, response) => {
