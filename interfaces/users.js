@@ -19,3 +19,21 @@ exports.getUsers = (request, response) => {
         return response.json(results.rows);
     });
 }
+
+exports.getUser = (request, response) => {
+    const id = parseInt(request.params.id);
+    pool.query('SELECT * FROM users WHERE id = ' + id, (error, results) => {
+        if (error) {
+            console.log('Error getting users');
+            console.log(error);
+            return response.json({errors: [error]});
+        }
+        if (results.rows && results.rows.length > 0) {
+            return response.json(results.rows[0]);
+        }
+        else {
+            return response.json([]);
+        }
+
+    });
+}
