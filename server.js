@@ -433,6 +433,17 @@ function getRandomDeck() {
     return final_random_deck;
 }
 
+function getRandomDeckForPlay() {
+    let random_cards = getRandomDeck();
+    let random_deck = {};
+    random_deck.id = -1;
+    random_deck.name = "Random Deck"
+    random_deck.owner = -1;
+    random_deck.sleeves = "https://c1.scryfall.com/file/scryfall-card-backs/large/59/597b79b3-7d77-4261-871a-60dd17403388.jpg?1561757129";
+    random_deck.cards = random_cards;
+    return random_deck;
+}
+
 function format_deck(deck) {
     let card_list = [];
     for (let card of deck) {
@@ -450,7 +461,7 @@ getCheapCommanders = (request, response) => {
 }
 
 getCheapDeck = (request, response) => {
-    response.json(getRandomDeck());
+    response.json(getRandomDeckForPlay());
 }
 
 getCheapDeckList = (request, response) => {
