@@ -119,14 +119,19 @@ function getCommandersFromList(list) {
     return commanders;
 }
 
-function getRandomCardsForCommander(commander, list) {
+function getRandomCardsForCommander(commander, commander2, list) {
     let deck = [];
-    while (deck.length < 59) {
+    let size = commander2 == null? 59: 58;
+    while (deck.length < size) {
         let random_card = list[Math.floor(Math.random() * list.length)];
         if (random_card.color_identity != null) {
             let bad_card = false;
             for (let color of random_card.color_identity) {
-                if (!commander.color_identity.includes(color)) {
+                if (commander2 == null && !commander.color_identity.includes(color)) {
+                    bad_card = true;
+                    break;
+                }
+                else if (commander2 != null && !commander.color_identity.includes(color) && !commander2.color_identity.includes(color)) {
                     bad_card = true;
                     break;
                 }
@@ -146,7 +151,7 @@ function getRandomCardsForCommander(commander, list) {
     return deck;
 }
 
-function getRandomLandsForCommander(commander, list) {
+function getRandomLandsForCommander(commander, commander2, list) {
     let land_list = [];
     let random_lands = [];
     for (let card of list) {
@@ -159,7 +164,11 @@ function getRandomLandsForCommander(commander, list) {
         if (random_land.color_identity != null) {
             let bad_card = false;
             for (let color of random_land.color_identity) {
-                if (!commander.color_identity.includes(color)) {
+                if (commander2 == null && !commander.color_identity.includes(color)) {
+                    bad_card = true;
+                    break;
+                }
+                else if (commander2 != null && !commander.color_identity.includes(color) && !commander2.color_identity.includes(color)) {
                     bad_card = true;
                     break;
                 }
@@ -233,18 +242,145 @@ function getBasicsForDeck(deck) {
     return basics;
 }
 
+function getPartnersFromCommanders(comm) {
+    let partners = [];
+    for (let card of comm) {
+        if (card.keywords && card.keywords.includes("Partner")) {
+            partners.push(card);
+        }
+    }
+    return partners;
+}
+
+function getPartnerWithsFromCommanders(comm) {
+    let partners = [];
+    for (let card of comm) {
+        if (card.keywords && card.keywords.includes("Partner with")) {
+            partners.push(card);
+        }
+    }
+    return partners;
+}
+
+function getFriendsForeverCommanders(comm) {
+    let comms = [];
+    for (let card of comm) {
+        if (card.oracle_text && card.oracle_text.includes("Friends forever")) {
+            comms.push(card);
+        }
+    }
+    return comms;
+}
+
+function getCommandersForBackgrounds(comm) {
+    let comms = [];
+    for (let card of comm) {
+        if (card.oracle_text && card.oracle_text.includes("Choose a Background")) {
+            comms.push(card);
+        }
+    }
+    return comms;
+}
+
+function getBackgroundsForCommander(comm) {
+    let backs = [];
+    for (let card of comm) {
+        if (card.type_line && card.type_line.includes("Background")) {
+            backs.push(card);
+        }
+    }
+    return backs;
+}
+
 function getRandomDeck() {
     let cheapList = getCheapCardsList();
     let commanders_list = getCommandersFromList(cheapList);
     let random_commander = commanders_list[Math.floor(Math.random() * commanders_list.length)];
-    let random_deck = getRandomCardsForCommander(random_commander, cheapList);
-    let random_lands = getRandomLandsForCommander(random_commander, cheapList);
+    //let p_list = getPartnersFromCommanders(commanders_list);
+    //let random_commander = p_list[Math.floor(Math.random() * p_list.length)];
+    //let pw_list = getPartnerWithsFromCommanders(commanders_list);
+    //let random_commander = pw_list[Math.floor(Math.random() * pw_list.length)];
+    //let chooser_list = getCommandersForBackgrounds(commanders_list);
+    //let random_commander = chooser_list[Math.floor(Math.random() * chooser_list.length)];
+    //let background_list = getBackgroundsForCommander(commanders_list);
+    //let random_commander = background_list[Math.floor(Math.random() * background_list.length)];
+    //let random_commander = getAllOfCard("Faceless One")[0];
+    //let ff_list = getFriendsForeverCommanders(commanders_list);
+    //let random_commander = ff_list[Math.floor(Math.random() * ff_list.length)];
+
+
+    if (random_commander.name === "Faceless One" || random_commander.name === "The Prismatic Piper") {
+        let colors = ["W", "U", "B", "R", "G"];
+        random_commander.color_identity = [colors[Math.floor(Math.random() * colors.length)]];
+    }
+
+    let random_commander_2 = null;
+
+    if (random_commander.keywords && random_commander.keywords.includes("Partner")) {
+        let partners = getPartnersFromCommanders(commanders_list);
+        if (random_commander.keywords.includes("Partner with")) {
+            if (random_commander.all_parts != null && random_commander.all_parts.length > 0) {
+                for (let part of random_commander.all_parts) {
+                    if (part.id !== random_commander.id) {
+                        let temp_partner = getCardById(part.id);
+                        if (temp_partner.keywords && temp_partner.keywords.includes("Partner with")) {
+                            let cheapest = 200;
+                            cheapest = temp_partner.prices.usd != null && Number(temp_partner.prices.usd) > 0 && Number(temp_partner.prices.usd) < cheapest ? Number(temp_partner.prices.usd) : cheapest
+                            cheapest = temp_partner.prices.usd_foil != null && Number(temp_partner.prices.usd_foil) > 0 && Number(temp_partner.prices.usd_foil) < cheapest ? Number(temp_partner.prices.usd_foil) : cheapest
+                            cheapest = temp_partner.prices.usd_etched != null && Number(temp_partner.prices.usd_etched) > 0 && Number(temp_partner.prices.usd_etched) < cheapest ? Number(temp_partner.prices.usd_etched) : cheapest
+                            if (cheapest > 0 && cheapest < 0.5) {
+                                random_commander_2 = temp_partner;
+                            }
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        else {
+            random_commander_2 = partners[Math.floor(Math.random() * partners.length)];
+        }
+    }
+    else if (random_commander.oracle_text.includes("Friends forever")) {
+        let ff_list = getFriendsForeverCommanders(commanders_list);
+        random_commander_2 = ff_list[Math.floor(Math.random() * ff_list.length)];
+    }
+    else if (random_commander.oracle_text && random_commander.oracle_text.includes("Choose a Background") && random_commander.name !== "Faceless One") {
+        let backgrounds = getBackgroundsForCommander(commanders_list);
+        random_commander_2 = backgrounds[Math.floor(Math.random() * backgrounds.length)];
+    }
+    else if (random_commander.type_line && random_commander.type_line.includes("Background") && random_commander.name !== "Faceless One") {
+        let choosers = getCommandersForBackgrounds(commanders_list);
+        random_commander_2 = choosers[Math.floor(Math.random() * choosers.length)];
+    }
+    else if (random_commander.name === "Faceless One") {
+        if (Math.floor(Math.random() * 100) > 50) {
+            let backgrounds = getBackgroundsForCommander(commanders_list);
+            random_commander_2 = backgrounds[Math.floor(Math.random() * backgrounds.length)];
+        }
+        else {
+            let choosers = getCommandersForBackgrounds(commanders_list);
+            random_commander_2 = choosers[Math.floor(Math.random() * choosers.length)];
+        }
+    }
+    if (random_commander_2 != null) {
+        if (random_commander_2.name === "Faceless One" || random_commander_2.name === "The Prismatic Piper") {
+            let colors = ["W", "U", "B", "R", "G"];
+            random_commander_2.color_identity = [colors[Math.floor(Math.random() * colors.length)]];
+        }
+    }
+
+    let random_deck = getRandomCardsForCommander(random_commander, random_commander_2, cheapList);
+    let random_lands = getRandomLandsForCommander(random_commander, random_commander_2, cheapList);
     for (let land of random_lands) {
         random_deck.push(land);
     }
     let basic_lands = getBasicsForDeck(random_deck);
     for (let land of basic_lands) {
         random_deck.push(land);
+    }
+    if (random_commander_2 != null) {
+        random_deck.unshift(random_commander_2);
     }
     random_deck.unshift(random_commander);
     return random_deck;
