@@ -423,9 +423,13 @@ function getRandomDeck() {
         final_random_deck.push(land);
     }
     if (random_commander_2 != null) {
-        final_random_deck.unshift(formatRandomCardData(random_commander_2.name));
+        let randomc2 = formatRandomCardData(random_commander_2.name);
+        randomc2.iscommander = true;
+        final_random_deck.unshift(randomc2);
     }
-    final_random_deck.unshift(formatRandomCardData(random_commander.name));
+    let randomc1 = formatRandomCardData(random_commander.name)
+    randomc1.iscommander = true;
+    final_random_deck.unshift(randomc1);
     return final_random_deck;
 }
 
