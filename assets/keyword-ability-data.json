@@ -1,0 +1,1427 @@
+[
+    {
+        "name": "Living weapon",
+        "reminder": "When this Equipment enters the battlefield, put a 0/0 black Phyrexian Germ creature token onto the battlefield, then attach this to it.",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Jump-start",
+        "reminder": "You may cast this card from your graveyard by discarding a card in addition to paying its other costs. Then exile this card.",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Basic landcycling",
+        "reminder": "Discard this card: Search your library for a basic land card, reveal it, and put it into your hand, then shuffle your library.",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Commander ninjutsu",
+        "reminder": "Return an unblocked attacker you control to hand: Put this card onto the battlefield from your hand or the command zone tapped and attacking.",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Legendary landwalk",
+        "reminder": "This creature can't be blocked as long as defending player controls a Legendary land.",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Nonbasic landwalk",
+        "reminder": "This creature can't be blocked as long as defending player controls a Nonbasic land.",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Totem armor",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Megamorph",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Haunt",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Forecast",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Graft",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Fortify",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Frenzy",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Gravestorm",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Hideaway",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Level Up",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Infect",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Reach",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Rampage",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Phasing",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Multikicker",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Morph",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Provoke",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Modular",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Ninjutsu",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Replicate",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Recover",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Poisonous",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Prowl",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Reinforce",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Persist",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Retrace",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Rebound",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Miracle",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Overload",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Outlast",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Prowess",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Renown",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Myriad",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Shroud",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Trample",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Vigilance",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Shadow",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Storm",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Soulshift",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Splice",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Transmute",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Ripple",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Suspend",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Vanishing",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Transfigure",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Wither",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Unearth",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Undying",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Soulbond",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Unleash",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Ascend",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Assist",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Afterlife",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Companion",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Fabricate",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Embalm",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Escape",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Fuse",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Menace",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Ingest",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Melee",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Improvise",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Mentor",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Partner",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Mutate",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Scavenge",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Tribute",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Surge",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Skulk",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Undaunted",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Riot",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Spectacle",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Forestwalk",
+        "reminder": "This creature can't be blocked as long as defending player controls a Forest.",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Islandwalk",
+        "reminder": "This creature can't be blocked as long as defending player controls an Island.",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Mountainwalk",
+        "reminder": "This creature can't be blocked as long as defending player controls a Mountain.",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Double strike",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Cumulative upkeep",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "First strike",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Encore",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Sunburst",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Deathtouch",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Defender",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Foretell",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Amplify",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Affinity",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Bushido",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Convoke",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Bloodthirst",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Absorb",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Aura Swap",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Changeling",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Conspire",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Cascade",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Annihilator",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Battle Cry",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Cipher",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Bestow",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Dash",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Awaken",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Crew",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Aftermath",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Afflict",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Flanking",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Echo",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Fading",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Fear",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Eternalize",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Entwine",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Epic",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Dredge",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Delve",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Evoke",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Exalted",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Evolve",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Extort",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Dethrone",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Exploit",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Devoid",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Emerge",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Escalate",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Flying",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Haste",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Hexproof",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Indestructible",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Intimidate",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Lifelink",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Horsemanship",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Kicker",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Madness",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Hidden agenda",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Swampwalk",
+        "reminder": "This creature can't be blocked as long as defending player controls a Swamp.",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Desertwalk",
+        "reminder": "This creature can't be blocked as long as defending player controls a Desert.",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Wizardcycling",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Slivercycling",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Cycling",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Landwalk",
+        "reminder": "This creature can't be blocked as long as defending player controls a land with the specified type.",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Plainswalk",
+        "reminder": "This creature can't be blocked as long as defending player controls a Plains.",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Champion",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Enchant",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Plainscycling",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Islandcycling",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Swampcycling",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Mountaincycling",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Forestcycling",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Landcycling",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Typecycling",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Split second",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Flash",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Banding",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Augment",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Double agenda",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Partner with",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Hexproof from",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Boast",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Buyback",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Ward",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Demonstrate",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Devour",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Flashback",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Equip",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Reconfigure",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Compleated",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Daybound",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Nightbound",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Decayed",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Disturb",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Training",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Cleave",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Intensity",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Blitz",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Casualty",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Friends forever",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Protection",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Offering",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Enlist",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Read Ahead",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Squad",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Ravenous",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "More Than Meets the Eye",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Living metal",
+        "reminder": "",
+        "category": "keyword-ability"
+    },
+    {
+        "name": "Meld",
+        "reminder": "",
+        "category": "keyword-action"
+    },
+    {
+        "name": "Bolster",
+        "reminder": "",
+        "category": "keyword-action"
+    },
+    {
+        "name": "Clash",
+        "reminder": "",
+        "category": "keyword-action"
+    },
+    {
+        "name": "Fateseal",
+        "reminder": "",
+        "category": "keyword-action"
+    },
+    {
+        "name": "Manifest",
+        "reminder": "",
+        "category": "keyword-action"
+    },
+    {
+        "name": "Monstrosity",
+        "reminder": "",
+        "category": "keyword-action"
+    },
+    {
+        "name": "Populate",
+        "reminder": "",
+        "category": "keyword-action"
+    },
+    {
+        "name": "Proliferate",
+        "reminder": "",
+        "category": "keyword-action"
+    },
+    {
+        "name": "Scry",
+        "reminder": "",
+        "category": "keyword-action"
+    },
+    {
+        "name": "Support",
+        "reminder": "",
+        "category": "keyword-action"
+    },
+    {
+        "name": "Detain",
+        "reminder": "",
+        "category": "keyword-action"
+    },
+    {
+        "name": "Explore",
+        "reminder": "",
+        "category": "keyword-action"
+    },
+    {
+        "name": "Fight",
+        "reminder": "",
+        "category": "keyword-action"
+    },
+    {
+        "name": "Amass",
+        "reminder": "",
+        "category": "keyword-action"
+    },
+    {
+        "name": "Adapt",
+        "reminder": "",
+        "category": "keyword-action"
+    },
+    {
+        "name": "Assemble",
+        "reminder": "",
+        "category": "keyword-action"
+    },
+    {
+        "name": "Abandon",
+        "reminder": "",
+        "category": "keyword-action"
+    },
+    {
+        "name": "Activate",
+        "reminder": "",
+        "category": "keyword-action"
+    },
+    {
+        "name": "Attach",
+        "reminder": "",
+        "category": "keyword-action"
+    },
+    {
+        "name": "Seek",
+        "reminder": "",
+        "category": "keyword-action"
+    },
+    {
+        "name": "Cast",
+        "reminder": "",
+        "category": "keyword-action"
+    },
+    {
+        "name": "Counter",
+        "reminder": "",
+        "category": "keyword-action"
+    },
+    {
+        "name": "Create",
+        "reminder": "",
+        "category": "keyword-action"
+    },
+    {
+        "name": "Destroy",
+        "reminder": "",
+        "category": "keyword-action"
+    },
+    {
+        "name": "Discard",
+        "reminder": "",
+        "category": "keyword-action"
+    },
+    {
+        "name": "Double",
+        "reminder": "",
+        "category": "keyword-action"
+    },
+    {
+        "name": "Exchange",
+        "reminder": "",
+        "category": "keyword-action"
+    },
+    {
+        "name": "Exile",
+        "reminder": "",
+        "category": "keyword-action"
+    },
+    {
+        "name": "Investigate",
+        "reminder": "",
+        "category": "keyword-action"
+    },
+    {
+        "name": "Play",
+        "reminder": "",
+        "category": "keyword-action"
+    },
+    {
+        "name": "Regenerate",
+        "reminder": "",
+        "category": "keyword-action"
+    },
+    {
+        "name": "Reveal",
+        "reminder": "",
+        "category": "keyword-action"
+    },
+    {
+        "name": "Sacrifice",
+        "reminder": "",
+        "category": "keyword-action"
+    },
+    {
+        "name": "Set in motion",
+        "reminder": "",
+        "category": "keyword-action"
+    },
+    {
+        "name": "Shuffle",
+        "reminder": "",
+        "category": "keyword-action"
+    },
+    {
+        "name": "Tap",
+        "reminder": "",
+        "category": "keyword-action"
+    },
+    {
+        "name": "Untap",
+        "reminder": "",
+        "category": "keyword-action"
+    },
+    {
+        "name": "Vote",
+        "reminder": "",
+        "category": "keyword-action"
+    },
+    {
+        "name": "Transform",
+        "reminder": "",
+        "category": "keyword-action"
+    },
+    {
+        "name": "Surveil",
+        "reminder": "",
+        "category": "keyword-action"
+    },
+    {
+        "name": "Goad",
+        "reminder": "",
+        "category": "keyword-action"
+    },
+    {
+        "name": "Planeswalk",
+        "reminder": "",
+        "category": "keyword-action"
+    },
+    {
+        "name": "Mill",
+        "reminder": "",
+        "category": "keyword-action"
+    },
+    {
+        "name": "Learn",
+        "reminder": "",
+        "category": "keyword-action"
+    },
+    {
+        "name": "Conjure",
+        "reminder": "",
+        "category": "keyword-action"
+    },
+    {
+        "name": "Exert",
+        "reminder": "",
+        "category": "keyword-action"
+    },
+    {
+        "name": "Connive",
+        "reminder": "",
+        "category": "keyword-action"
+    },
+    {
+        "name": "Venture into the dungeon",
+        "reminder": "",
+        "category": "keyword-action"
+    },
+    {
+        "name": "Convert",
+        "reminder": "",
+        "category": "keyword-action"
+    },
+    {
+        "name": "Battalion",
+        "reminder": "",
+        "category": "ability-words"
+    },
+    {
+        "name": "Bloodrush",
+        "reminder": "",
+        "category": "ability-words"
+    },
+    {
+        "name": "Channel",
+        "reminder": "",
+        "category": "ability-words"
+    },
+    {
+        "name": "Chroma",
+        "reminder": "",
+        "category": "ability-words"
+    },
+    {
+        "name": "Cohort",
+        "reminder": "",
+        "category": "ability-words"
+    },
+    {
+        "name": "Constellation",
+        "reminder": "",
+        "category": "ability-words"
+    },
+    {
+        "name": "Converge",
+        "reminder": "",
+        "category": "ability-words"
+    },
+    {
+        "name": "Delirium",
+        "reminder": "",
+        "category": "ability-words"
+    },
+    {
+        "name": "Domain",
+        "reminder": "",
+        "category": "ability-words"
+    },
+    {
+        "name": "Fateful hour",
+        "reminder": "",
+        "category": "ability-words"
+    },
+    {
+        "name": "Ferocious",
+        "reminder": "",
+        "category": "ability-words"
+    },
+    {
+        "name": "Formidable",
+        "reminder": "",
+        "category": "ability-words"
+    },
+    {
+        "name": "Grandeur",
+        "reminder": "",
+        "category": "ability-words"
+    },
+    {
+        "name": "Hellbent",
+        "reminder": "",
+        "category": "ability-words"
+    },
+    {
+        "name": "Heroic",
+        "reminder": "",
+        "category": "ability-words"
+    },
+    {
+        "name": "Imprint",
+        "reminder": "",
+        "category": "ability-words"
+    },
+    {
+        "name": "Inspired",
+        "reminder": "",
+        "category": "ability-words"
+    },
+    {
+        "name": "Join forces",
+        "reminder": "",
+        "category": "ability-words"
+    },
+    {
+        "name": "Kinship",
+        "reminder": "",
+        "category": "ability-words"
+    },
+    {
+        "name": "Landfall",
+        "reminder": "",
+        "category": "ability-words"
+    },
+    {
+        "name": "Lieutenant",
+        "reminder": "",
+        "category": "ability-words"
+    },
+    {
+        "name": "Metalcraft",
+        "reminder": "",
+        "category": "ability-words"
+    },
+    {
+        "name": "Morbid",
+        "reminder": "",
+        "category": "ability-words"
+    },
+    {
+        "name": "Parley",
+        "reminder": "",
+        "category": "ability-words"
+    },
+    {
+        "name": "Radiance",
+        "reminder": "",
+        "category": "ability-words"
+    },
+    {
+        "name": "Raid",
+        "reminder": "",
+        "category": "ability-words"
+    },
+    {
+        "name": "Rally",
+        "reminder": "",
+        "category": "ability-words"
+    },
+    {
+        "name": "Spell mastery",
+        "reminder": "",
+        "category": "ability-words"
+    },
+    {
+        "name": "Strive",
+        "reminder": "",
+        "category": "ability-words"
+    },
+    {
+        "name": "Sweep",
+        "reminder": "",
+        "category": "ability-words"
+    },
+    {
+        "name": "Tempting offer",
+        "reminder": "",
+        "category": "ability-words"
+    },
+    {
+        "name": "Threshold",
+        "reminder": "",
+        "category": "ability-words"
+    },
+    {
+        "name": "Will of the council",
+        "reminder": "",
+        "category": "ability-words"
+    },
+    {
+        "name": "Adamant",
+        "reminder": "",
+        "category": "ability-words"
+    },
+    {
+        "name": "Addendum",
+        "reminder": "",
+        "category": "ability-words"
+    },
+    {
+        "name": "Council's dilemma",
+        "reminder": "",
+        "category": "ability-words"
+    },
+    {
+        "name": "Eminence",
+        "reminder": "",
+        "category": "ability-words"
+    },
+    {
+        "name": "Enrage",
+        "reminder": "",
+        "category": "ability-words"
+    },
+    {
+        "name": "Hero's Reward",
+        "reminder": "",
+        "category": "ability-words"
+    },
+    {
+        "name": "Kinfall",
+        "reminder": "",
+        "category": "ability-words"
+    },
+    {
+        "name": "Landship",
+        "reminder": "",
+        "category": "ability-words"
+    },
+    {
+        "name": "Legacy",
+        "reminder": "",
+        "category": "ability-words"
+    },
+    {
+        "name": "Revolt",
+        "reminder": "",
+        "category": "ability-words"
+    },
+    {
+        "name": "Underdog",
+        "reminder": "",
+        "category": "ability-words"
+    },
+    {
+        "name": "Undergrowth",
+        "reminder": "",
+        "category": "ability-words"
+    },
+    {
+        "name": "Magecraft",
+        "reminder": "",
+        "category": "ability-words"
+    },
+    {
+        "name": "Teamwork",
+        "reminder": "",
+        "category": "ability-words"
+    },
+    {
+        "name": "Pack tactics",
+        "reminder": "",
+        "category": "ability-words"
+    },
+    {
+        "name": "Coven",
+        "reminder": "",
+        "category": "ability-words"
+    },
+    {
+        "name": "Alliance",
+        "reminder": "",
+        "category": "ability-words"
+    }
+]
