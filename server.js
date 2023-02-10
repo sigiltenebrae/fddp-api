@@ -490,6 +490,7 @@ function getAllOfCardFormatted(card_name) {
                 power: card.power != null && card.power !== '*'? Number(card.power): card.power === '*'? 0: null,
                 toughness: card.toughness != null && card.toughness !== '*'? Number(card.toughness): card.toughness === '*'? 0: null,
                 oracle_text: card.oracle_text,
+                date: card.released_at,
                 colors: card.colors
             });
         }
@@ -503,13 +504,15 @@ function getAllOfCardFormatted(card_name) {
 getAllOfToken = (request, response) => {
     const card_name = request.body.name;
     let card_data = getAllOfCardFormatted(card_name);
-    pool.query("SELECT * FROM custom_tokens WHERE name ILIKE '" + card_name + "'", (error, results) => {
+    pool.query("SELECT * FROM custom_tokens WHERE name LIKE '" + card_name + "'", (error, results) => {
         if (error) {
             console.log('Error getting custom cards for ' + card_name);
             console.log(error);
+            card_data.sort((a, b) => (a.date < b.date) ? 1: -1);
             return response.json(card_data);
         }
         if (!results.rows || results.rows.length === 0) {
+            card_data.sort((a, b) => (a.date < b.date) ? 1: -1);
             return response.json(card_data);
         }
         else {
@@ -528,10 +531,12 @@ getAllOfToken = (request, response) => {
                         power: card.power != null && card.power !== '*'? Number(card.power): card.power === '*' ? 0: null,
                         toughness: card.toughness != null && card.toughness !== '*'? Number(card.toughness): card.toughness === '*' ? 0: null,
                         oracle_text: card.oracle_text,
+                        date: "99999999999",
                         colors: colors
                     }
                 );
             });
+            card_data.sort((a, b) => (a.date < b.date) ? 1: -1);
             return response.json(card_data);
         }
     });
