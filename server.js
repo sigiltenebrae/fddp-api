@@ -597,14 +597,24 @@ getCardImages = (request, response) => {
         if (card.name.toLowerCase() === card_name.toLowerCase()) {
             out_card.name = card.name;
             if (card.image_uris && card.image_uris.png) {
-                out_card.images.push(card.image_uris.png);
+                out_card.images.push(
+                    {
+                        image: card.image_uris.png,
+                        date: card.released_at
+                    });
             }
             else if (card.card_faces && card.card_faces.length === 2) {
                 if (card.card_faces[0].image_uris && card.card_faces[0].image_uris.png) {
-                    out_card.images.push(card.card_faces[0].image_uris.png);
+                    out_card.images.push({
+                        image: card.card_faces[0].image_uris.png,
+                        date: card.released_at
+                    });
                 }
                 if (card.card_faces[1].image_uris && card.card_faces[1].image_uris.png) {
-                    out_card.back_images.push(card.card_faces[1].image_uris.png);
+                    out_card.back_images.push({
+                        image: card.card_faces[1].image_uris.png,
+                        date: card.released_at
+                    });
                 }
             }
         }
@@ -613,18 +623,30 @@ getCardImages = (request, response) => {
         if (error) {
             console.log('Error getting custom cards for ' + card_name);
             console.log(error);
+            out_card.images.sort((a, b) => (a.date < b.date) ? 1: -1);
+            out_card.back_images.sort((a, b) => (a.date < b.date) ? 1: -1);
             return response.json(out_card);
         }
         if (!results.rows || results.rows.length === 0) {
+            out_card.images.sort((a, b) => (a.date < b.date) ? 1: -1);
+            out_card.back_images.sort((a, b) => (a.date < b.date) ? 1: -1);
             return response.json(out_card);
         }
         else {
             results.rows.forEach((card) => {
-                out_card.images.push(card.image);
+                out_card.images.push({
+                    image: card.image,
+                    date: "9999999999999"
+                });
                 if (out_card.back_images.length > 0) {
-                    out_card.back_images.push(card.image);
+                    out_card.back_images.push({
+                        image: card.image,
+                        date: "99999999999999"
+                    });
                 }
             });
+            out_card.images.sort((a, b) => (a.date < b.date) ? 1: -1);
+            out_card.back_images.sort((a, b) => (a.date < b.date) ? 1: -1);
             return response.json(out_card);
         }
     })
