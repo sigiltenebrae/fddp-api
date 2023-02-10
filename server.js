@@ -491,6 +491,7 @@ function getAllOfCardFormatted(card_name) {
                 toughness: card.toughness != null && card.toughness !== '*'? Number(card.toughness): card.toughness === '*'? 0: null,
                 oracle_text: card.oracle_text,
                 date: card.released_at,
+                set_name: card.set_name,
                 colors: card.colors
             });
         }
@@ -532,6 +533,7 @@ getAllOfToken = (request, response) => {
                         toughness: card.toughness != null && card.toughness !== '*'? Number(card.toughness): card.toughness === '*' ? 0: null,
                         oracle_text: card.oracle_text,
                         date: "99999999999",
+                        set_name: "Custom",
                         colors: colors
                     }
                 );
@@ -605,6 +607,7 @@ getCardImages = (request, response) => {
                 out_card.images.push(
                     {
                         image: card.image_uris.png,
+                        set_name: card.set_name,
                         date: card.released_at
                     });
             }
@@ -612,12 +615,14 @@ getCardImages = (request, response) => {
                 if (card.card_faces[0].image_uris && card.card_faces[0].image_uris.png) {
                     out_card.images.push({
                         image: card.card_faces[0].image_uris.png,
+                        set_name: card.set_name,
                         date: card.released_at
                     });
                 }
                 if (card.card_faces[1].image_uris && card.card_faces[1].image_uris.png) {
                     out_card.back_images.push({
                         image: card.card_faces[1].image_uris.png,
+                        set_name: card.set_name,
                         date: card.released_at
                     });
                 }
@@ -641,11 +646,13 @@ getCardImages = (request, response) => {
             results.rows.forEach((card) => {
                 out_card.images.push({
                     image: card.image,
+                    set_name: "Custom",
                     date: "9999999999999"
                 });
                 if (out_card.back_images.length > 0) {
                     out_card.back_images.push({
                         image: card.image,
+                        set_name: "Custom",
                         date: "99999999999999"
                     });
                 }
