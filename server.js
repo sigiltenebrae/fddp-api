@@ -19,7 +19,9 @@ const decksdb = require('./interfaces/decks');
 const gamesdb = require('./interfaces/games');
 const usersdb = require('./interfaces/users');
 const customsdb = require('./interfaces/custom_cards');
+const bansdb = require('./interfaces/ban_list');
 const authdb = require('./interfaces/auth');
+
 const {request} = require("express");
 
 const app = express();
@@ -873,6 +875,9 @@ app.delete('/api/custom_cards/:id', customsdb.deleteCustomCard)
 app.post('/api/custom_tokens', customsdb.createCustomToken);
 app.get('/api/custom_tokens', customsdb.getCustomTokens);
 app.delete('/api/custom_tokens/:id', customsdb.deleteCustomToken);
+
+app.get('/api/bans/list', bansdb.getBanList);
+app.get('/api/bans/types', bansdb.getBanTypes);
 
 app.get('/api/games/types', gamesdb.getGameTypes);
 app.get('/api/games/', gamesdb.getGames);
