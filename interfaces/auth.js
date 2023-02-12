@@ -14,9 +14,10 @@ const pool = new Pool({
 
 exports.signup = (request, response) => {
     const username = request.body.username;
+    const name = request.body.name;
     const password = bcrypt.hashSync(request.body.password, 8);
-    pool.query('INSERT INTO users (username, password) ' +
-        'VALUES ($1, $2) RETURNING *', [username, password],
+    pool.query('INSERT INTO users (username, name, password) ' +
+        'VALUES ($1, $2, $3) RETURNING *', [username, name, password],
         (error, results) => {
             if (error) {
                 return response.status(500).send({ message: error.message });
