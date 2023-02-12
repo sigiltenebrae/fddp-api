@@ -839,7 +839,10 @@ app.post('/api/auth/signup', authdb.signup);
 app.post('/api/auth/signin', authdb.signin);
 app.post('/api/auth/change_password', authdb.changepassword);
 
+
 app.get('/api/users', usersdb.getUsers);
+app.put('/api/users/:id', usersdb.updateProfile);
+
 
 app.post('/api/cards', getCardInfo);
 app.post('/api/cards/all', debugGetCard);

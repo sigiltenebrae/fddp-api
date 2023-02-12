@@ -37,3 +37,21 @@ exports.getUser = (request, response) => {
 
     });
 }
+
+exports.updateProfile = (request, response) => {
+    const id = parseInt(request.params.id);
+    if (request.body && request.body.user) {
+        const user = request.body.user;
+        pool.query('UPDATE users SET name = $1, username = $2, playmat = $3, default_sleeves = $4, theme = $5, gridlines = $6 WHERE id = $7',
+            [user.name, user.username, user.playmat, user.default_sleeves, user.theme, user.gridlines, id], (error, results) => {
+                if (error) {
+                    console.log('User update failed for profile with id: ' + id);
+                    console.log(error);
+                    return response.json({errors: [error]});
+                }
+                else {
+                    return response.json({errors: []});
+                }
+            });
+    }
+}

@@ -10,7 +10,7 @@ const pool = new Pool({
     database: config.DB,
     password: config.PASSWORD,
     port: 5432,
-})
+});
 
 exports.signup = (request, response) => {
     const username = request.body.username;
@@ -64,13 +64,9 @@ exports.signin = (request, response) => {
                 if (err) {
                     return response.status(500).send({ message: err.message });
                 }
-                return response.status(200).send({
-                    id: user.id,
-                    username: user.username,
-                    roles: res.rows,
-                    theme: user.theme,
-                    accessToken: token
-                });
+                user.roles = res.rows;
+                user.accessToken = token;
+                return response.status(200).send(user);
             });
 
         });
