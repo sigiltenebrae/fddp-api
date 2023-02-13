@@ -711,6 +711,7 @@ function getCardScryfallData(card_name) {
                 out_card.back_toughness = card.card_faces[1].toughness != null && card.card_faces[1].toughness !== '*' ? Number(card.card_faces[1].toughness): card.card_faces[1].toughness === '*' ? 0: null;
                 out_card.loyalty = card.card_faces[0].loyalty != null ? Number(card.card_faces[0].loyalty): null;
                 out_card.back_loyalty = card.card_faces[1].loyalty != null ? Number(card.card_faces[1].loyalty): null;
+                out_card.legality = card.legalities.commander === 'legal';
             }
             else{
                 out_card.back_face = false;
@@ -727,6 +728,7 @@ function getCardScryfallData(card_name) {
                 out_card.back_toughness = null;
                 out_card.loyalty = card.loyalty != null ? Number(card.loyalty): null;
                 out_card.back_loyalty = null;
+                out_card.legality = card.legalities.commander === 'legal';
             }
             out_card.cmc = card.cmc;
             if (card.all_parts) {
@@ -805,6 +807,7 @@ getDeckForPlay = (request, response) => {
                     card.cmc = card_data.cmc != null ? Number(card_data.cmc): null;
                     card.tokens = card_data.tokens ? card_data.tokens: [];
                     card.gatherer = card_data.gatherer ? card_data.gatherer: null;
+                    card.legality = card_data.legality;
                 });
                 pool.query('SELECT * FROM deck_tokens WHERE deckid = $1', [id], (er, re) => {
                     if (er) {
