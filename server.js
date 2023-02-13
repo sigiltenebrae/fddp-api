@@ -481,6 +481,17 @@ function getAllOfCard(card_name) {
     return card_data;
 }
 
+function getCheapestCost(card_name) {
+    let cards = getAllOfCard(card_name);
+    let cheapest = 99999999;
+    for (let card of cards) {
+        cheapest = card.prices.usd != null && Number(card.prices.usd) > 0 && Number(card.prices.usd) < cheapest ? Number(card.prices.usd) : cheapest
+        cheapest = card.prices.usd_foil != null && Number(card.prices.usd_foil) > 0 && Number(card.prices.usd_foil) < cheapest ? Number(card.prices.usd_foil) : cheapest
+        cheapest = card.prices.usd_etched != null && Number(card.prices.usd_etched) > 0 && Number(card.prices.usd_etched) < cheapest ? Number(card.prices.usd_etched) : cheapest
+    }
+    return cheapest;
+}
+
 function getAllOfCardFormatted(card_name) {
     let card_data = [];
     for (let card of scryfalldata) {
@@ -712,6 +723,7 @@ function getCardScryfallData(card_name) {
                 out_card.loyalty = card.card_faces[0].loyalty != null ? Number(card.card_faces[0].loyalty): null;
                 out_card.back_loyalty = card.card_faces[1].loyalty != null ? Number(card.card_faces[1].loyalty): null;
                 out_card.legality = card.legalities.commander === 'legal';
+                out_card.cheapest = getCheapestCost(card.name);
             }
             else{
                 out_card.back_face = false;
@@ -729,6 +741,7 @@ function getCardScryfallData(card_name) {
                 out_card.loyalty = card.loyalty != null ? Number(card.loyalty): null;
                 out_card.back_loyalty = null;
                 out_card.legality = card.legalities.commander === 'legal';
+                out_card.cheapest = getCheapestCost(card.name);
             }
             out_card.cmc = card.cmc;
             if (card.all_parts) {
@@ -808,6 +821,7 @@ getDeckForPlay = (request, response) => {
                     card.tokens = card_data.tokens ? card_data.tokens: [];
                     card.gatherer = card_data.gatherer ? card_data.gatherer: null;
                     card.legality = card_data.legality;
+                    card.cheapest = card_data.cheapest;
                 });
                 pool.query('SELECT * FROM deck_tokens WHERE deckid = $1', [id], (er, re) => {
                     if (er) {
