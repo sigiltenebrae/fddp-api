@@ -1054,7 +1054,7 @@ app.get('/api/decks/:id', decksdb.getDeck);
 app.put('/api/decks/:id', decksdb.updateDeck);
 app.delete('/api/decks/:id', decksdb.deleteDeck);
 app.get('/api/game/deck/:id', getDeckForPlay);
-
+app.get('/api/decklist', decksdb.getDeckList);
 
 app.post('/api/custom_cards', customsdb.createCustomCard);
 app.get('/api/custom_cards', customsdb.getCustomCards);
@@ -1074,6 +1074,7 @@ app.get('/api/games/:id', gamesdb.getGameById);
 app.post('/api/games', gamesdb.createGame);
 app.put('/api/games/start/:id', gamesdb.startGame);
 app.put('/api/games/:id', gamesdb.updateGame);
+app.get('/api/games/results/:id', gamesdb.getGameResults);
 
 app.get('/api/planes', getPlanesApi);
 

@@ -166,3 +166,20 @@ exports.updateGame = (request, response) => {
             })
     }
 }
+
+exports.getGameResults = (request, response) => {
+    const id = parseInt(request.params.id);
+    pool.query('SELECT * FROM game_results WHERE game_id = $1', [id], (error, results) => {
+        if (error) {
+            console.log('Error getting game results for : ' + id);
+            console.log(error);
+            return response.json({errors: [error]});
+        }
+        if (results.rows.length > 0) {
+            return response.json(results.rows);
+        }
+        else {
+            return response.json([]);
+        }
+    });
+}

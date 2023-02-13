@@ -268,4 +268,15 @@ exports.getDeck = (request, response) => {
     })
 }
 
-
+exports.getDeckList = (request, response) => {
+    pool.query('SELECT * FROM decks', (error, results) => {
+        if (error) {
+            console.log('Error getting deck list');
+            console.log(error);
+            return response.json({errors: [error]});
+        }
+        else {
+            return response.json({deck_list: results.rows});
+        }
+    })
+}
