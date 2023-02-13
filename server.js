@@ -386,7 +386,7 @@ function getRandomDeck() {
             random_commander_2 = partners[Math.floor(Math.random() * partners.length)];
         }
     }
-    else if (random_commander.oracle_text.includes("Friends forever")) {
+    else if (random_commander.oracle_text && random_commander.oracle_text.includes("Friends forever")) {
         let ff_list = getFriendsForeverCommanders();
         random_commander_2 = ff_list[Math.floor(Math.random() * ff_list.length)];
     }
