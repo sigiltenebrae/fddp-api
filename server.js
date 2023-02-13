@@ -742,8 +742,6 @@ getDecksForUserBasic = (request, response) => {
                                         errors.push(err);
                                         deck_data.commander = [];
                                         deck_data.colors = [];
-                                        decks.push(deck_data);
-                                        resolve();
                                     } else {
                                         deck_data.commander = res.rows;
                                         deck_data.colors = [];
@@ -755,9 +753,35 @@ getDecksForUserBasic = (request, response) => {
                                                 }
                                             }
                                         }
-                                        decks.push(deck_data);
-                                        resolve();
                                     }
+
+                                    pool.query('SELECT * FROM game_results WHERE deck_id = $1', [deck_data.id],
+                                        (e, r) => {
+                                            deck_data.wins = 0;
+                                            deck_data.losses = 0;
+                                            if (e) {
+                                                console.log('Error getting game results for deck: ' + deck_data.id);
+                                                console.log(err);
+                                                decks.push(deck_data);
+                                                resolve();
+                                            }
+                                            else {
+                                                if (r.rows.length > 0) {
+                                                    for (let result of r.rows) {
+                                                        if (result.winner != null) {
+                                                            if (result.winner) {
+                                                                deck_data.wins ++;
+                                                            }
+                                                            else {
+                                                                deck_data.losses ++;
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                                decks.push(deck_data);
+                                                resolve();
+                                            }
+                                        });
                                 });
                         }))
                     }
