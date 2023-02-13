@@ -41,6 +41,10 @@ app.post('/', (request, response) => {
 });
 
 
+let scryfalldata = null;
+let cheapdata = null;
+let cheap_commanders_list = null;
+
 function updateDB() {
     return new Promise ((resolve) => {
             axios.get('https://api.scryfall.com/bulk-data').then( res => {
@@ -63,6 +67,8 @@ function updateDB() {
                             console.log('scryfall update downloaded');
                             rawscryfalldata = fs.readFileSync('assets/default-cards.json');
                             scryfalldata = JSON.parse(rawscryfalldata);
+                            cheapdata = getCheapCardsList();
+                            cheap_commanders_list = loadCheapCommanders();
                             resolve();
                         });
                     });
@@ -97,9 +103,9 @@ function getCheapCardsList() {
     return cheaps;
 }
 
-function getCommandersFromList(list) {
+function loadCheapCommanders() {
     let commanders = [];
-    for (let card of list) {
+    for (let card of cheapdata) {
         if (card.type_line != null && card.type_line.includes("Legendary") && card.type_line.includes("Creature")) {
             commanders.push(card);
         }
@@ -121,11 +127,11 @@ function getCommandersFromList(list) {
     return commanders;
 }
 
-function getRandomCardsForCommander(commander, commander2, list) {
+function getRandomCardsForCommander(commander, commander2) {
     let deck = [];
     let size = commander2 == null? 59: 58;
     while (deck.length < size) {
-        let random_card = list[Math.floor(Math.random() * list.length)];
+        let random_card = cheapdata[Math.floor(Math.random() * cheapdata.length)];
         if (random_card.color_identity != null) {
             let bad_card = false;
             for (let color of random_card.color_identity) {
@@ -170,10 +176,10 @@ function formatRandomCardData(card_name) {
     return card_data;
 }
 
-function getRandomLandsForCommander(commander, commander2, list) {
+function getRandomLandsForCommander(commander, commander2) {
     let land_list = [];
     let random_lands = [];
-    for (let card of list) {
+    for (let card of cheapdata) {
         if (card.type_line != null && card.type_line.includes("Land")  && !card.type_line.includes("Basic")) {
             land_list.push(card);
         }
@@ -303,9 +309,9 @@ function getPartnerWithsFromCommanders(comm) {
     return partners;
 }
 
-function getFriendsForeverCommanders(comm) {
+function getFriendsForeverCommanders() {
     let comms = [];
-    for (let card of comm) {
+    for (let card of cheap_commanders_list) {
         if (card.oracle_text && card.oracle_text.includes("Friends forever")) {
             comms.push(card);
         }
@@ -313,9 +319,9 @@ function getFriendsForeverCommanders(comm) {
     return comms;
 }
 
-function getCommandersForBackgrounds(comm) {
+function getCommandersForBackgrounds() {
     let comms = [];
-    for (let card of comm) {
+    for (let card of cheap_commanders_list) {
         if (card.oracle_text && card.oracle_text.includes("Choose a Background")) {
             comms.push(card);
         }
@@ -323,9 +329,9 @@ function getCommandersForBackgrounds(comm) {
     return comms;
 }
 
-function getBackgroundsForCommander(comm) {
+function getBackgroundsForCommander() {
     let backs = [];
-    for (let card of comm) {
+    for (let card of cheap_commanders_list) {
         if (card.type_line && card.type_line.includes("Background")) {
             backs.push(card);
         }
@@ -334,9 +340,7 @@ function getBackgroundsForCommander(comm) {
 }
 
 function getRandomDeck() {
-    let cheapList = getCheapCardsList();
-    let commanders_list = getCommandersFromList(cheapList);
-    let random_commander = commanders_list[Math.floor(Math.random() * commanders_list.length)];
+    let random_commander = cheap_commanders_list[Math.floor(Math.random() * cheap_commanders_list.length)];
     //let p_list = getPartnersFromCommanders(commanders_list);
     //let random_commander = p_list[Math.floor(Math.random() * p_list.length)];
     //let pw_list = getPartnerWithsFromCommanders(commanders_list);
@@ -383,24 +387,24 @@ function getRandomDeck() {
         }
     }
     else if (random_commander.oracle_text.includes("Friends forever")) {
-        let ff_list = getFriendsForeverCommanders(commanders_list);
+        let ff_list = getFriendsForeverCommanders();
         random_commander_2 = ff_list[Math.floor(Math.random() * ff_list.length)];
     }
     else if (random_commander.oracle_text && random_commander.oracle_text.includes("Choose a Background") && random_commander.name !== "Faceless One") {
-        let backgrounds = getBackgroundsForCommander(commanders_list);
+        let backgrounds = getBackgroundsForCommander();
         random_commander_2 = backgrounds[Math.floor(Math.random() * backgrounds.length)];
     }
     else if (random_commander.type_line && random_commander.type_line.includes("Background") && random_commander.name !== "Faceless One") {
-        let choosers = getCommandersForBackgrounds(commanders_list);
+        let choosers = getCommandersForBackgrounds();
         random_commander_2 = choosers[Math.floor(Math.random() * choosers.length)];
     }
     else if (random_commander.name === "Faceless One") {
         if (Math.floor(Math.random() * 100) > 50) {
-            let backgrounds = getBackgroundsForCommander(commanders_list);
+            let backgrounds = getBackgroundsForCommander();
             random_commander_2 = backgrounds[Math.floor(Math.random() * backgrounds.length)];
         }
         else {
-            let choosers = getCommandersForBackgrounds(commanders_list);
+            let choosers = getCommandersForBackgrounds();
             random_commander_2 = choosers[Math.floor(Math.random() * choosers.length)];
         }
     }
@@ -411,8 +415,8 @@ function getRandomDeck() {
         }
     }
 
-    let random_deck = getRandomCardsForCommander(random_commander, random_commander_2, cheapList);
-    let random_lands = getRandomLandsForCommander(random_commander, random_commander_2, cheapList);
+    let random_deck = getRandomCardsForCommander(random_commander, random_commander_2);
+    let random_lands = getRandomLandsForCommander(random_commander, random_commander_2);
     for (let land of random_lands) {
         random_deck.push(land);
     }
@@ -435,13 +439,18 @@ function getRandomDeck() {
     return final_random_deck;
 }
 
+
+/**
+ * The outer function to generate a random cheap deck.
+ * @returns {{}}
+ */
 function getRandomDeckForPlay() {
     let random_cards = getRandomDeck();
     let random_deck = {};
     random_deck.id = -1;
     random_deck.name = "Random Deck"
     random_deck.owner = -1;
-    random_deck.sleeves = "https://c1.scryfall.com/file/scryfall-card-backs/large/59/597b79b3-7d77-4261-871a-60dd17403388.jpg?1561757129";
+    random_deck.sleeves = "";
     random_deck.cards = random_cards;
     random_deck.tokens = [];
     return random_deck;
@@ -456,11 +465,11 @@ function format_deck(deck) {
 }
 
 getCheapCards = (request, response) => {
-    response.json(getCheapCardsList());
+    response.json(cheapdata);
 }
 
 getCheapCommanders = (request, response) => {
-    response.json(getCommandersFromList(getCheapCardsList()));
+    response.json(getCommandersFromList(cheapdata));
 }
 
 getCheapDeck = (request, response) => {
@@ -1071,7 +1080,9 @@ app.get('/api/planes', getPlanesApi);
 
 if (fs.existsSync('assets/default-cards.json')) {
     let rawscryfalldata = fs.readFileSync('assets/default-cards.json');
-    let scryfalldata = JSON.parse(rawscryfalldata);
+    scryfalldata = JSON.parse(rawscryfalldata);
+    cheapdata = getCheapCardsList();
+    cheap_commanders_list = loadCheapCommanders();
 }
 updateDB().then(() => {
     app.listen(port, () => {
