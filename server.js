@@ -289,9 +289,9 @@ function getBasicsForDeck(deck) {
     return basics;
 }
 
-function getPartnersFromCommanders(comm) {
+function getPartnersFromCommanders() {
     let partners = [];
-    for (let card of comm) {
+    for (let card of cheap_commanders_list) {
         if (card.keywords && card.keywords.includes("Partner")) {
             partners.push(card);
         }
@@ -299,9 +299,9 @@ function getPartnersFromCommanders(comm) {
     return partners;
 }
 
-function getPartnerWithsFromCommanders(comm) {
+function getPartnerWithsFromCommanders() {
     let partners = [];
-    for (let card of comm) {
+    for (let card of cheap_commanders_list) {
         if (card.keywords && card.keywords.includes("Partner with")) {
             partners.push(card);
         }
@@ -362,7 +362,7 @@ function getRandomDeck() {
     let random_commander_2 = null;
 
     if (random_commander.keywords && random_commander.keywords.includes("Partner")) {
-        let partners = getPartnersFromCommanders(commanders_list);
+        let partners = getPartnersFromCommanders();
         if (random_commander.keywords.includes("Partner with")) {
             if (random_commander.all_parts != null && random_commander.all_parts.length > 0) {
                 for (let part of random_commander.all_parts) {
