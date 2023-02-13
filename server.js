@@ -22,7 +22,7 @@ const customsdb = require('./interfaces/custom_cards');
 const bansdb = require('./interfaces/ban_list');
 const authdb = require('./interfaces/auth');
 
-const {request} = require("express");
+const {request, response} = require("express");
 
 const app = express();
 const port = 2999;
@@ -700,6 +700,167 @@ function getCardById(id) {
     }
 }
 
+
+
+getDecksForUserBasic = (request, response) => {
+    let userid = null
+    if (request.params.id) {
+        userid = parseInt(request.params.id);
+        console.log('getting decks for user: ' + userid)
+    }
+    else {
+        console.log('getting all decks');
+    }
+
+    let errors = [];
+    let decks = [];
+    pool.query('SELECT * FROM decks' + (userid == null ? '': ' WHERE owner = ' + userid),
+        (error, results) => {
+            if (error) {
+                console.log('Error getting decks for user: ' + userid);
+                console.log(error);
+                return response.json({decks: [], errors: [error]});
+            } else {
+                if (results.rows && results.rows.length > 0) {
+                    let deck_data_promises = []
+                    for (let deck_data of results.rows) {
+                        deck_data_promises.push(new Promise((resolve, reject) => {
+                            pool.query('SELECT * FROM deck_cards WHERE deckid = $1 AND iscommander', [deck_data.id],
+                                (err, res) => {
+                                    if (err) {
+                                        console.log('Error getting cards for deck: ' + deck_data.id);
+                                        console.log(err);
+                                        errors.push(err);
+                                        deck_data.commander = [];
+                                        deck_data.colors = [];
+                                        decks.push(deck_data);
+                                        resolve();
+                                    } else {
+                                        deck_data.commander = res.rows;
+                                        deck_data.colors = [];
+                                        for (let card of deck_data.commander) {
+                                            let scryfall_card = getCardScryfallData(card.name);
+                                            for (let mana of scryfall_card.color_identity) {
+                                                if (mana === 'W' || mana === 'U' || mana === 'B' || mana === 'R' || mana === 'G') {
+                                                    deck_data.colors.push(mana);
+                                                }
+                                            }
+                                        }
+                                        decks.push(deck_data);
+                                        resolve();
+                                    }
+                                });
+                        }))
+                    }
+                    Promise.all(deck_data_promises).then(() => {
+                        return response.json({decks: decks, errors: errors});
+                    });
+                } else {
+                    return response.json({decks: [], errors: []});
+                }
+            }
+        });
+}
+
+function getBanId(ban_type, ban_types){
+    for (let type of ban_types) {
+        if (ban_type === type.type) {
+            return type.id;
+        }
+    }
+}
+
+getDeckLegality = (request, response) => {
+    let deckid = request.params.id;
+    pool.query('SELECT * FROM decks where id = $1', [deckid],
+        (error, results) => {
+            if (error) {
+                console.log('Error getting deck: ');
+                console.log(error);
+                return response.json([{name: "Failed to check legality", gatherer: null}]);
+            }
+            if (results.rows.length > 0) {
+                let deck = results.rows[0];
+                pool.query('SELECT * FROM deck_cards WHERE deckid = $1', [deckid], (err, res) => {
+                    if (err) {
+                        console.log('Error getting cards for deck: ' + deckid);
+                        console.log(err);
+                        return response.json([{name: "Failed to check legality", gatherer: null}]);
+                    }
+                    deck.cards = res.rows;
+                    pool.query('SELECT * FROM ban_list', (e, r) => {
+                        if (e) {
+                            console.log('Error getting ban list');
+                            console.log(e);
+                            return response.json([{name: "Failed to check legality", gatherer: null}]);
+                        }
+                        let banned_cards = r.rows
+                        pool.query('SELECT * FROM ban_types', (er, re) => {
+                            if (er) {
+                                console.log('Error getting ban types');
+                                console.log(er);
+                                return response.json([{name: "Failed to check legality", gatherer: null}]);
+                            }
+                            let ban_types = re.rows;
+                            let ban_list = [[],[],[],[]];
+                            banned_cards.forEach((card) => {
+                                ban_list[card.ban_type - 1].push(card);
+                            });
+                            let bad_cards = [];
+                            deck.cards.forEach((card) => {
+                                let card_data = getCardScryfallData(card.name);
+                                card.gatherer = card_data.gatherer ? card_data.gatherer: null;
+                                card.legality = card_data.legality;
+                                card.cheapest = card_data.cheapest;
+                            });
+                            for (let card of deck.cards) {
+                                let card_allowed = true;
+                                for (let banned_card of ban_list[getBanId("banned", ban_types) - 1]) {
+                                    if (card.name === banned_card.name) {
+                                        card_allowed = false;
+                                        break;
+                                    }
+                                }
+                                if (!card_allowed) {
+                                    bad_cards.push({name: card.name, gatherer: card.gatherer});
+                                    break;
+                                }
+                                else {
+                                    if (!card.legality || card.cheapest > 25) {
+                                        card_allowed = false;
+                                        if (card.iscommander) {
+                                            for (let unbanned_commander of ban_list[getBanId("allowed as commander", ban_types) - 1]) {
+                                                if (card.name === unbanned_commander.name) {
+                                                    card_allowed = true;
+                                                    break;
+                                                }
+                                            }
+                                        }
+                                        if (!card_allowed) {
+                                            for (let unbanned_card of ban_list[getBanId("unbanned", ban_types) - 1]) {
+                                                if (card.name === unbanned_card.name) {
+                                                    card_allowed = true;
+                                                    break;
+                                                }
+                                            }
+                                        }
+                                        if (!card_allowed) {
+                                            bad_cards.push({name: card.name, gatherer: card.gatherer});
+                                        }
+                                    }
+                                }
+                            }
+                            return response.json(bad_cards);
+                        });
+                    });
+                });
+            }
+            else {
+                return response.json([{name: "Failed to check legality", gatherer: null}]);
+            }
+        });
+}
+
 function getCardScryfallData(card_name) {
     let out_card = {};
     out_card.images = [];
@@ -873,8 +1034,9 @@ app.get('/api/cheap/commanders', getCheapCommanders);
 app.get('/api/cheap/randomdeck', getCheapDeck);
 app.get('/api/cheap/randomdecklist', getCheapDeckList);
 
-app.get('/api/userdecks/basic/:id', decksdb.getDecksForUserBasic);
-app.get('/api/decks/basic', decksdb.getAllDecksBasic);
+app.get('/api/userdecks/basic/:id', getDecksForUserBasic);
+app.get('/api/decks/basic', getDecksForUserBasic);
+app.get('/api/decks/legality/:id', getDeckLegality);
 
 app.get('/api/archidekt/deck/:id', getArchidektDeck);
 

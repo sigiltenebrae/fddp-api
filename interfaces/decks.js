@@ -224,27 +224,6 @@ exports.getDecksForUser = (request, response) => {
         })
 }
 
-exports.getDecksForUserBasic = (request, response) => {
-    const userid = parseInt(request.params.id);
-    let errors = [];
-    pool.query('SELECT * FROM decks WHERE owner = $1', [userid],
-        (error, results) => {
-            if (error) {
-                console.log('Error getting decks for user: ' + userid);
-                console.log(error);
-                return response.json({decks: [], errors: [error]});
-            }
-            else {
-                if (results.rows && results.rows.length > 0) {
-                    return response.json({decks: results.rows, errors: errors});
-                }
-                else {
-                    return response.json({decks: [], errors: []});
-                }
-            }
-        });
-}
-
 exports.getAllDecksBasic = (request, response) => {
     let errors = [];
     pool.query('SELECT * FROM decks',
