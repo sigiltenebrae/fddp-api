@@ -1,3 +1,14 @@
+const config = require("../config/db.config.js");
+const {request, response} = require("express");
+const Pool = require('pg').Pool
+const pool = new Pool({
+    user: config.USER,
+    host: config.HOST,
+    database: config.DB,
+    password: config.PASSWORD,
+    port: 5432,
+});
+
 exports.getGameTypes = (request, response) => {
     pool.query('SELECT * FROM game_types',
         (error, results) => {
@@ -18,7 +29,7 @@ exports.getGameTypes = (request, response) => {
 }
 
 exports.getGames = (request, response) => {
-    pool.query('SELECT * FROM games',
+    pool.query('SELECT * FROM games ORDER BY id DESC',
         (error, results) => {
             if (error) {
                 console.log('Error getting all games');
@@ -27,7 +38,28 @@ exports.getGames = (request, response) => {
             }
             else {
                 if (results.rows && results.rows.length > 0) {
-                    return response.json(results.rows);
+                    let games = results.rows;
+                    let game_promises = [];
+                    for (let game of games) {
+                        game_promises.push(new Promise((resolve) => {
+                            pool.query('SELECT * FROM game_results WHERE game_id =' + game.id,
+                                (err, res) => {
+                                    if (err) {
+                                        game.players = [];
+                                        resolve();
+                                    }
+                                    else {
+                                        if (res.rows) {
+                                            game.players = res.rows;
+                                        }
+                                        resolve();
+                                    }
+                                })
+                        }));
+                    }
+                    Promise.all(game_promises).then(() => {
+                        return response.json(games);
+                    });
                 }
                 else {
                     return response.json([]);
