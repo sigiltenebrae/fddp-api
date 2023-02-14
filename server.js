@@ -69,7 +69,9 @@ function updateDB() {
                             scryfalldata = JSON.parse(rawscryfalldata);
                             cheapdata = getCheapCardsList();
                             cheap_commanders_list = loadCheapCommanders();
-                            resolve();
+                            updateThemesDB().then(() => {
+                                resolve();
+                            })
                         });
                     });
                 }
@@ -78,6 +80,104 @@ function updateDB() {
                 resolve();
             });
         });
+}
+
+function themeInList(theme, list) {
+    for (let item of list) {
+        if (item.name === theme.name) {
+            return true;
+        }
+    }
+    return false;
+}
+
+function updateThemesDB() {
+    return new Promise((resolve) => {
+        axios.get('https://json.edhrec.com/pages/themes.json').then( themeres => {
+            const themes = themeres.data.container.json_dict.cardlists[0].cardviews;
+            axios.get('https://json.edhrec.com/pages/tribes.json').then( triberes => {
+                const tribes = triberes.data.container.json_dict.cardlists[0].cardviews;
+                pool.query('SELECT * FROM edhrec_themes', (theme_errors, theme_results) => {
+                    if (theme_errors) {
+                        console.log('error loading themes from db');
+                        console.log(theme_errors);
+                        resolve();
+                    }
+                    else {
+                        let theme_promises = [];
+                        for(let theme of themes) {
+                            if (!themeInList(theme, theme_results.rows)) {
+                                theme_promises.push(new Promise((resolve_theme) => {
+                                  pool.query('INSERT INTO edhrec_themes (name, url) VALUES ($1, $2)', [theme.name, theme.url],
+                                      (theme_err, theme_res) => {
+                                          if (theme_err) {
+                                              console.log(theme_err);
+                                              resolve_theme();
+                                          }
+                                      });
+                                }));
+                            }
+                        }
+                        for (let theme of theme_results.rows) {
+                            if (!themeInList(theme, themes)) {
+                                theme_promises.push(new Promise((resolve_theme) => {
+                                    pool.query('DELETE FROM edhrec_themes WHERE name = $1)', [theme.name],
+                                        (theme_err, theme_res) => {
+                                            if(theme_err) {
+                                                console.log(theme_err);
+                                                resolve_theme();
+                                            }
+                                        });
+                                }));
+                            }
+                        }
+                        pool.query('SELECT * FROM edhrec_tribes', (tribe_errors, tribe_results) => {
+                            if (tribe_errors) {
+                                console.log('error loading tribes from db');
+                                console.log(theme_errors);
+                                resolve();
+                            }
+                            else {
+                                let tribe_promises = [];
+                                for(let tribe of tribes) {
+                                    if (!themeInList(tribe, tribe_results.rows)) {
+                                        tribe_promises.push(new Promise((resolve_tribe) => {
+                                            pool.query('INSERT INTO edhrec_tribes (name, url) VALUES ($1, $2)', [tribe.name, tribe.url],
+                                                (tribe_err, tribe_res) => {
+                                                    if (tribe_err) {
+                                                        console.log(tribe_err);
+                                                        resolve_tribe();
+                                                    }
+                                                });
+                                        }));
+                                    }
+                                }
+                                for (let tribe of tribe_results.rows) {
+                                    if (!themeInList(tribe, tribes)) {
+                                        tribe_promises.push(new Promise((resolve_tribe) => {
+                                            pool.query('DELETE FROM edhrec_tribes WHERE name = $1', [tribe.name],
+                                                (tribe_err, tribe_res) => {
+                                                    if (tribe_err) {
+                                                        console.log(tribe_err);
+                                                        resolve_tribe();
+                                                    }
+                                                });
+                                        }));
+                                    }
+                                }
+                                Promise.all(theme_promises).then(() => {
+                                    Promise.all(tribe_promises).then(() => {
+                                       resolve();
+                                    });
+                                })
+
+                            }
+                        })
+                    }
+                })
+            })
+        })
+    })
 }
 
 function getCheapCardsList() {
