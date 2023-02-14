@@ -280,3 +280,139 @@ exports.getDeckList = (request, response) => {
         }
     })
 }
+
+exports.getThemesForDeck = (request, response) => {
+    if (request.body && request.body.deck_id) {
+        const deck_id = request.body.deck_id;
+        pool.query('SELECT * FROM deck_themes WHERE deck_id = $1', [deck_id], (theme_err, theme_res) => {
+            let deck_themes = [];
+            if (theme_err) {
+                console.log('error fetching themes for deck: ' + deck_id);
+                console.log(theme_err);
+                return response.json({themes: deck_themes, tribes: []});
+            }
+            else {
+                deck_themes = theme_res.rows;
+                pool.query('SELECT * FROM deck_tribes WHERE deck_id = $1', [deck_id], (tribe_err, tribe_res) => {
+                    let deck_tribes = [];
+                    if (tribe_err) {
+                        console.log('error fetching tribes for deck: ' + deck_id);
+                        console.log(theme_err);
+                    }
+                    else {
+                        deck_tribes = tribe_res.rows;
+                    }
+                    return response.json({themes: deck_themes, tribes: deck_tribes});
+                });
+            }
+        });
+    }
+}
+
+function themeInList(theme, list) {
+    for (let item of list) {
+        if (item.theme_id === theme.theme_id) {
+            return true;
+        }
+    }
+    return false;
+}
+
+function tribeInList(theme, list) {
+    for (let item of list) {
+        if (item.tribe_id === theme.tribe_id) {
+            return true;
+        }
+    }
+    return false;
+}
+
+exports.updateDeckThemes = (request, response) => {
+    if (request.body && request.body.themes && request.body.tribes) {
+        const deck_id = parseInt(request.params.id);
+        const new_themes = request.body.themes;
+        const new_tribes = request.body.tribes;
+        pool.query('SELECT * FROM deck_themes WHERE deck_id = $1', [deck_id], (theme_err, theme_res) => {
+            let deck_themes = [];
+            if (theme_err) {
+                console.log('error fetching themes for deck: ' + deck_id);
+                console.log(theme_err);
+                return response.json({errors: theme_err});
+            }
+            else {
+                deck_themes = theme_res.rows;
+                pool.query('SELECT * FROM deck_tribes WHERE deck_id = $1', [deck_id], (tribe_err, tribe_res) => {
+                    let deck_tribes = [];
+                    if (tribe_err) {
+                        console.log('error fetching tribes for deck: ' + deck_id);
+                        console.log(theme_err);
+                        return response.json({errors: tribe_err});
+                    }
+                    else {
+                        deck_tribes = tribe_res.rows
+                        let theme_promises = [];
+                        let tribe_promises = [];
+                        for(let theme of new_themes) {
+                            if (!themeInList(theme, deck_themes)) {
+                                theme_promises.push(new Promise((resolve_theme) => {
+                                    pool.query('INSERT INTO deck_themes (deck_id, theme_id) VALUES ($1, $2)', [deck_id, theme.theme_id],
+                                        (theme_err, theme_res) => {
+                                            if (theme_err) {
+                                                console.log(theme_err);
+                                            }
+                                            resolve_theme();
+                                        });
+                                }));
+                            }
+                        }
+                        for (let theme of deck_themes) {
+                            if (!themeInList(theme, new_themes)) {
+                                theme_promises.push(new Promise((resolve_theme) => {
+                                    pool.query('DELETE FROM deck_themes WHERE deck_id = $1 AND theme_id = $2', [deck_id, theme.theme_id],
+                                        (theme_err, theme_res) => {
+                                            if(theme_err) {
+                                                console.log(theme_err);
+                                            }
+                                            resolve_theme();
+                                        });
+                                }));
+                            }
+                        }
+                        for(let tribe of new_tribes) {
+                            if (!tribeInList(tribe, deck_tribes)) {
+                                tribe_promises.push(new Promise((resolve_tribe) => {
+                                    pool.query('INSERT INTO deck_tribes (deck_id, tribe_id) VALUES ($1, $2)', [deck_id, tribe.tribe_id],
+                                        (tribe_err, tribe_res) => {
+                                            if (tribe_err) {
+                                                console.log(tribe_err);
+                                            }
+                                            resolve_tribe();
+                                        });
+                                }));
+                            }
+                        }
+                        for (let tribe of deck_tribes) {
+                            if (!tribeInList(tribe, new_tribes)) {
+                                tribe_promises.push(new Promise((resolve_tribe) => {
+                                    pool.query('DELETE FROM deck_tribes WHERE deck_id = $1 AND tribe_id = $2', [deck_id, tribe.tribe_id],
+                                        (tribe_err, tribe_res) => {
+                                            if (tribe_err) {
+                                                console.log(tribe_err);
+                                            }
+                                            resolve_tribe();
+                                        });
+                                }));
+                            }
+                        }
+                        Promise.all(theme_promises).then(() => {
+                            Promise.all(tribe_promises).then(() => {
+                                return response.json({message: 'themes updated successfully'});
+                            })
+                        })
+
+                    }
+                });
+            }
+        });
+    }
+}

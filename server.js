@@ -23,6 +23,7 @@ const bansdb = require('./interfaces/ban_list');
 const authdb = require('./interfaces/auth');
 
 const {request, response} = require("express");
+const {updateDeckThemes} = require("./interfaces/decks");
 
 const app = express();
 const port = 2999;
@@ -121,7 +122,7 @@ function updateThemesDB() {
                         for (let theme of theme_results.rows) {
                             if (!themeInList(theme, themes)) {
                                 theme_promises.push(new Promise((resolve_theme) => {
-                                    pool.query('DELETE FROM edhrec_themes WHERE name = $1)', [theme.name],
+                                    pool.query('DELETE FROM edhrec_themes WHERE name = $1', [theme.name],
                                         (theme_err, theme_res) => {
                                             if(theme_err) {
                                                 console.log(theme_err);
@@ -167,6 +168,7 @@ function updateThemesDB() {
                                 }
                                 Promise.all(theme_promises).then(() => {
                                     Promise.all(tribe_promises).then(() => {
+                                        console.log('Themes synced with edhrec successfully');
                                        resolve();
                                     });
                                 })
@@ -878,8 +880,34 @@ getDecksForUserBasic = (request, response) => {
                                                         }
                                                     }
                                                 }
-                                                decks.push(deck_data);
-                                                resolve();
+                                                pool.query('SELECT * FROM deck_themes WHERE deck_id = $1', [deck_data.id], (theme_err, theme_res) => {
+                                                    let deck_themes = [];
+                                                    if (theme_err) {
+                                                        console.log('error fetching themes for deck: ' + deck_data.id);
+                                                        console.log(theme_err);
+                                                        deck_data.themes = [];
+                                                        deck_data.tribes = [];
+                                                        decks.push(deck_data);
+                                                        resolve();
+                                                    }
+                                                    else {
+                                                        deck_themes = theme_res.rows;
+                                                        pool.query('SELECT * FROM deck_tribes WHERE deck_id = $1', [deck_data.id], (tribe_err, tribe_res) => {
+                                                            let deck_tribes = [];
+                                                            if (tribe_err) {
+                                                                console.log('error fetching tribes for deck: ' + deck_data.id);
+                                                                console.log(theme_err);
+                                                            }
+                                                            else {
+                                                                deck_tribes = tribe_res.rows;
+                                                            }
+                                                            deck_data.themes = deck_themes;
+                                                            deck_data.tribes = deck_tribes;
+                                                            decks.push(deck_data);
+                                                            resolve();
+                                                        });
+                                                    }
+                                                });
                                             }
                                         });
                                 });
@@ -1136,8 +1164,33 @@ getDeckForPlay = (request, response) => {
                         if (token.g) { colors.push("G")}
                         token.colors = colors;
                     });
-                    console.log('compiled deck ' + deck.name);
-                    return response.json(deck);
+                    pool.query('SELECT * FROM deck_themes WHERE deck_id = $1', [id], (theme_err, theme_res) => {
+                        let deck_themes = [];
+                        if (theme_err) {
+                            console.log('error fetching themes for deck: ' + id);
+                            console.log(theme_err);
+                            deck.themes = [];
+                            deck.tribes = [];
+                            return response.json(deck);
+                        }
+                        else {
+                            deck_themes = theme_res.rows;
+                            pool.query('SELECT * FROM deck_tribes WHERE deck_id = $1', [id], (tribe_err, tribe_res) => {
+                                let deck_tribes = [];
+                                if (tribe_err) {
+                                    console.log('error fetching tribes for deck: ' + id);
+                                    console.log(theme_err);
+                                }
+                                else {
+                                    deck_tribes = tribe_res.rows;
+                                }
+                                deck.themes = deck_themes;
+                                deck.tribes = deck_tribes;
+                                return response.json(deck);
+                            });
+                        }
+                    });
+
                 });
             });
         }
@@ -1146,6 +1199,24 @@ getDeckForPlay = (request, response) => {
             return response.json({});
         }
     });
+}
+
+getThemes = (request, response) => {
+    pool.query('SELECT * FROM edhrec_themes', (theme_errors, theme_results) => {
+        if (theme_errors) {
+            return response.json({themes: [], tribes: []});
+        }
+        else {
+            pool.query('SELECT * FROM edhrec_tribes', (tribe_errors, tribe_results) => {
+                if (tribe_errors) {
+                    return response.json({themes: [], tribes: []});
+                }
+                else {
+                    return response.json({themes: theme_results.rows, tribes: tribe_results.rows});
+                }
+            })
+        }
+    })
 }
 
 app.post('/api/auth/signup', authdb.signup);
@@ -1202,6 +1273,9 @@ app.get('/api/games/results/:id', gamesdb.getGameResults);
 app.put('/api/games/results/:id', gamesdb.updateGameResults);
 
 app.get('/api/planes', getPlanesApi);
+
+app.get('/api/themes', getThemes);
+app.put('/api/themes/decks/:id', decksdb.updateDeckThemes);
 
 
 if (fs.existsSync('assets/default-cards.json')) {
