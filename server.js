@@ -1099,6 +1099,7 @@ app.post('/api/games', gamesdb.createGame);
 app.put('/api/games/start/:id', gamesdb.startGame);
 app.put('/api/games/:id', gamesdb.updateGame);
 app.get('/api/games/results/:id', gamesdb.getGameResults);
+app.put('/api/games/results/:id', gamesdb.updateGameResults);
 
 app.get('/api/planes', getPlanesApi);
 

@@ -183,3 +183,29 @@ exports.getGameResults = (request, response) => {
         }
     });
 }
+
+exports.updateGameResults = (request, response) => {
+    if (request.body && request.body.results) {
+        const res = request.body.results;
+        let result_promises = [];
+        for (let result of res) {
+            result_promises.push(new Promise((resolve) => {
+                pool.query('UPDATE game_results SET winner = $1 WHERE game_id = $2 AND deck_id = $3 AND player_id = $4',
+                    [result.winner, result.game_id, result.deck_id, result.player_id], (error, results) => {
+                        if (error) {
+                            console.log('Game results update failed for game with id: ' + result.game_id);
+                            console.log(error);
+                            resolve()
+                        }
+                        else {
+                            console.log('game updated with id ' + result.game_id)
+                            resolve()
+                        }
+                    })
+            }))
+        }
+        Promise.all(result_promises).then(() => {
+            return response.json({message: 'game update successful'});
+        });
+    }
+}
