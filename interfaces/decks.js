@@ -15,8 +15,8 @@ exports.createDeck = (request, response) => {
         console.log('creating deck');
         const deck = request.body.deck;
         let deck_errors = [];
-        pool.query('INSERT INTO decks (name, owner, sleeves, image, link, rating) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
-            [deck.name, deck.owner, deck.sleeves, deck.image, deck.link, deck.rating],
+        pool.query('INSERT INTO decks (name, owner, sleeves, image, link, rating, active) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *',
+            [deck.name, deck.owner, deck.sleeves, deck.image, deck.link, deck.rating, deck.active],
             (error, results) => {
                 if (error) {
                     console.log('deck creation failed');
@@ -72,8 +72,8 @@ exports.updateDeck = (request, response) => {
     let errors = [];
     if (request.body && request.body.deck) {
         const deck = request.body.deck;
-        pool.query('UPDATE decks SET name = $1, owner = $2, sleeves = $3, image = $4, link = $5, rating = $6 WHERE id = $7',
-            [deck.name, deck.owner, deck.sleeves, deck.image, deck.link, deck.rating, id],
+        pool.query('UPDATE decks SET name = $1, owner = $2, sleeves = $3, image = $4, link = $5, rating = $6, active = $7 WHERE id = $8',
+            [deck.name, deck.owner, deck.sleeves, deck.image, deck.link, deck.rating, deck.active, id],
             (error, results) => {
                 if (error) {
                     console.log('Deck update failed for deck with id: ' + id);
