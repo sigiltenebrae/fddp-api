@@ -68,6 +68,46 @@ exports.getGames = (request, response) => {
         });
 }
 
+exports.getGamesNoTest = (request, response) => {
+    pool.query('SELECT * FROM games WHERE type != 6 ORDER BY id DESC',
+        (error, results) => {
+            if (error) {
+                console.log('Error getting all games');
+                console.log(error);
+                return response.json({errors: [error]});
+            }
+            else {
+                if (results.rows && results.rows.length > 0) {
+                    let games = results.rows;
+                    let game_promises = [];
+                    for (let game of games) {
+                        game_promises.push(new Promise((resolve) => {
+                            pool.query('SELECT * FROM game_results WHERE game_id =' + game.id,
+                                (err, res) => {
+                                    if (err) {
+                                        game.players = [];
+                                        resolve();
+                                    }
+                                    else {
+                                        if (res.rows) {
+                                            game.players = res.rows;
+                                        }
+                                        resolve();
+                                    }
+                                })
+                        }));
+                    }
+                    Promise.all(game_promises).then(() => {
+                        return response.json(games);
+                    });
+                }
+                else {
+                    return response.json([]);
+                }
+            }
+        });
+}
+
 exports.getActiveGames = (request, response) => {
     pool.query('SELECT * FROM games WHERE active = true',
         (error, results) => {

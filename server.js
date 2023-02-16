@@ -1264,6 +1264,7 @@ app.get('/api/bans/types', bansdb.getBanTypes);
 
 app.get('/api/games/types', gamesdb.getGameTypes);
 app.get('/api/games/', gamesdb.getGames);
+app.get('/api/gamesnt/', gamesdb.getGamesNoTest);
 app.get('/api/games/active', gamesdb.getActiveGames);
 app.get('/api/games/:id', gamesdb.getGameById);
 app.post('/api/games', gamesdb.createGame);
