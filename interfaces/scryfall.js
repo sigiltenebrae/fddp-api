@@ -307,17 +307,17 @@ function getAllCardImages(card_name) {
     return images;
 }
 
-exports.getAllOfCardApi = (request, response) => {
+let getAllOfCardApi = (request, response) => {
     const card_name = request.body.name;
-    response.json(getAllOfCard(card_name));
+    return response.json(getAllOfCard(card_name));
 }
 
-exports.getScryfallCardApi = (request, response) => {
+let getScryfallCardApi = (request, response) => {
     const card_name = request.body.name;
-    response.json(getScryfallCard(card_name));
+    return response.json(getScryfallCard(card_name));
 }
 
-exports.getCardImagesApi = (request, response) => {
+let getCardImagesApi = (request, response) => {
     const card_name = request.body.name;
     console.log('Getting images for: ' + card_name);
     let out_card = {};
@@ -391,7 +391,7 @@ exports.getCardImagesApi = (request, response) => {
 /**
  * Gets all instances of a token in Scryfall and the local db
  */
-exports.getAllOfTokenApi = (request, response) => {
+let getAllOfTokenApi = (request, response) => {
     const card_name = request.body.name;
     let card_data = getAllOfCardFormatted(card_name);
     pool.query("SELECT * FROM custom_tokens WHERE name LIKE '" + card_name + "'", (error, results) => {
@@ -433,11 +433,9 @@ exports.getAllOfTokenApi = (request, response) => {
     });
 }
 
-exports.getPlanesApi = (request, response) => {
+let getPlanesApi = (request, response) => {
     return response.json(getPlanes());
 }
-
-
 
 module.exports = {
     loadCommanderData,
@@ -450,4 +448,9 @@ module.exports = {
     getCheapCommanderData,
     getFormattedScryfallCard,
     getAllCardImages,
+    getAllOfCardApi,
+    getScryfallCardApi,
+    getCardImagesApi,
+    getAllOfTokenApi,
+    getPlanesApi
 }

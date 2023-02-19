@@ -25,10 +25,6 @@ const authdb = require('./interfaces/auth');
 const randomdb = require('./interfaces/randomander');
 const themesdb = require('./interfaces/themes');
 
-const {request, response} = require("express");
-const {updateDeckThemes} = require("./interfaces/decks");
-const {GetAllOfCard, getScryfallCardApi} = require("./interfaces/scryfall");
-
 const app = express();
 const port = 2999;
 app.use(cors({
@@ -315,7 +311,7 @@ app.post('/api/decks', decksdb.createDeck);
 app.get('/api/decks/:id', decksdb.getDeck);
 app.put('/api/decks/:id', decksdb.updateDeck);
 app.delete('/api/decks/:id', decksdb.deleteDeck);
-app.get('/api/game/deck/:id', getDeckForPlay);
+app.get('/api/game/deck/:id', decksdb.getDeckForPlay);
 app.get('/api/decklist', decksdb.getDeckList);
 app.put('/api/themes/decks/:id', decksdb.updateDeckThemes);
 app.get('/api/userdecks/basic/:id', decksdb.getDecksBasic);
