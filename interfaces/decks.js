@@ -227,7 +227,9 @@ exports.getDecksForUser = (request, response) => {
 exports.getDeck = (request, response) => {
     const id = parseInt(request.params.id);
 
-    pool.query('SELECT * FROM decks where id = $1', [id], (error, results) => {
+    console.log('get deck')
+    console.log(id);
+    pool.query('SELECT * FROM decks where id=' + id , (error, results) => {
         if (error) {
             console.log('Error getting deck: ' + id);
             console.log(error);
@@ -401,7 +403,7 @@ exports.getDeckForPlay = (request, response) => {
     const id = parseInt(request.params.id);
     pool.query('SELECT * FROM decks where id = $1', [id], (error, results) => {
         if (error) {
-            console.log('Error getting deck: ');
+            console.log('Error getting deck for play: ');
             console.log(error);
             return response.json({errors: [error]});
         }

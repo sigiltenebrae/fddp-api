@@ -308,7 +308,6 @@ app.get('/api/decks/legality/:id', getDeckLegality);
 app.get('/api/archidekt/deck/:id', getArchidektDeck);
 
 app.post('/api/decks', decksdb.createDeck);
-app.get('/api/decks/:id', decksdb.getDeck);
 app.put('/api/decks/:id', decksdb.updateDeck);
 app.delete('/api/decks/:id', decksdb.deleteDeck);
 app.get('/api/game/deck/:id', decksdb.getDeckForPlay);
