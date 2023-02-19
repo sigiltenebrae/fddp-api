@@ -1,5 +1,5 @@
 const config = require("../config/db.config.js");
-const {request, response} = require("express");
+const scryfalldb = require('./scryfall');
 const Pool = require('pg').Pool
 const pool = new Pool({
     user: config.USER,
@@ -8,7 +8,6 @@ const pool = new Pool({
     password: config.PASSWORD,
     port: 5432,
 });
-const apidb = require('../server');
 
 exports.createDeck = (request, response) => {
     console.log('attempting to create deck');
@@ -225,26 +224,6 @@ exports.getDecksForUser = (request, response) => {
         })
 }
 
-exports.getAllDecksBasic = (request, response) => {
-    let errors = [];
-    pool.query('SELECT * FROM decks',
-        (error, results) => {
-            if (error) {
-                console.log('Error getting all decks');
-                console.log(error);
-                return response.json({decks: [], errors: [error]});
-            }
-            else {
-                if (results.rows && results.rows.length > 0) {
-                    return response.json({decks: results.rows, errors: errors});
-                }
-                else {
-                    return response.json({decks: [], errors: []});
-                }
-            }
-        });
-}
-
 exports.getDeck = (request, response) => {
     const id = parseInt(request.params.id);
 
@@ -418,6 +397,208 @@ exports.updateDeckThemes = (request, response) => {
     }
 }
 
-exports.testFunction = (request, response) => {
-    return response.json(apidb.getCardScryfallData('Forest'));
+exports.getDeckForPlay = (request, response) => {
+    const id = parseInt(request.params.id);
+    pool.query('SELECT * FROM decks where id = $1', [id], (error, results) => {
+        if (error) {
+            console.log('Error getting deck: ');
+            console.log(error);
+            return response.json({errors: [error]});
+        }
+        if (results.rows.length > 0) {
+            let deck = results.rows[0];
+            pool.query('SELECT * FROM deck_cards WHERE deckid = $1', [id], (err, res) => {
+                if (err) {
+                    console.log('Error getting cards for deck: ' + id);
+                    console.log(err);
+                    return response.json({deck: deck, errors: [err]});
+                }
+                deck.cards = res.rows;
+                deck.cards.forEach((card) => {
+                    let card_data = scryfalldb.getFormattedScryfallCard(card.name);
+
+                    card.back_face = card_data.back_face ? card_data.back_face: false;
+                    card.mana_cost = card_data.mana_cost ? card_data.mana_cost: [];
+                    card.color_identity = card_data.color_identity ? card_data.color_identity: [];
+                    card.back_mana_cost = card_data.back_mana_cost ? card_data.back_mana_cost: [];
+                    card.types = card_data.types ? card_data.types: [];
+                    card.back_types = card_data.back_types ? card_data.back_types: [];
+                    card.oracle_text = card_data.oracle_text ? card_data.oracle_text: '';
+                    card.back_oracle_text = card_data.back_oracle_text ? card_data.back_oracle_text: '';
+                    card.power = card_data.power != null && card_data.power !== '*' ? Number(card_data.power): card_data.power === '*' ? 0: null;
+                    card.back_power = card_data.back_power != null && card_data.back_power !== '*' ? Number(card_data.back_power): card_data.back_power === '*'? 0: null;
+                    card.toughness = card_data.toughness != null && card_data.toughness !== '*' ? Number(card_data.toughness): card_data.toughness === '*'? 0: null;
+                    card.back_toughness = card_data.back_toughness != null && card_data.back_toughness !== '*'? Number(card_data.back_toughness): card_data.back_toughness === '*' ? 0:  null;
+                    card.loyalty = card_data.loyalty != null ? Number(card_data.loyalty): null;
+                    card.back_loyalty = card_data.back_loyalty != null ? Number(card_data.back_loyalty): null;
+                    card.cmc = card_data.cmc != null ? Number(card_data.cmc): null;
+                    card.tokens = card_data.tokens ? card_data.tokens: [];
+                    card.gatherer = card_data.gatherer ? card_data.gatherer: null;
+                    card.legality = card_data.legality;
+                    card.cheapest = card_data.cheapest;
+                });
+                pool.query('SELECT * FROM deck_tokens WHERE deckid = $1', [id], (er, re) => {
+                    if (er) {
+                        console.log('Error getting tokens for deck ' + id);
+                        console.log(er);
+                        return response.json({deck: deck, errors: [er]});
+                    }
+                    deck.tokens = re.rows;
+                    deck.tokens.forEach((token) => {
+                        token.types = token.type_line.replace(/[^a-zA-Z0-9 ]/g, '').split(' ').filter(element => element);
+                        token.power = token.power != null && token.power !== '*' ? Number(token.power) : token.power === '*' ? 0: null;
+                        token.toughness = token.toughness != null && token.toughness !== '*' ? Number(token.toughness) : token.toughness === '*'? 0: null;
+                        let colors = [];
+                        if (token.w) { colors.push("W")}
+                        if (token.u) { colors.push("U")}
+                        if (token.b) { colors.push("B")}
+                        if (token.r) { colors.push("R")}
+                        if (token.g) { colors.push("G")}
+                        token.colors = colors;
+                    });
+                    pool.query('SELECT * FROM deck_themes WHERE deck_id = $1', [id], (theme_err, theme_res) => {
+                        let deck_themes = [];
+                        if (theme_err) {
+                            console.log('error fetching themes for deck: ' + id);
+                            console.log(theme_err);
+                            deck.themes = [];
+                            deck.tribes = [];
+                            return response.json(deck);
+                        }
+                        else {
+                            deck_themes = theme_res.rows;
+                            pool.query('SELECT * FROM deck_tribes WHERE deck_id = $1', [id], (tribe_err, tribe_res) => {
+                                let deck_tribes = [];
+                                if (tribe_err) {
+                                    console.log('error fetching tribes for deck: ' + id);
+                                    console.log(theme_err);
+                                }
+                                else {
+                                    deck_tribes = tribe_res.rows;
+                                }
+                                deck.themes = deck_themes;
+                                deck.tribes = deck_tribes;
+                                return response.json(deck);
+                            });
+                        }
+                    });
+
+                });
+            });
+        }
+        else {
+            console.log('deck returned null value');
+            return response.json({});
+        }
+    });
+}
+
+exports.getDecksBasic = (request, response) => {
+    let userid = null
+    if (request.params.id) {
+        userid = parseInt(request.params.id);
+        console.log('getting decks for user: ' + userid)
+    }
+    else {
+        console.log('getting all decks');
+    }
+
+    let errors = [];
+    let decks = [];
+    pool.query('SELECT * FROM decks' + (userid == null ? '': ' WHERE owner = ' + userid),
+        (error, results) => {
+            if (error) {
+                console.log('Error getting decks for user: ' + userid);
+                console.log(error);
+                return response.json({decks: [], errors: [error]});
+            } else {
+                if (results.rows && results.rows.length > 0) {
+                    let deck_data_promises = []
+                    for (let deck_data of results.rows) {
+                        deck_data_promises.push(new Promise((resolve, reject) => {
+                            pool.query('SELECT * FROM deck_cards WHERE deckid = $1 AND iscommander', [deck_data.id],
+                                (err, res) => {
+                                    if (err) {
+                                        console.log('Error getting cards for deck: ' + deck_data.id);
+                                        console.log(err);
+                                        errors.push(err);
+                                        deck_data.commander = [];
+                                        deck_data.colors = [];
+                                    } else {
+                                        deck_data.commander = res.rows;
+                                        deck_data.colors = [];
+                                        for (let card of deck_data.commander) {
+                                            let scryfall_card = scryfalldb.getFormattedScryfallCard(card.name);
+                                            for (let mana of scryfall_card.color_identity) {
+                                                if (mana === 'W' || mana === 'U' || mana === 'B' || mana === 'R' || mana === 'G') {
+                                                    deck_data.colors.push(mana);
+                                                }
+                                            }
+                                        }
+                                    }
+
+                                    pool.query('SELECT * FROM game_results WHERE deck_id = $1', [deck_data.id],
+                                        (e, r) => {
+                                            deck_data.wins = 0;
+                                            deck_data.losses = 0;
+                                            if (e) {
+                                                console.log('Error getting game results for deck: ' + deck_data.id);
+                                                console.log(err);
+                                                decks.push(deck_data);
+                                                resolve();
+                                            }
+                                            else {
+                                                if (r.rows.length > 0) {
+                                                    for (let result of r.rows) {
+                                                        if (result.winner != null) {
+                                                            if (result.winner) {
+                                                                deck_data.wins ++;
+                                                            }
+                                                            else {
+                                                                deck_data.losses ++;
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                                pool.query('SELECT * FROM deck_themes WHERE deck_id = $1', [deck_data.id], (theme_err, theme_res) => {
+                                                    let deck_themes = [];
+                                                    if (theme_err) {
+                                                        console.log('error fetching themes for deck: ' + deck_data.id);
+                                                        console.log(theme_err);
+                                                        deck_data.themes = [];
+                                                        deck_data.tribes = [];
+                                                        decks.push(deck_data);
+                                                        resolve();
+                                                    }
+                                                    else {
+                                                        deck_themes = theme_res.rows;
+                                                        pool.query('SELECT * FROM deck_tribes WHERE deck_id = $1', [deck_data.id], (tribe_err, tribe_res) => {
+                                                            let deck_tribes = [];
+                                                            if (tribe_err) {
+                                                                console.log('error fetching tribes for deck: ' + deck_data.id);
+                                                                console.log(theme_err);
+                                                            }
+                                                            else {
+                                                                deck_tribes = tribe_res.rows;
+                                                            }
+                                                            deck_data.themes = deck_themes;
+                                                            deck_data.tribes = deck_tribes;
+                                                            decks.push(deck_data);
+                                                            resolve();
+                                                        });
+                                                    }
+                                                });
+                                            }
+                                        });
+                                });
+                        }))
+                    }
+                    Promise.all(deck_data_promises).then(() => {
+                        return response.json({decks: decks, errors: errors});
+                    });
+                } else {
+                    return response.json({decks: [], errors: []});
+                }
+            }
+        });
 }
