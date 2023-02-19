@@ -8,6 +8,7 @@ const pool = new Pool({
     password: config.PASSWORD,
     port: 5432,
 });
+const apidb = require('../server');
 
 exports.createDeck = (request, response) => {
     console.log('attempting to create deck');
@@ -415,4 +416,8 @@ exports.updateDeckThemes = (request, response) => {
             }
         });
     }
+}
+
+exports.testFunction = (request, response) => {
+    return response.json(apidb.getCardScryfallData('Forest'));
 }

@@ -1279,6 +1279,8 @@ app.get('/api/themes', getThemes);
 app.put('/api/themes/decks/:id', decksdb.updateDeckThemes);
 
 
+app.get('/api/test', decksdb.testFunction);
+
 if (fs.existsSync('assets/default-cards.json')) {
     let rawscryfalldata = fs.readFileSync('assets/default-cards.json');
     scryfalldata = JSON.parse(rawscryfalldata);
@@ -1292,3 +1294,8 @@ updateDB().then(() => {
     }
 );
 setInterval(updateDB, 60000 * 60 * 24);
+
+//Will fail. Need to restructure - 1 file for the startup code that other files can call.
+module.exports = {
+    getCardScryfallData,
+}
