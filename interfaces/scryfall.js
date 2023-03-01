@@ -160,6 +160,26 @@ function getAllOfCard(card_name) {
     return card_data;
 }
 
+function getAllOfCardFormatted(card_name) {
+    let card_data = [];
+    for (let card of scryfalldata) {
+        if (card.name.toLowerCase() === card_name.toLowerCase()) {
+            card_data.push({
+                name: card.name,
+                image: card.image_uris != null && card.image_uris.png != null? card.image_uris.png: null,
+                types: card.type_line.replace(/[^a-zA-Z0-9 ]/g, '').split(' ').filter(element => element),
+                power: card.power != null && card.power !== '*'? Number(card.power): card.power === '*'? 0: null,
+                toughness: card.toughness != null && card.toughness !== '*'? Number(card.toughness): card.toughness === '*'? 0: null,
+                oracle_text: card.oracle_text,
+                date: card.released_at,
+                set_name: card.set_name,
+                colors: card.colors
+            });
+        }
+    }
+    return card_data;
+}
+
 /**
  * Returns the cheapest cost in usd found for the given card name
  * @param card_name
