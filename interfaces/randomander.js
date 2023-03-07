@@ -108,25 +108,27 @@ function getRandomCardsForCommander(commander, commander2, carddata) {
     let size = commander2 == null? 59: 58;
     while (deck.length < size) {
         let random_card = carddata[Math.floor(Math.random() * carddata.length)];
-        if (random_card.color_identity != null) {
-            let bad_card = false;
-            for (let color of random_card.color_identity) {
-                if (commander2 == null && !commander.color_identity.includes(color)) {
-                    bad_card = true;
-                    break;
+        if (random_card.type_line != null && !random_card.type_line.includes("Stickers")) {
+            if (random_card.color_identity != null) {
+                let bad_card = false;
+                for (let color of random_card.color_identity) {
+                    if (commander2 == null && !commander.color_identity.includes(color)) {
+                        bad_card = true;
+                        break;
+                    }
+                    else if (commander2 != null && !commander.color_identity.includes(color) && !commander2.color_identity.includes(color)) {
+                        bad_card = true;
+                        break;
+                    }
                 }
-                else if (commander2 != null && !commander.color_identity.includes(color) && !commander2.color_identity.includes(color)) {
-                    bad_card = true;
-                    break;
-                }
-            }
-            if (!bad_card) {
-                if (random_card.type_line != null && !random_card.type_line.includes("Land")) {
-                    const inArray = deck.some(element => {
-                        return element.name === random_card.name;
-                    });
-                    if (!inArray) {
-                        deck.push(random_card);
+                if (!bad_card) {
+                    if (random_card.type_line != null && !random_card.type_line.includes("Land")) {
+                        const inArray = deck.some(element => {
+                            return element.name === random_card.name;
+                        });
+                        if (!inArray) {
+                            deck.push(random_card);
+                        }
                     }
                 }
             }
