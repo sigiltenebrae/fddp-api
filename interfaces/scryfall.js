@@ -160,6 +160,21 @@ function getAllOfCard(card_name) {
     return card_data;
 }
 
+/**
+ * Return a list of all cards with a name containing the substring.
+ * @param card_name
+ * @returns {*[]}
+ */
+function searchScryfallCard(card_name) {
+    let card_data = [];
+    for (let card of scryfalldata) {
+        if (card.name.toLowerCase().includes(card_name.toLowerCase())) {
+            card_data.push(card);
+        }
+    }
+    return card_data;
+}
+
 function getAllOfCardFormatted(card_name) {
     let card_data = [];
     for (let card of scryfalldata) {
@@ -332,6 +347,11 @@ let getAllOfCardApi = (request, response) => {
     return response.json(getAllOfCard(card_name));
 }
 
+let searchCardApi = (request, response) => {
+    const card_name = request.body.name;
+    return response.json(searchScryfallCard(card_name));
+}
+
 let getScryfallCardApi = (request, response) => {
     const card_name = request.body.name;
     return response.json(getScryfallCard(card_name));
@@ -469,6 +489,7 @@ module.exports = {
     getFormattedScryfallCard,
     getAllCardImages,
     getAllOfCardApi,
+    searchCardApi,
     getScryfallCardApi,
     getCardImagesApi,
     getAllOfTokenApi,

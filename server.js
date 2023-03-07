@@ -197,6 +197,7 @@ app.put('/api/users/:id', usersdb.updateProfile);
 
 app.post('/api/cards', scryfalldb.getScryfallCardApi);
 app.post('/api/cards/all', scryfalldb.getAllOfCardApi);
+app.post('/api/cards/search', scryfalldb.searchCardApi);
 app.post('/api/tokens/all', scryfalldb.getAllOfTokenApi);
 app.post('/api/cards/images', scryfalldb.getCardImagesApi);
 app.get('/api/planes', scryfalldb.getPlanesApi);
