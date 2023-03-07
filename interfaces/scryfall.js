@@ -175,10 +175,13 @@ function searchScryfallCard(card_name) {
     return card_data;
 }
 
-function getAllOfCardFormatted(card_name) {
+function getAllOfCardFormatted(card_name, search) {
     let card_data = [];
     for (let card of scryfalldata) {
-        if (card.name.toLowerCase() === card_name.toLowerCase()) {
+        if (
+            (!search && card.name.toLowerCase() === card_name.toLowerCase()) ||
+            (search && card.name.toLowerCase().includes(card_name.toLowerCase()))
+        ) {
             card_data.push({
                 name: card.name,
                 image: card.image_uris != null && card.image_uris.png != null? card.image_uris.png: null,
@@ -433,7 +436,8 @@ let getCardImagesApi = (request, response) => {
  */
 let getAllOfTokenApi = (request, response) => {
     const card_name = request.body.name;
-    let card_data = getAllOfCardFormatted(card_name);
+    const search = request.body.search != null? request.body.search: false;
+    let card_data = getAllOfCardFormatted(card_name, search);
     pool.query("SELECT * FROM custom_tokens WHERE name LIKE '" + card_name + "'", (error, results) => {
         if (error) {
             console.log('Error getting custom cards for ' + card_name);
