@@ -235,6 +235,8 @@ app.delete('/api/custom_tokens/:id', customsdb.deleteCustomToken);
 
 app.get('/api/bans/list', bansdb.getBanList);
 app.get('/api/bans/types', bansdb.getBanTypes);
+app.post('/api/bans/create', bansdb.banCard);
+app.post('/api/bans/delete', bansdb.removeBan);
 
 app.get('/api/games/types', gamesdb.getGameTypes);
 app.get('/api/games/', gamesdb.getGames);

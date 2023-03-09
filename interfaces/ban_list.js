@@ -47,9 +47,39 @@ let getBanTypes = (request, response) => {
     })
 }
 
+let banCard = (request, response) => {
+    if (request.body && request.body.card) {
+        console.log('adding ban for card: ' + request.body.card.name);
+        pool.query('INSERT INTO ban_list (name, ban_type) VALUES ($1, $2)', [request.body.card.name, request.body.card.ban_type], (error, results) => {
+            if (error) {
+                console.log('Error creating ban');
+                console.log(error);
+                return response.json({errors: [error]});
+            }
+            return response.json({message: 'ban created successfully'});
+        });
+    }
+}
+
+let removeBan = (request, response) => {
+    if (request.body && request.body.card) {
+        pool.query('DELETE FROM ban_list WHERE name = $1', [request.body.card.name], (error, results) => {
+            if (error) {
+                console.log('Error deleting ban');
+                console.log(error);
+                return response.json({errors: [error]});
+            }
+            console.log('removed ban for: ' + request.body.card.name);
+            return response.json({message: 'ban deleted successfully'});
+        })
+    }
+}
+
 module.exports = {
     getBanList,
     getBanTypes,
     grabBanList,
-    grabBanTypes
+    grabBanTypes,
+    banCard,
+    removeBan
 }
