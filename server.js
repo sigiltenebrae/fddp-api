@@ -69,8 +69,10 @@ function updateDB() {
                             scryfalldb.loadCheapData(0.5);
                             scryfalldb.loadCheapCommanders();
                             updateThemesDB().then(() => {
-                                resolve();
-                            })
+                                legalitydb.updateAllLegalities().then(() => {
+                                    resolve();
+                                });
+                            });
                         });
                     });
                 }
@@ -92,9 +94,10 @@ function themeInList(theme, list) {
 
 function updateThemesDB() {
     return new Promise((resolve) => {
-        axios.get('https://json.edhrec.com/pages/themes.json').then( themeres => {
+        console.log('syncing with edhrec');
+        axios.get('https://json.edhrec.com/pages/themes.json', {timeout: 5000}).then( themeres => {
             const themes = themeres.data.container.json_dict.cardlists[0].cardviews;
-            axios.get('https://json.edhrec.com/pages/tribes.json').then( triberes => {
+            axios.get('https://json.edhrec.com/pages/tribes.json', {timeout: 5000}).then( triberes => {
                 const tribes = triberes.data.container.json_dict.cardlists[0].cardviews;
                 pool.query('SELECT * FROM edhrec_themes', (theme_errors, theme_results) => {
                     if (theme_errors) {
@@ -175,9 +178,15 @@ function updateThemesDB() {
                         })
                     }
                 })
-            })
-        })
-    })
+            }).catch((err) => {
+                console.log(err.message);
+                resolve();
+            });
+        }).catch((error) => {
+            console.log(error.message);
+            resolve();
+        });
+    });
 }
 
 getArchidektDeck = (request, response) =>{
@@ -249,10 +258,16 @@ if (fs.existsSync('assets/default-cards.json')) {
     scryfalldb.loadCheapData(0.5);
     scryfalldb.loadCheapCommanders();
 }
+/**
 updateDB().then(() => {
     app.listen(port, () => {
         console.log(`App running on port ${port}.`);
     });
     }
 );
+ */
+
+app.listen(port, () => {
+    console.log(`App running on port ${port}.`);
+});
 setInterval(updateDB, 60000 * 60 * 24);

@@ -257,16 +257,24 @@ function grabDeck(id) {
     })
 }
 
+function grabDecks() {
+    return new Promise((resolve) => {
+        pool.query('SELECT * FROM decks', (error, results) => {
+            if (error) {
+                console.log('Error getting deck list');
+                console.log(error);
+                resolve({errors: [error]});
+            }
+            else {
+                resolve({deck_list: results.rows});
+            }
+        })
+    })
+}
+
 let getDeckList = (request, response) => {
-    pool.query('SELECT * FROM decks', (error, results) => {
-        if (error) {
-            console.log('Error getting deck list');
-            console.log(error);
-            return response.json({errors: [error]});
-        }
-        else {
-            return response.json({deck_list: results.rows});
-        }
+    grabDecks().then((decks) => {
+        return response.json(decks);
     })
 }
 
@@ -633,6 +641,7 @@ module.exports = {
     getDecksForUser,
     getDeck,
     grabDeck,
+    grabDecks,
     getDeckList,
     getThemesForDeck,
     updateDeckThemes,
