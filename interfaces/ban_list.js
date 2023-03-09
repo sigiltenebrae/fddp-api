@@ -9,24 +9,47 @@ const pool = new Pool({
     port: 5432,
 });
 
-exports.getBanList = (request, response) => {
-    pool.query('SELECT * FROM ban_list', (error, results) => {
-        if (error) {
-            console.log('Error getting ban list');
-            console.log(error);
-            return response.json({errors: [error]});
-        }
-        return response.json(results.rows);
-    });
+function grabBanList() {
+    return new Promise((resolve) => {
+        pool.query('SELECT * FROM ban_list', (error, results) => {
+            if (error) {
+                console.log('Error getting ban list');
+                console.log(error);
+                resolve({errors: [error]});
+            }
+            resolve(results.rows);
+        });
+    })
 }
 
-exports.getBanTypes = (request, response) => {
-    pool.query('SELECT * FROM ban_types', (error, results) => {
-        if (error) {
-            console.log('Error getting ban types');
-            console.log(error);
-            return response.json({errors: [error]});
-        }
-        return response.json(results.rows);
-    });
+let getBanList = (request, response) => {
+    grabBanList().then((list) => {
+        return response.json(list);
+    })
+}
+
+function grabBanTypes() {
+    return new Promise((resolve) => {
+        pool.query('SELECT * FROM ban_types', (error, results) => {
+            if (error) {
+                console.log('Error getting ban types');
+                console.log(error);
+                resolve({errors: [error]});
+            }
+            resolve(results.rows);
+        });
+    })
+}
+
+let getBanTypes = (request, response) => {
+    grabBanTypes().then((types) => {
+        return response.json(types);
+    })
+}
+
+module.exports = {
+    getBanList,
+    getBanTypes,
+    grabBanList,
+    grabBanTypes
 }

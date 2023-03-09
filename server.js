@@ -24,6 +24,7 @@ const bansdb = require('./interfaces/ban_list');
 const authdb = require('./interfaces/auth');
 const randomdb = require('./interfaces/randomander');
 const themesdb = require('./interfaces/themes');
+const legalitydb = require('./interfaces/legality');
 
 const app = express();
 const port = 2999;
@@ -238,6 +239,8 @@ app.get('/api/games/results/:id', gamesdb.getGameResults);
 app.put('/api/games/results/:id', gamesdb.updateGameResults);
 
 app.get('/api/themes', themesdb.getThemes);
+
+app.get('/api/legality/update/:id', legalitydb.getLegality);
 
 if (fs.existsSync('assets/default-cards.json')) {
     let rawscryfalldata = fs.readFileSync('assets/default-cards.json');

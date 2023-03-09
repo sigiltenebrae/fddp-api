@@ -1,0 +1,88 @@
+const scryfalldb = require('./scryfall');
+const deckdb = require('./decks');
+const banlistdb = require('./ban_list');
+
+const config = require("../config/db.config.js");
+const {response} = require("express");
+const Pool = require('pg').Pool
+const pool = new Pool({
+    user: config.USER,
+    host: config.HOST,
+    database: config.DB,
+    password: config.PASSWORD,
+    port: 5432,
+});
+
+getLegality = (request, response) => {
+    const id = parseInt(request.params.id);
+    checkLegality(id).then((legality) => {
+        pool.query('UPDATE decks SET legality = $1 WHERE id = $2', [JSON.stringify(legality), id], (error, results) => {
+            if (error) {
+                console.log('error updating legality in db for deck with id: ' + id);
+            }
+            return response.json(legality);
+        });
+    });
+}
+
+function checkLegality(id) {
+    return new Promise((resolve) => {
+        let legality = null;
+        deckdb.grabDeckForPlay(id).then((deck) => {
+            if (deck.cards != null && deck.cards.length > 0) {
+                legality = [];
+                banlistdb.grabBanList().then((bans) => {
+                    banlistdb.grabBanTypes().then((btypes) => {
+                        let banlist = [[], [], [], []];
+                        let bantypes = {};
+                        for (let type of btypes) {
+                            bantypes[type.type] = type.id;
+                        }
+                        bans.forEach((card) => {
+                            banlist[card.ban_type - 1].push(card);
+                        });
+                        deck.cards.forEach((card) => {
+                            for (let banned_card of banlist[bantypes["banned"] - 1]) {
+                                if (card.name === banned_card.name) {
+                                    legality.push({name: card.name, gatherer: card.gatherer});
+                                    break;
+                                }
+                            }
+                            if (!card.legality || card.cheapest > 25) { //it is banned in commander
+                                let card_allowed = false;
+                                if (card.iscommander) {
+                                    for (let unbanned_commander of banlist[bantypes["allowed as commander"] - 1]) {
+                                        if (card.name === unbanned_commander.name) {
+                                            card_allowed = true;
+                                            break;
+                                        }
+                                    }
+                                }
+                                if (!card_allowed) {
+                                    for (let unbanned_card of banlist[bantypes["unbanned"] - 1]) {
+                                        if (card.name === unbanned_card.name) {
+                                            card_allowed = true;
+                                            break;
+                                        }
+                                    }
+                                }
+                                if (!card_allowed) {
+                                    legality.push({name: card.name, gatherer: card.gatherer});
+                                }
+                            }
+                        });
+                        resolve(legality);
+                    });
+                });
+            }
+            else {
+                console.log('deck grab failed for legality check');
+                resolve(legality);
+            }
+        });
+    });
+}
+
+module.exports = {
+    getLegality
+}
