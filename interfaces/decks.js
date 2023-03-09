@@ -72,7 +72,7 @@ let updateDeck = (request, response) => {
     let errors = [];
     if (request.body && request.body.deck) {
         const deck = request.body.deck;
-        pool.query('UPDATE decks SET name = $1, owner = $2, sleeves = $3, image = $4, link = $5, rating = $6, active = $7 WHERE id = $8',
+        pool.query('UPDATE decks SET name = $1, owner = $2, sleeves = $3, image = $4, link = $5, rating = $6, active = $7, modified = now() WHERE id = $8',
             [deck.name, deck.owner, deck.sleeves, deck.image, deck.link, deck.rating, deck.active, id],
             (error, results) => {
                 if (error) {
