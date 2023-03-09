@@ -250,6 +250,7 @@ app.put('/api/games/results/:id', gamesdb.updateGameResults);
 app.get('/api/themes', themesdb.getThemes);
 
 app.get('/api/legality/update/:id', legalitydb.getLegality);
+app.get('/api/legality/all/force', legalitydb.getAllLegalities);
 
 if (fs.existsSync('assets/default-cards.json')) {
     let rawscryfalldata = fs.readFileSync('assets/default-cards.json');

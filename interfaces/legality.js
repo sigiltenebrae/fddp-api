@@ -13,12 +13,18 @@ const pool = new Pool({
     port: 5432,
 });
 
-getLegality = (request, response) => {
+let getLegality = (request, response) => {
     const id = parseInt(request.params.id);
     console.log('updating legality for deck: ' + id);
     updateLegality(id).then((legality) => {
         return response.json(legality);
     });
+}
+
+let getAllLegalities = (request, response) => {
+    updateAllLegalities().then(() => {
+        return response.json({message: 'all legalities checked'});
+    })
 }
 
 function checkLegality(id) {
@@ -63,8 +69,13 @@ function checkLegality(id) {
                                     }
                                 }
                                 if (!card_allowed) {
-                                    legality.push({name: card.name, gatherer: card.gatherer,
-                                    reason: card.cheapest > 25 ? 'Price: ' + card.cheapest: 'Banned in Commander'});
+                                    const inArray = legality.some(element => {
+                                        return element.name === card.name;
+                                    });
+                                    if (!inArray) {
+                                        legality.push({name: card.name, gatherer: card.gatherer,
+                                            reason: card.cheapest > 25 ? 'Price: ' + card.cheapest: 'Banned in Commander'});
+                                    }
                                 }
                             }
                         });
@@ -113,5 +124,6 @@ function updateAllLegalities() {
 
 module.exports = {
     getLegality,
+    getAllLegalities,
     updateAllLegalities
 }

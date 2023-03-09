@@ -200,6 +200,7 @@ let getDecksForUser = (request, response) => {
                    let decks = [];
                    for (let deck_data of results.rows) {
                        let deck = deck_data;
+                       deck.legality = JSON.parse(deck_data.legality);
                        pool.query('SELECT * FROM deck_cards WHERE deckid = $1', [deck.id],
                            (err, res) => {
                                if (err) {
@@ -243,6 +244,7 @@ function grabDeck(id) {
             }
             if (results.rows.length > 0) {
                 let deck = results.rows[0];
+                deck.legality = JSON.parse(deck.legality);
                 pool.query('SELECT * FROM deck_cards WHERE deckid = $1', [id], (err, res) => {
                     if (err) {
                         console.log('Error getting cards for deck: ' + id);
@@ -266,7 +268,11 @@ function grabDecks() {
                 resolve({errors: [error]});
             }
             else {
-                resolve({deck_list: results.rows});
+                let deck_list = results.rows;
+                deck_list.forEach((deck) => {
+                    deck.legality = JSON.parse(deck.legality);
+                })
+                resolve({deck_list: deck_list});
             }
         })
     })
@@ -424,6 +430,7 @@ function grabDeckForPlay(id) {
             }
             if (results.rows.length > 0) {
                 let deck = results.rows[0];
+                deck.legality = JSON.parse(deck.legality);
                 pool.query('SELECT * FROM deck_cards WHERE deckid = $1', [id], (err, res) => {
                     if (err) {
                         console.log('Error getting cards for deck: ' + id);
@@ -619,6 +626,7 @@ let getDecksBasic = (request, response) => {
                     for (let deck_data of results.rows) {
                         deck_data_promises.push(new Promise((resolve, reject) => {
                             grabDeckBasic(deck_data).then(() => {
+                                deck_data.legality = JSON.parse(deck_data.legality);
                                 decks.push(deck_data);
                                 resolve();
                             })
