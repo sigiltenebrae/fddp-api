@@ -75,11 +75,24 @@ let removeBan = (request, response) => {
     }
 }
 
+let setBanImage = (request, response) => {
+    if (request.body && request.body.card) {
+        pool.query('UPDATE ban_list SET image = $1 WHERE name = $2', [request.body.card.image, request.body.card.name],
+            (error, results) => {
+                if (error) {
+                    console.log('failed to set ban image for ' + card.name);
+                }
+                return response.json({});
+            });
+    }
+}
+
 module.exports = {
     getBanList,
     getBanTypes,
     grabBanList,
     grabBanTypes,
     banCard,
-    removeBan
+    removeBan,
+    setBanImage
 }
