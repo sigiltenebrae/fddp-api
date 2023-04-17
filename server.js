@@ -212,6 +212,7 @@ app.post('/api/tokens/all', scryfalldb.getAllOfTokenApi);
 app.post('/api/cards/images', scryfalldb.getCardImagesApi);
 app.get('/api/planes', scryfalldb.getPlanesApi);
 app.get('/api/stickers', scryfalldb.getStickersApi);
+app.get('/api/attractions', scryfalldb.getAttractionsApi);
 
 app.get('/api/randomdeck/cheap', randomdb.getCheapRandomDeck);
 app.get('/api/randomdeck/regular', randomdb.getCheapRandomDeck);

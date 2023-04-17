@@ -1,4 +1,5 @@
 const config = require("../config/db.config.js");
+const {response} = require("express");
 const Pool = require('pg').Pool
 const pool = new Pool({
     user: config.USER,
@@ -331,6 +332,21 @@ function getStickers() {
     return stickers;
 }
 
+function getAttractions() {
+    let attractions = [];
+    for (let card of scryfalldata) {
+        if (card.type_line) {
+            let types = card.type_line.replace(/[^a-zA-Z0-9 ]/g, '').split(' ').filter(element => element);
+            if (types.includes('Attraction')) {
+                let out_card = formatScryfallCard(card)
+                out_card.image = card.image_uris != null && card.image_uris.png != null? card.image_uris.png: null;
+                attractions.push(out_card);
+            }
+        }
+    }
+    return attractions;
+}
+
 /**
  * Returns an array of all valid images for a given card name.
  * @param card_name
@@ -504,6 +520,10 @@ let getStickersApi = (request, response) => {
     return response.json(getStickers());
 }
 
+let getAttractionsApi = (request, response) => {
+    return response.json(getAttractions());
+}
+
 module.exports = {
     loadCommanderData,
     loadCheapCommanders,
@@ -522,5 +542,6 @@ module.exports = {
     getAllOfTokenApi,
     getPlanesApi,
     getStickers,
-    getStickersApi
+    getStickersApi,
+    getAttractionsApi
 }
