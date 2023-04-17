@@ -96,6 +96,278 @@ function getBackgroundsFromCommanderData(commanderdata) {
     return backs;
 }
 
+function colorLT(commander_1, commander_2, colors) {
+    for (let color of commander_1.color_identity) {
+        if (!colors.includes(color)) { //has a bad color
+            return false;
+        }
+    }
+    if (commander_2 != null) {
+        for (let color of commander_2.color_identity) {
+            if (!colors.includes(color)) { //has a bad color
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
+function colorEq(commander_1, commander_2, colors) {
+    if (!colorLT(commander_1, commander_2, colors)){
+        return false;
+    }
+    for (let color of colors) {
+        if (!commander_1.color_identity.includes(color)) {
+            if (!commander_2.color_identity.includes(color)) {
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
+function canPartner(random_commander) {
+    if (random_commander.keywords && random_commander.keywords.includes("Partner")) {
+        return true;
+    }
+    else if (random_commander.oracle_text && random_commander.oracle_text.includes("Friends forever")) {
+        return true;
+    }
+    else if (random_commander.oracle_text && random_commander.oracle_text.includes("Choose a Background")) {
+        return true;
+    }
+    else if (random_commander.type_line && random_commander.type_line.includes("Background")) {
+        return true;
+    }
+    return false;
+}
+
+function getRandomCommander(commanderdata, colors) {
+    let random_commander = null;
+    let random_commander_2 = null;
+    if (colors) {
+        while(true) {
+            random_commander = commanderdata[Math.floor(Math.random() * commanderdata.length)];
+            if (!colorLT(random_commander, null,  colors)) {
+                continue;
+            }
+            if (random_commander.color_identity.length === colors.length) { //all colors are represented
+                break;
+            }
+            if (!canPartner(random_commander)) {
+                continue;
+            }
+            if (random_commander.keywords && random_commander.keywords.includes("Partner")) {
+                let partners = getPartnersFromCommanderData(commanderdata);
+                if (random_commander.keywords.includes("Partner with")) {
+                    if (random_commander.all_parts != null && random_commander.all_parts.length > 0) {
+                        for (let part of random_commander.all_parts) {
+                            if (part.id !== random_commander.id) {
+                                let temp_partner = getCardById(part.id);
+                                if (temp_partner.keywords && temp_partner.keywords.includes("Partner with")) {
+                                    const inArray = commanderdata.some(element => {
+                                        return element.name === temp_partner.name;
+                                    });
+                                    if (inArray) {
+                                        random_commander_2 = temp_partner;
+                                        if  (!colorEq(random_commander, random_commander_2, colors)) {
+                                            continue;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                else {
+                    let count = 0;
+                    while(count < 20) {
+                        random_commander_2 = partners[Math.floor(Math.random() * partners.length)];
+                        if (colorEq(random_commander, random_commander_2, colors)) {
+                            break;
+                        }
+                        else {
+                            random_commander_2 = null;
+                        }
+                        count ++;
+                    }
+                    if (random_commander_2 == null) {
+                        continue;
+                    }
+                    else {
+                        break;
+                    }
+                }
+            }
+            else if (random_commander.oracle_text && random_commander.oracle_text.includes("Friends forever")) {
+                let ff_list = getFriendsForeverFromCommanderData(commanderdata);
+                let count = 0;
+                while(count < 20) {
+                    random_commander_2 = ff_list[Math.floor(Math.random() * ff_list.length)];
+                    if (colorEq(random_commander, random_commander_2, colors)) {
+                        break;
+                    }
+                    else {
+                        random_commander_2 = null;
+                    }
+                    count ++;
+                }
+                if (random_commander_2 == null) {
+                    continue;
+                }
+                else {
+                    break;
+                }
+            }
+            else if (random_commander.oracle_text && random_commander.oracle_text.includes("Choose a Background") && random_commander.name !== "Faceless One") {
+                let backgrounds = getBackgroundsFromCommanderData(commanderdata);
+                let count = 0;
+                while(count < 20) {
+                    random_commander_2 = backgrounds[Math.floor(Math.random() * backgrounds.length)];
+                    if (colorEq(random_commander, random_commander_2, colors)) {
+                        break;
+                    }
+                    else {
+                        random_commander_2 = null;
+                    }
+                    count ++;
+                }
+                if (random_commander_2 == null) {
+                    continue;
+                }
+                else {
+                    break;
+                }
+            }
+            else if (random_commander.type_line && random_commander.type_line.includes("Background") && random_commander.name !== "Faceless One") {
+                let choosers = getChooseBackgroundFromCommanderData(commanderdata);
+                let count = 0;
+                while(count < 20) {
+                    random_commander_2 = choosers[Math.floor(Math.random() * choosers.length)];
+                    if (colorEq(random_commander, random_commander_2, colors)) {
+                        break;
+                    }
+                    else {
+                        random_commander_2 = null;
+                    }
+                    count ++;
+                }
+                if (random_commander_2 == null) {
+                    continue;
+                }
+                else {
+                    break;
+                }
+            }
+            else if (random_commander.name === "Faceless One") {
+                if (Math.floor(Math.random() * 100) > 50) {
+                    let backgrounds = getBackgroundsFromCommanderData(commanderdata);
+                    let count = 0;
+                    while(count < 20) {
+                        random_commander_2 = backgrounds[Math.floor(Math.random() * backgrounds.length)];
+                        if (colorEq(random_commander, random_commander_2, colors)) {
+                            break;
+                        }
+                        else {
+                            random_commander_2 = null;
+                        }
+                        count ++;
+                    }
+                    if (random_commander_2 == null) {
+                        continue;
+                    }
+                    else {
+                        break;
+                    }
+                }
+                else {
+                    let choosers = getChooseBackgroundFromCommanderData(commanderdata);
+                    let count = 0;
+                    while(count < 20) {
+                        random_commander_2 = choosers[Math.floor(Math.random() * choosers.length)];
+                        if (colorEq(random_commander, random_commander_2, colors)) {
+                            break;
+                        }
+                        else {
+                            random_commander_2 = null;
+                        }
+                        count ++;
+                    }
+                    if (random_commander_2 == null) {
+                        continue;
+                    }
+                    else {
+                        break;
+                    }
+                }
+            }
+        }
+    }
+    else {
+        random_commander = commanderdata[Math.floor(Math.random() * commanderdata.length)];
+
+        if (random_commander.name === "Faceless One" || random_commander.name === "The Prismatic Piper") {
+            let colors = ["W", "U", "B", "R", "G"];
+            random_commander.color_identity = [colors[Math.floor(Math.random() * colors.length)]];
+        }
+
+
+
+        if (random_commander.keywords && random_commander.keywords.includes("Partner")) {
+            let partners = getPartnersFromCommanderData(commanderdata);
+            if (random_commander.keywords.includes("Partner with")) {
+                if (random_commander.all_parts != null && random_commander.all_parts.length > 0) {
+                    for (let part of random_commander.all_parts) {
+                        if (part.id !== random_commander.id) {
+                            let temp_partner = getCardById(part.id);
+                            if (temp_partner.keywords && temp_partner.keywords.includes("Partner with")) {
+                                const inArray = commanderdata.some(element => {
+                                    return element.name === temp_partner.name;
+                                });
+                                if (inArray) {
+                                    random_commander_2 = temp_partner;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            else {
+                random_commander_2 = partners[Math.floor(Math.random() * partners.length)];
+            }
+        }
+        else if (random_commander.oracle_text && random_commander.oracle_text.includes("Friends forever")) {
+            let ff_list = getFriendsForeverFromCommanderData(commanderdata);
+            random_commander_2 = ff_list[Math.floor(Math.random() * ff_list.length)];
+        }
+        else if (random_commander.oracle_text && random_commander.oracle_text.includes("Choose a Background") && random_commander.name !== "Faceless One") {
+            let backgrounds = getBackgroundsFromCommanderData(commanderdata);
+            random_commander_2 = backgrounds[Math.floor(Math.random() * backgrounds.length)];
+        }
+        else if (random_commander.type_line && random_commander.type_line.includes("Background") && random_commander.name !== "Faceless One") {
+            let choosers = getChooseBackgroundFromCommanderData(commanderdata);
+            random_commander_2 = choosers[Math.floor(Math.random() * choosers.length)];
+        }
+        else if (random_commander.name === "Faceless One") {
+            if (Math.floor(Math.random() * 100) > 50) {
+                let backgrounds = getBackgroundsFromCommanderData(commanderdata);
+                random_commander_2 = backgrounds[Math.floor(Math.random() * backgrounds.length)];
+            }
+            else {
+                let choosers = getChooseBackgroundFromCommanderData(commanderdata);
+                random_commander_2 = choosers[Math.floor(Math.random() * choosers.length)];
+            }
+        }
+        if (random_commander_2 != null) {
+            if (random_commander_2.name === "Faceless One" || random_commander_2.name === "The Prismatic Piper") {
+                let colors = ["W", "U", "B", "R", "G"];
+                random_commander_2.color_identity = [colors[Math.floor(Math.random() * colors.length)]];
+            }
+        }
+    }
+    return [random_commander, random_commander_2];
+}
+
 /**
  * Returns an array of cards matching the given commanders' color identity of length 60.
  * @param commander
@@ -260,66 +532,10 @@ function getBasicsForDeck(deck) {
  * @returns [any]
  */
 function getRandomDeck(commanderdata, carddata) {
-    let random_commander = commanderdata[Math.floor(Math.random() * commanderdata.length)];
 
-    if (random_commander.name === "Faceless One" || random_commander.name === "The Prismatic Piper") {
-        let colors = ["W", "U", "B", "R", "G"];
-        random_commander.color_identity = [colors[Math.floor(Math.random() * colors.length)]];
-    }
-
-    let random_commander_2 = null;
-
-    if (random_commander.keywords && random_commander.keywords.includes("Partner")) {
-        let partners = getPartnersFromCommanderData(commanderdata);
-        if (random_commander.keywords.includes("Partner with")) {
-            if (random_commander.all_parts != null && random_commander.all_parts.length > 0) {
-                for (let part of random_commander.all_parts) {
-                    if (part.id !== random_commander.id) {
-                        let temp_partner = getCardById(part.id);
-                        if (temp_partner.keywords && temp_partner.keywords.includes("Partner with")) {
-                            const inArray = commanderdata.some(element => {
-                                return element.name === temp_partner.name;
-                            });
-                            if (inArray) {
-                                random_commander_2 = temp_partner;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        else {
-            random_commander_2 = partners[Math.floor(Math.random() * partners.length)];
-        }
-    }
-    else if (random_commander.oracle_text && random_commander.oracle_text.includes("Friends forever")) {
-        let ff_list = getFriendsForeverFromCommanderData(commanderdata);
-        random_commander_2 = ff_list[Math.floor(Math.random() * ff_list.length)];
-    }
-    else if (random_commander.oracle_text && random_commander.oracle_text.includes("Choose a Background") && random_commander.name !== "Faceless One") {
-        let backgrounds = getBackgroundsFromCommanderData(commanderdata);
-        random_commander_2 = backgrounds[Math.floor(Math.random() * backgrounds.length)];
-    }
-    else if (random_commander.type_line && random_commander.type_line.includes("Background") && random_commander.name !== "Faceless One") {
-        let choosers = getChooseBackgroundFromCommanderData(commanderdata);
-        random_commander_2 = choosers[Math.floor(Math.random() * choosers.length)];
-    }
-    else if (random_commander.name === "Faceless One") {
-        if (Math.floor(Math.random() * 100) > 50) {
-            let backgrounds = getBackgroundsFromCommanderData(commanderdata);
-            random_commander_2 = backgrounds[Math.floor(Math.random() * backgrounds.length)];
-        }
-        else {
-            let choosers = getChooseBackgroundFromCommanderData(commanderdata);
-            random_commander_2 = choosers[Math.floor(Math.random() * choosers.length)];
-        }
-    }
-    if (random_commander_2 != null) {
-        if (random_commander_2.name === "Faceless One" || random_commander_2.name === "The Prismatic Piper") {
-            let colors = ["W", "U", "B", "R", "G"];
-            random_commander_2.color_identity = [colors[Math.floor(Math.random() * colors.length)]];
-        }
-    }
+    let temp_commanders = getRandomCommander(commanderdata, null);
+    let random_commander = temp_commanders[0];
+    let random_commander_2 = temp_commanders[1];
 
     let random_deck = getRandomCardsForCommander(random_commander, random_commander_2, carddata);
     let random_lands = getRandomLandsForCommander(random_commander, random_commander_2, carddata);
@@ -369,4 +585,13 @@ exports.getCheapRandomDeck = (request, response) => {
 
 exports.getRandomDeck = (request, response) => {
     response.json(getRandomDeckForPlay(scryfalldb.getCommanderData(), scryfalldb.getScryfallData()));
+}
+
+exports.getRandomCommanderAPI = (request, response) => {
+    if (request.body && request.body.colors) {
+        response.json(getRandomCommander(scryfalldb.getCommanderData(), request.body.colors));
+    }
+    else {
+        response.json(getRandomCommander(scryfalldb.getCommanderData(), null));
+    }
 }

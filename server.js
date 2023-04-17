@@ -214,6 +214,7 @@ app.get('/api/planes', scryfalldb.getPlanesApi);
 
 app.get('/api/randomdeck/cheap', randomdb.getCheapRandomDeck);
 app.get('/api/randomdeck/regular', randomdb.getCheapRandomDeck);
+app.get('/api/randomcommander/', randomdb.getRandomCommanderAPI);
 
 app.get('/api/archidekt/deck/:id', getArchidektDeck);
 
@@ -256,22 +257,34 @@ app.get('/api/legality/update/:id', legalitydb.getLegality);
 app.get('/api/legality/all/force', legalitydb.getAllLegalities);
 
 if (fs.existsSync('assets/default-cards.json')) {
-    let rawscryfalldata = fs.readFileSync('assets/default-cards.json');
-    scryfalldb.setScryfallData(JSON.parse(rawscryfalldata));
-    scryfalldb.loadCommanderData();
-    scryfalldb.loadCheapData(0.5);
-    scryfalldb.loadCheapCommanders();
-}
-/**
-updateDB().then(() => {
-    app.listen(port, () => {
-        console.log(`App running on port ${port}.`);
-    });
+    console.log('db file exists');
+    let mtime = fs.statSync("assets/default-cards.json").mtime
+    if ((Math.abs(Date.now() - mtime) / 1000) > (60 * 60 * 24)) {
+        console.log('db file too old, updating');
+        updateDB().then(() => {
+            app.listen(port, () => {
+                console.log(`App running on port ${port}.`);
+            });
+        });
     }
-);
- */
+    else {
+        let rawscryfalldata = fs.readFileSync('assets/default-cards.json');
+        scryfalldb.setScryfallData(JSON.parse(rawscryfalldata));
+        scryfalldb.loadCommanderData();
+        scryfalldb.loadCheapData(0.5);
+        scryfalldb.loadCheapCommanders();
+        app.listen(port, () => {
+            console.log(`App running on port ${port}.`);
+        });
+    }
+}
+else {
+    console.log('db file missing');
+    updateDB().then(() => {
+        app.listen(port, () => {
+            console.log(`App running on port ${port}.`);
+        });
+    });
+}
 
-app.listen(port, () => {
-    console.log(`App running on port ${port}.`);
-});
 setInterval(updateDB, 60000 * 60 * 24);
