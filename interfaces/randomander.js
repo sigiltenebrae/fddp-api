@@ -380,7 +380,7 @@ function getRandomCardsForCommander(commander, commander2, carddata) {
     let size = commander2 == null? 59: 58;
     while (deck.length < size) {
         let random_card = carddata[Math.floor(Math.random() * carddata.length)];
-        if (random_card.type_line != null && !random_card.type_line.includes("Stickers")) {
+        if (random_card.type_line != null && !random_card.type_line.includes("Stickers") && !random_card.type_line.includes("Attraction")) {
             if (random_card.color_identity != null) {
                 let bad_card = false;
                 for (let color of random_card.color_identity) {
