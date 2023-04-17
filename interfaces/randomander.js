@@ -580,18 +580,34 @@ function getRandomDeckForPlay(commanderdata, carddata) {
 }
 
 exports.getCheapRandomDeck = (request, response) => {
-    response.json(getRandomDeckForPlay(scryfalldb.getCheapCommanderData(), scryfalldb.getCheapData()));
+    let deck = getRandomDeckForPlay(scryfalldb.getCheapCommanderData(), scryfalldb.getCheapData());
+    let stickers = scryfalldb.getStickers();
+    deck.stickers = [];
+    for (let i = 0; i < 3; i++) {
+        let ind = Math.floor(Math.random() * stickers.length);
+        deck.stickers.push(stickers[ind]);
+        stickers.splice(ind, 1);
+    }
+    return response.json(deck);
 }
 
 exports.getRandomDeck = (request, response) => {
-    response.json(getRandomDeckForPlay(scryfalldb.getCommanderData(), scryfalldb.getScryfallData()));
+    let deck = getRandomDeckForPlay(scryfalldb.getCommanderData(), scryfalldb.getScryfallData());
+    let stickers = scryfalldb.getStickers();
+    deck.stickers = [];
+    for (let i = 0; i < 3; i++) {
+        let ind = Math.floor(Math.random() * stickers.length);
+        deck.stickers.push(stickers[ind]);
+        stickers.splice(ind, 1);
+    }
+    return response.json(deck);
 }
 
 exports.getRandomCommanderAPI = (request, response) => {
     if (request.body && request.body.colors) {
-        response.json(getRandomCommander(scryfalldb.getCommanderData(), request.body.colors));
+        return response.json(getRandomCommander(scryfalldb.getCommanderData(), request.body.colors));
     }
     else {
-        response.json(getRandomCommander(scryfalldb.getCommanderData(), null));
+        return response.json(getRandomCommander(scryfalldb.getCommanderData(), null));
     }
 }

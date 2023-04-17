@@ -220,79 +220,83 @@ function getCheapestCost(card_name) {
  * @returns {any}
  */
 function getFormattedScryfallCard(card_name) {
-    let out_card = {};
-    out_card.images = [];
-    out_card.back_images = [];
     for (let card of scryfalldata) {
         if (card.name.toLowerCase() === card_name.toLowerCase()) {
-            out_card.name = card.name;
-            if (card.card_faces && card.card_faces.length === 2){
-                out_card.back_face = true;
-                out_card.mana_cost = card.card_faces[0].mana_cost != null? card.card_faces[0].mana_cost.replace(/[^a-zA-Z0-9 ]/g, '').split('').filter(element => element): null;
-                out_card.color_identity = card.color_identity != null? card.color_identity.join('').replace(/[^a-zA-Z0-9 ]/g, '').split('').filter(element => element): null;
-                out_card.back_mana_cost = card.card_faces[1].mana_cost != null ? card.card_faces[1].mana_cost.replace(/[^a-zA-Z0-9 ]/g, '').split('').filter(element => element): null;
-                out_card.types = card.card_faces[0].type_line.replace(/[^a-zA-Z0-9 ]/g, '').split(' ').filter(element => element);
-                out_card.back_types = card.card_faces[1].type_line.replace(/[^a-zA-Z0-9 ]/g, '').split(' ').filter(element => element);
-                out_card.oracle_text = card.card_faces[0].oracle_text;
-                out_card.back_oracle_text = card.card_faces[1].oracle_text;
-                out_card.power = card.card_faces[0].power != null && card.card_faces[0].power !== '*' ? Number(card.card_faces[0].power): card.card_faces[0].power === '*'? 0: null;
-                out_card.back_power = card.card_faces[1].power != null && card.card_faces[1].power !== '*' ? Number(card.card_faces[1].power): card.card_faces[1].power === '*'? 0: null;
-                out_card.toughness = card.card_faces[0].toughness != null && card.card_faces[0].toughness !== '*' ? Number(card.card_faces[0].toughness): card.card_faces[0].toughness === '*'? 0: null;
-                out_card.back_toughness = card.card_faces[1].toughness != null && card.card_faces[1].toughness !== '*' ? Number(card.card_faces[1].toughness): card.card_faces[1].toughness === '*' ? 0: null;
-                out_card.loyalty = card.card_faces[0].loyalty != null ? Number(card.card_faces[0].loyalty): null;
-                out_card.back_loyalty = card.card_faces[1].loyalty != null ? Number(card.card_faces[1].loyalty): null;
-                out_card.legality = card.legalities.commander === 'legal';
-                out_card.cheapest = getCheapestCost(card.name);
-            }
-            else{
-                out_card.back_face = false;
-                out_card.color_identity = card.color_identity != null? card.color_identity.join('').replace(/[^a-zA-Z0-9 ]/g, '').split('').filter(element => element): null;
-                out_card.mana_cost = card.mana_cost != null ? card.mana_cost.replace(/[^a-zA-Z0-9 ]/g, '').split('').filter(element => element): null;
-                out_card.back_mana_cost = null;
-                out_card.types = card.type_line.replace(/[^a-zA-Z0-9 ]/g, '').split(' ').filter(element => element);
-                out_card.back_types = null;
-                out_card.oracle_text = card.oracle_text;
-                out_card.back_oracle_text = null;
-                out_card.power = card.power != null && card.power !== '*' ? Number(card.power): card.power === '*' ? 0: null;
-                out_card.back_power = null;
-                out_card.toughness = card.toughness != null && card.toughness !== '*' ? Number(card.toughness): card.toughness === '*'? 0: null;
-                out_card.back_toughness = null;
-                out_card.loyalty = card.loyalty != null ? Number(card.loyalty): null;
-                out_card.back_loyalty = null;
-                out_card.legality = card.legalities.commander === 'legal';
-                out_card.cheapest = getCheapestCost(card.name);
-            }
-            out_card.cmc = card.cmc;
-            if (card.all_parts) {
-                let tokens = [];
-                for (let part of card.all_parts) {
-                    if (part.component === 'token' || part.type_line.includes('Emblem')) {
-                        //tokens.push({name: part.name, types: part.type_line.replace(/[^a-zA-Z0-9 ]/g, '').split(' ').filter(element => element),})
-                        let token_data = getScryfallCardById(part.id);
-                        tokens.push(
-                            {
-                                name: token_data.name,
-                                types: token_data.type_line.replace(/[^a-zA-Z0-9 ]/g, '').split(' ').filter(element => element),
-                                oracle_text: token_data.oracle_text,
-                                power: token_data.power != null && token_data.power !== '*' ? Number(token_data.power) : token_data.power === '*'? 0: null,
-                                toughness: token_data.toughness != null && token_data.toughness !== '*' ? Number(token_data.toughness) : token_data.toughness === '*'? 0: null,
-                                colors: token_data.colors,
-                                image: token_data.image_uris.png
-                            }
-                        )
-                    }
-                }
-                if (tokens.length > 0) {
-                    out_card.tokens = tokens;
-                }
-            }
-            if (card.related_uris && card.related_uris.gatherer) {
-                out_card.gatherer = card.related_uris.gatherer;
-            }
-            return out_card;
+            return formatScryfallCard(card);
         }
     }
     return {};
+}
+
+function formatScryfallCard(card) {
+    let out_card = {};
+    out_card.images = [];
+    out_card.back_images = [];
+    out_card.name = card.name;
+    if (card.card_faces && card.card_faces.length === 2){
+        out_card.back_face = true;
+        out_card.mana_cost = card.card_faces[0].mana_cost != null? card.card_faces[0].mana_cost.replace(/[^a-zA-Z0-9 ]/g, '').split('').filter(element => element): null;
+        out_card.color_identity = card.color_identity != null? card.color_identity.join('').replace(/[^a-zA-Z0-9 ]/g, '').split('').filter(element => element): null;
+        out_card.back_mana_cost = card.card_faces[1].mana_cost != null ? card.card_faces[1].mana_cost.replace(/[^a-zA-Z0-9 ]/g, '').split('').filter(element => element): null;
+        out_card.types = card.card_faces[0].type_line.replace(/[^a-zA-Z0-9 ]/g, '').split(' ').filter(element => element);
+        out_card.back_types = card.card_faces[1].type_line.replace(/[^a-zA-Z0-9 ]/g, '').split(' ').filter(element => element);
+        out_card.oracle_text = card.card_faces[0].oracle_text;
+        out_card.back_oracle_text = card.card_faces[1].oracle_text;
+        out_card.power = card.card_faces[0].power != null && card.card_faces[0].power !== '*' ? Number(card.card_faces[0].power): card.card_faces[0].power === '*'? 0: null;
+        out_card.back_power = card.card_faces[1].power != null && card.card_faces[1].power !== '*' ? Number(card.card_faces[1].power): card.card_faces[1].power === '*'? 0: null;
+        out_card.toughness = card.card_faces[0].toughness != null && card.card_faces[0].toughness !== '*' ? Number(card.card_faces[0].toughness): card.card_faces[0].toughness === '*'? 0: null;
+        out_card.back_toughness = card.card_faces[1].toughness != null && card.card_faces[1].toughness !== '*' ? Number(card.card_faces[1].toughness): card.card_faces[1].toughness === '*' ? 0: null;
+        out_card.loyalty = card.card_faces[0].loyalty != null ? Number(card.card_faces[0].loyalty): null;
+        out_card.back_loyalty = card.card_faces[1].loyalty != null ? Number(card.card_faces[1].loyalty): null;
+        out_card.legality = card.legalities.commander === 'legal';
+        out_card.cheapest = getCheapestCost(card.name);
+    }
+    else{
+        out_card.back_face = false;
+        out_card.color_identity = card.color_identity != null? card.color_identity.join('').replace(/[^a-zA-Z0-9 ]/g, '').split('').filter(element => element): null;
+        out_card.mana_cost = card.mana_cost != null ? card.mana_cost.replace(/[^a-zA-Z0-9 ]/g, '').split('').filter(element => element): null;
+        out_card.back_mana_cost = null;
+        out_card.types = card.type_line.replace(/[^a-zA-Z0-9 ]/g, '').split(' ').filter(element => element);
+        out_card.back_types = null;
+        out_card.oracle_text = card.oracle_text;
+        out_card.back_oracle_text = null;
+        out_card.power = card.power != null && card.power !== '*' ? Number(card.power): card.power === '*' ? 0: null;
+        out_card.back_power = null;
+        out_card.toughness = card.toughness != null && card.toughness !== '*' ? Number(card.toughness): card.toughness === '*'? 0: null;
+        out_card.back_toughness = null;
+        out_card.loyalty = card.loyalty != null ? Number(card.loyalty): null;
+        out_card.back_loyalty = null;
+        out_card.legality = card.legalities.commander === 'legal';
+        out_card.cheapest = getCheapestCost(card.name);
+    }
+    out_card.cmc = card.cmc;
+    if (card.all_parts) {
+        let tokens = [];
+        for (let part of card.all_parts) {
+            if (part.component === 'token' || part.type_line.includes('Emblem')) {
+                //tokens.push({name: part.name, types: part.type_line.replace(/[^a-zA-Z0-9 ]/g, '').split(' ').filter(element => element),})
+                let token_data = getScryfallCardById(part.id);
+                tokens.push(
+                    {
+                        name: token_data.name,
+                        types: token_data.type_line.replace(/[^a-zA-Z0-9 ]/g, '').split(' ').filter(element => element),
+                        oracle_text: token_data.oracle_text,
+                        power: token_data.power != null && token_data.power !== '*' ? Number(token_data.power) : token_data.power === '*'? 0: null,
+                        toughness: token_data.toughness != null && token_data.toughness !== '*' ? Number(token_data.toughness) : token_data.toughness === '*'? 0: null,
+                        colors: token_data.colors,
+                        image: token_data.image_uris.png
+                    }
+                )
+            }
+        }
+        if (tokens.length > 0) {
+            out_card.tokens = tokens;
+        }
+    }
+    if (card.related_uris && card.related_uris.gatherer) {
+        out_card.gatherer = card.related_uris.gatherer;
+    }
+    return out_card;
 }
 
 /**
@@ -318,7 +322,7 @@ function getStickers() {
         if (card.type_line) {
             let types = card.type_line.replace(/[^a-zA-Z0-9 ]/g, '').split(' ').filter(element => element);
             if (types.includes('Stickers')) {
-                stickers.push(card.name);
+                stickers.push(formatScryfallCard(card));
             }
         }
     }
@@ -515,5 +519,6 @@ module.exports = {
     getCardImagesApi,
     getAllOfTokenApi,
     getPlanesApi,
+    getStickers,
     getStickersApi
 }

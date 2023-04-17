@@ -521,6 +521,13 @@ function grabDeckForPlay(id) {
 let getDeckForPlay = (request, response) => {
     const id = parseInt(request.params.id);
     grabDeckForPlay(id).then((deck) => {
+        let stickers = scryfalldb.getStickers();
+        deck.stickers = [];
+        for (let i = 0; i < 3; i++) {
+            let ind = Math.floor(Math.random() * stickers.length);
+            deck.stickers.push(stickers[ind]);
+            stickers.splice(ind, 1);
+        }
         return response.json(deck);
     })
 }
