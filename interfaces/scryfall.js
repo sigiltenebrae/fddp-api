@@ -322,7 +322,9 @@ function getStickers() {
         if (card.type_line) {
             let types = card.type_line.replace(/[^a-zA-Z0-9 ]/g, '').split(' ').filter(element => element);
             if (types.includes('Stickers')) {
-                stickers.push(formatScryfallCard(card));
+                let out_card = formatScryfallCard(card)
+                out_card.image = card.image_uris != null && card.image_uris.png != null? card.image_uris.png: null;
+                stickers.push(out_card);
             }
         }
     }
