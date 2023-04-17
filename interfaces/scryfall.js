@@ -312,6 +312,19 @@ function getPlanes() {
     return planes;
 }
 
+function getStickers() {
+    let stickers = [];
+    for (let card of scryfalldata) {
+        if (card.type_line) {
+            let types = card.type_line.replace(/[^a-zA-Z0-9 ]/g, '').split(' ').filter(element => element);
+            if (types.includes('Stickers')) {
+                stickers.push(card.name);
+            }
+        }
+    }
+    return stickers;
+}
+
 /**
  * Returns an array of all valid images for a given card name.
  * @param card_name
@@ -481,6 +494,10 @@ let getPlanesApi = (request, response) => {
     return response.json(getPlanes());
 }
 
+let getStickersApi = (request, response) => {
+    return response.json(getStickers());
+}
+
 module.exports = {
     loadCommanderData,
     loadCheapCommanders,
@@ -497,5 +514,6 @@ module.exports = {
     getScryfallCardApi,
     getCardImagesApi,
     getAllOfTokenApi,
-    getPlanesApi
+    getPlanesApi,
+    getStickersApi
 }
