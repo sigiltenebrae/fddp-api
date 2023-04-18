@@ -534,6 +534,49 @@ let getDeckForPlay = (request, response) => {
     })
 }
 
+function grabLastPlayed(deck_id) {
+    return new Promise((resolve) => {
+        pool.query('SELECT game_id FROM game_results WHERE deck_id = ' + deck_id + ' ORDER BY game_id DESC',
+            (err, res) => {
+                if (err) {
+                    console.log('Error getting games for deck: ' + deck_data.id);
+                    console.log(err);
+                    resolve(null);
+                }
+                else {
+                    let games = res.rows;
+                    let last_played = null;
+                    let game_promises = [];
+                    for (let game of games) {
+                        game_promises.push(new Promise((resolve_game) => {
+                            pool.query('SELECT * FROM games WHERE id = ' + game.game_id,
+                                (e, r) => {
+                                    if (e) {
+                                        console.log('Error getting games with id: ' + game.game_id);
+                                        console.log(err);
+                                    }
+                                    else {
+                                        if (r.rows && r.rows.length === 1) {
+                                            let game_data = r.rows[0];
+                                            if (game_data.started != null && !game_data.test) {
+                                                if (last_played == null || last_played < game_data.started) {
+                                                    last_played = game_data.started;
+                                                }
+                                            }
+                                        }
+                                    }
+                                    resolve_game();
+                                });
+                        }));
+                    }
+                    Promise.all(game_promises).then(() => {
+                        resolve(last_played);
+                    });
+                }
+            });
+    });
+}
+
 function grabDeckBasic(deck_data) {
     return new Promise((resolve) => {
         pool.query('SELECT * FROM deck_cards WHERE deckid = $1 AND iscommander', [deck_data.id],
@@ -636,8 +679,11 @@ let getDecksBasic = (request, response) => {
                         deck_data_promises.push(new Promise((resolve, reject) => {
                             grabDeckBasic(deck_data).then(() => {
                                 deck_data.legality = JSON.parse(deck_data.legality);
-                                decks.push(deck_data);
-                                resolve();
+                                grabLastPlayed(deck_data.id).then((lp) => {
+                                    deck_data.last_played = lp;
+                                    decks.push(deck_data);
+                                    resolve();
+                                });
                             })
                         }))
                     }
@@ -649,6 +695,18 @@ let getDecksBasic = (request, response) => {
                 }
             }
         });
+}
+
+let getLastPlayed = (request, response) => {
+    if (request.params.id) {
+        let deck_id = parseInt(request.params.id);
+        grabLastPlayed(deck_id).then((lp) => {
+            return response.json({last_played: lp});
+        });
+    }
+    else {
+        return response.json({last_played: null});
+    }
 }
 
 module.exports = {
@@ -665,4 +723,5 @@ module.exports = {
     getDeckForPlay,
     grabDeckForPlay,
     getDecksBasic,
+    getLastPlayed
 }

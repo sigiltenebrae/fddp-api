@@ -228,6 +228,7 @@ app.get('/api/decklist', decksdb.getDeckList);
 app.put('/api/themes/decks/:id', decksdb.updateDeckThemes);
 app.get('/api/userdecks/basic/:id', decksdb.getDecksBasic);
 app.get('/api/decks/basic', decksdb.getDecksBasic);
+app.get('/api/decks/last_played/:id', decksdb.getLastPlayed);
 
 app.post('/api/custom_cards', customsdb.createCustomCard);
 app.get('/api/custom_cards', customsdb.getCustomCards);
