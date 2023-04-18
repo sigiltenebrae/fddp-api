@@ -218,12 +218,21 @@ function getCheapestCost(card_name) {
 /**
  * Returns the formatted scryfall card object
  * @param card_name string name of the card to get
+ * @param options options object. nontoken only supported value.
  * @returns {any}
  */
-function getFormattedScryfallCard(card_name) {
+function getFormattedScryfallCard(card_name, options) {
     for (let card of scryfalldata) {
         if (card.name.toLowerCase() === card_name.toLowerCase()) {
-            return formatScryfallCard(card);
+            if (options && options.nontoken) {
+                let types = card.type_line.replace(/[^a-zA-Z0-9 ]/g, '').split(' ').filter(element => element);
+                if (!types.includes('Token')) {
+                    return formatScryfallCard(card);
+                }
+            }
+            else {
+                return formatScryfallCard(card);
+            }
         }
     }
     return {};

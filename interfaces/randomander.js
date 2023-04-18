@@ -6,7 +6,7 @@ const scryfalldb = require('./scryfall');
  * @returns {any}
  */
 function formatRandomCardData(card_name) {
-    let card_data = scryfalldb.getFormattedScryfallCard(card_name);
+    let card_data = scryfalldb.getFormattedScryfallCard(card_name, {nontoken: true});
     let random_card_images = scryfalldb.getAllCardImages(card_name);
     card_data.image = random_card_images[Math.floor(Math.random() * random_card_images.length)];
     card_data.power = card_data.power != null && card_data.power !== '*' ? Number(card_data.power): card_data.power === '*' ? 0: null;

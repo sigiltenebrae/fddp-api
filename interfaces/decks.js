@@ -439,7 +439,7 @@ function grabDeckForPlay(id) {
                     }
                     deck.cards = res.rows;
                     deck.cards.forEach((card) => {
-                        let card_data = scryfalldb.getFormattedScryfallCard(card.name);
+                        let card_data = scryfalldb.getFormattedScryfallCard(card.name, {nontoken: true});
 
                         card.back_face = card_data.back_face ? card_data.back_face: false;
                         card.mana_cost = card_data.mana_cost ? card_data.mana_cost: [];
