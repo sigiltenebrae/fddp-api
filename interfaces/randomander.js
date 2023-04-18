@@ -15,6 +15,8 @@ function formatRandomCardData(card_name) {
     card_data.back_toughness = card_data.back_toughness != null && card_data.back_toughness !== '*'? Number(card_data.back_toughness): card_data.back_toughness === '*' ? 0:  null;
     card_data.loyalty = card_data.loyalty != null ? Number(card_data.loyalty): null;
     card_data.back_loyalty = card_data.back_loyalty != null ? Number(card_data.back_loyalty): null;
+    card_data.defense = card_data.defense != null ? Number(card_data.defense): null;
+    card_data.back_defense = card_data.back_defense != null ? Number(card_data.back_defense): null;
     card_data.cmc = card_data.cmc != null ? Number(card_data.cmc): null;
     card_data.count = 1;
     card_data.iscommander = false;

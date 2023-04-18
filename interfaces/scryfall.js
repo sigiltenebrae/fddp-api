@@ -249,6 +249,8 @@ function formatScryfallCard(card) {
         out_card.back_toughness = card.card_faces[1].toughness != null && card.card_faces[1].toughness !== '*' ? Number(card.card_faces[1].toughness): card.card_faces[1].toughness === '*' ? 0: null;
         out_card.loyalty = card.card_faces[0].loyalty != null ? Number(card.card_faces[0].loyalty): null;
         out_card.back_loyalty = card.card_faces[1].loyalty != null ? Number(card.card_faces[1].loyalty): null;
+        out_card.defense = card.card_faces[0].defense != null ? Number(card.card_faces[0].defense): null;
+        out_card.back_defense = card.card_faces[1].defense != null ? Number(card.card_faces[1].defense): null;
         out_card.legality = card.legalities.commander === 'legal';
         out_card.cheapest = getCheapestCost(card.name);
     }
@@ -267,6 +269,8 @@ function formatScryfallCard(card) {
         out_card.back_toughness = null;
         out_card.loyalty = card.loyalty != null ? Number(card.loyalty): null;
         out_card.back_loyalty = null;
+        out_card.defense = card.defense != null ? Number(card.defense): null;
+        out_card.back_defense = null;
         out_card.legality = card.legalities.commander === 'legal';
         out_card.cheapest = getCheapestCost(card.name);
     }

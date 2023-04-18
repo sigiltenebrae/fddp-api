@@ -455,6 +455,8 @@ function grabDeckForPlay(id) {
                         card.back_toughness = card_data.back_toughness != null && card_data.back_toughness !== '*'? Number(card_data.back_toughness): card_data.back_toughness === '*' ? 0:  null;
                         card.loyalty = card_data.loyalty != null ? Number(card_data.loyalty): null;
                         card.back_loyalty = card_data.back_loyalty != null ? Number(card_data.back_loyalty): null;
+                        card.defense = card_data.defense != null ? Number(card_data.defense): null;
+                        card.back_defense = card_data.back_defense != null ? Number(card_data.back_defense): null;
                         card.cmc = card_data.cmc != null ? Number(card_data.cmc): null;
                         card.tokens = card_data.tokens ? card_data.tokens: [];
                         card.gatherer = card_data.gatherer ? card_data.gatherer: null;
