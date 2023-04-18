@@ -405,7 +405,8 @@ let searchCardApi = (request, response) => {
 
 let getScryfallCardApi = (request, response) => {
     const card_name = request.body.name;
-    return response.json(getScryfallCard(card_name));
+    //return response.json(getScryfallCard(card_name));
+    return response.json(getFormattedScryfallCard(card_name));
 }
 
 let getCardImagesApi = (request, response) => {
