@@ -298,7 +298,7 @@ function formatScryfallCard(card) {
                         power: token_data.power != null && token_data.power !== '*' ? Number(token_data.power) : token_data.power === '*'? 0: null,
                         toughness: token_data.toughness != null && token_data.toughness !== '*' ? Number(token_data.toughness) : token_data.toughness === '*'? 0: null,
                         colors: token_data.colors,
-                        image: token_data.image_uris.png
+                        image: token_data.image_uris != null && token_data.image_uris.png != null? token_data.image_uris.png: null
                     }
                 )
             }
@@ -551,6 +551,7 @@ module.exports = {
     getAllCardImages,
     getAllOfCardApi,
     searchCardApi,
+    getScryfallCardById,
     getScryfallCardApi,
     getCardImagesApi,
     getAllOfTokenApi,

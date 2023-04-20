@@ -165,7 +165,7 @@ function getRandomCommander(commanderdata, colors) {
                     if (random_commander.all_parts != null && random_commander.all_parts.length > 0) {
                         for (let part of random_commander.all_parts) {
                             if (part.id !== random_commander.id) {
-                                let temp_partner = getCardById(part.id);
+                                let temp_partner = scryfalldb.getScryfallCardById(part.id);
                                 if (temp_partner.keywords && temp_partner.keywords.includes("Partner with")) {
                                     const inArray = commanderdata.some(element => {
                                         return element.name === temp_partner.name;
@@ -321,7 +321,7 @@ function getRandomCommander(commanderdata, colors) {
                 if (random_commander.all_parts != null && random_commander.all_parts.length > 0) {
                     for (let part of random_commander.all_parts) {
                         if (part.id !== random_commander.id) {
-                            let temp_partner = getCardById(part.id);
+                            let temp_partner = scryfalldb.getScryfallCardById(part.id);
                             if (temp_partner.keywords && temp_partner.keywords.includes("Partner with")) {
                                 const inArray = commanderdata.some(element => {
                                     return element.name === temp_partner.name;
@@ -533,9 +533,9 @@ function getBasicsForDeck(deck) {
  * Generate the random deck using the given commanderdata and carddata
  * @returns [any]
  */
-function getRandomDeck(commanderdata, carddata) {
+function getRandomDeck(commanderdata, carddata, colors) {
 
-    let temp_commanders = getRandomCommander(commanderdata, null);
+    let temp_commanders = getRandomCommander(commanderdata, colors);
     let random_commander = temp_commanders[0];
     let random_commander_2 = temp_commanders[1];
 
@@ -567,10 +567,11 @@ function getRandomDeck(commanderdata, carddata) {
  * Return the formatted random deck
  * @param commanderdata
  * @param carddata
+ * @param colors
  * @returns {any}
  */
-function getRandomDeckForPlay(commanderdata, carddata) {
-    let random_cards = getRandomDeck(commanderdata, carddata);
+function getRandomDeckForPlay(commanderdata, carddata, colors) {
+    let random_cards = getRandomDeck(commanderdata, carddata, colors);
     let random_deck = {};
     random_deck.id = -1;
     random_deck.name = "Random Deck"
@@ -582,7 +583,8 @@ function getRandomDeckForPlay(commanderdata, carddata) {
 }
 
 exports.getCheapRandomDeck = (request, response) => {
-    let deck = getRandomDeckForPlay(scryfalldb.getCheapCommanderData(), scryfalldb.getCheapData());
+    let colors = request.body && request.body.colors? request.body.colors: null;
+    let deck = getRandomDeckForPlay(scryfalldb.getCheapCommanderData(), scryfalldb.getCheapData(), colors);
     let stickers = scryfalldb.getStickers();
     deck.stickers = [];
     for (let i = 0; i < 3; i++) {
@@ -594,7 +596,8 @@ exports.getCheapRandomDeck = (request, response) => {
 }
 
 exports.getRandomDeck = (request, response) => {
-    let deck = getRandomDeckForPlay(scryfalldb.getCommanderData(), scryfalldb.getScryfallData());
+    let colors = request.body && request.body.colors? request.body.colors: null;
+    let deck = getRandomDeckForPlay(scryfalldb.getCommanderData(), scryfalldb.getScryfallData(), colors);
     let stickers = scryfalldb.getStickers();
     deck.stickers = [];
     for (let i = 0; i < 3; i++) {

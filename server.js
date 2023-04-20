@@ -214,8 +214,8 @@ app.get('/api/planes', scryfalldb.getPlanesApi);
 app.get('/api/stickers', scryfalldb.getStickersApi);
 app.get('/api/attractions', scryfalldb.getAttractionsApi);
 
-app.get('/api/randomdeck/cheap', randomdb.getCheapRandomDeck);
-app.get('/api/randomdeck/regular', randomdb.getCheapRandomDeck);
+app.post('/api/randomdeck/cheap', randomdb.getCheapRandomDeck);
+app.post('/api/randomdeck/regular', randomdb.getCheapRandomDeck);
 app.get('/api/randomcommander/', randomdb.getRandomCommanderAPI);
 
 app.get('/api/archidekt/deck/:id', getArchidektDeck);
