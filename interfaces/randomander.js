@@ -152,6 +152,7 @@ function getRandomCommander(commanderdata, colors) {
     if (colors) {
         while(true) {
             random_commander = commanderdata[Math.floor(Math.random() * commanderdata.length)];
+            random_commander_2 = null;
             if (!colorLT(random_commander, null,  colors)) {
                 continue;
             }
