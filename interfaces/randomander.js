@@ -32,7 +32,9 @@ function getPartnersFromCommanderData(commanderdata) {
     let partners = [];
     for (let card of commanderdata) {
         if (card.keywords && card.keywords.includes("Partner")) {
-            partners.push(card);
+            if (!random_commander.keywords.includes("Partner with")) {
+                partners.push(card);
+            }
         }
     }
     return partners;
