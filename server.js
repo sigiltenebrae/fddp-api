@@ -90,9 +90,7 @@ function updateDB() {
                     scryfalldb.loadCheapData(0.5);
                     scryfalldb.loadCheapCommanders();
                     updateThemesDB().then(() => {
-                        legalitydb.updateAllLegalities().then(() => {
-                            resolve();
-                        });
+                        resolve();
                     });
                 }
                 else {
@@ -235,7 +233,7 @@ app.get('/api/attractions', scryfalldb.getAttractionsApi);
 
 app.post('/api/randomdeck/cheap', randomdb.getCheapRandomDeck);
 app.post('/api/randomdeck/regular', randomdb.getCheapRandomDeck);
-app.get('/api/randomcommander/', randomdb.getRandomCommanderAPI);
+app.post('/api/randomcommander/', randomdb.getRandomCommanderAPI);
 
 app.get('/api/archidekt/deck/:id', getArchidektDeck);
 
