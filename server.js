@@ -63,7 +63,7 @@ function updateDB() {
                         update_file.on("finish", () => {
                             update_file.close();
                             console.log('scryfall update downloaded');
-                            rawscryfalldata = fs.readFileSync('assets/default-cards.json');
+                            let rawscryfalldata = fs.readFileSync('assets/default-cards.json');
                             scryfalldb.setScryfallData(JSON.parse(rawscryfalldata));
                             scryfalldb.loadCommanderData();
                             scryfalldb.loadCheapData(0.5);
@@ -78,7 +78,26 @@ function updateDB() {
                 }
             }).catch(function (error) {
                 console.log('error updating the local scryfall db');
-                resolve();
+                console.log(error.code);
+                if (error.response && error.response.data) {
+                    console.log(error.response.data);
+                }
+                if (fs.existsSync('assets/default-cards.json')) {
+                    console.log('using old db');
+                    let rawscryfalldata = fs.readFileSync('assets/default-cards.json');
+                    scryfalldb.setScryfallData(JSON.parse(rawscryfalldata));
+                    scryfalldb.loadCommanderData();
+                    scryfalldb.loadCheapData(0.5);
+                    scryfalldb.loadCheapCommanders();
+                    updateThemesDB().then(() => {
+                        legalitydb.updateAllLegalities().then(() => {
+                            resolve();
+                        });
+                    });
+                }
+                else {
+                    resolve();
+                }
             });
         });
 }
@@ -284,9 +303,14 @@ if (fs.existsSync('assets/default-cards.json')) {
 else {
     console.log('db file missing');
     updateDB().then(() => {
-        app.listen(port, () => {
-            console.log(`App running on port ${port}.`);
-        });
+        if (fs.existsSync('assets/default-cards.json')) {
+            app.listen(port, () => {
+                console.log(`App running on port ${port}.`);
+            });
+        }
+        else {
+            console.log('Unable to download scryfall db');
+        }
     });
 }
 
