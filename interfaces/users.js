@@ -55,3 +55,51 @@ exports.updateProfile = (request, response) => {
             });
     }
 }
+
+exports.getCommanders = (request, response) => {
+    const id = parseInt(request.params.id);
+    pool.query('SELECT * FROM decks WHERE owner = ' + id, (error, results) => {
+        if (error) {
+            console.log('Failed to load decks for user: ' + id);
+            return response.json([]);
+        }
+        else {
+            if (results && results.rows && results.rows.length != null && results.rows.length > 0) {
+                let deck_promises = [];
+                let commander_list = [];
+                for (let deck of results.rows) {
+                    deck_promises.push(
+                        new Promise((resolve) => {
+                            pool.query('SELECT name FROM deck_cards WHERE deckid = ' + deck.id + ' AND iscommander = true', (e, r) => {
+                                if (e) {
+                                    console.log('Error loading cards for deck: ' + deck.id);
+                                    console.log(e);
+                                    resolve();
+                                }
+                                else {
+                                    if (r && r.rows && r.rows.length != null && r.rows.length > 0) {
+                                        for (let card of r.rows) {
+                                            if (!commander_list.includes(card.name)) {
+                                                commander_list.push(card.name);
+                                            }
+                                        }
+                                        resolve();
+                                    }
+                                    else {
+                                        resolve();
+                                    }
+                                }
+                            })
+                        }));
+                }
+                Promise.all(deck_promises).then(() => {
+                    commander_list.sort((a, b) => (a > b)? 1: -1);
+                    return response.json(commander_list);
+                });
+            }
+            else {
+                return response.json([]);
+            }
+        }
+    })
+}
