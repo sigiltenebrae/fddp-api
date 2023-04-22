@@ -16,7 +16,13 @@ exports.getUsers = (request, response) => {
             console.log(error);
             return response.json({errors: [error]});
         }
-        return response.json(results.rows);
+        if (results.rows && results.rows.length) {
+            for (let user of results.rows) {
+                user.recs = JSON.parse(user.recs);
+            }
+            return response.json(results.rows);
+        }
+        return response.json({});
     });
 }
 
