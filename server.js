@@ -25,6 +25,7 @@ const authdb = require('./interfaces/auth');
 const randomdb = require('./interfaces/randomander');
 const themesdb = require('./interfaces/themes');
 const legalitydb = require('./interfaces/legality');
+const edhrecdb = require('./interfaces/edhrec');
 
 const app = express();
 const port = 2999;
@@ -276,6 +277,8 @@ app.get('/api/themes', themesdb.getThemes);
 
 app.get('/api/legality/update/:id', legalitydb.getLegality);
 app.get('/api/legality/all/force', legalitydb.getAllLegalities);
+
+app.post('/api/edhrec/cmdrthemes', edhrecdb.getEdhrecThemesApi);
 
 if (fs.existsSync('assets/default-cards.json')) {
     console.log('db file exists');
