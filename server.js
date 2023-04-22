@@ -223,6 +223,7 @@ app.post('/api/auth/change_password', authdb.changepassword);
 app.get('/api/users', usersdb.getUsers);
 app.put('/api/users/:id', usersdb.updateProfile);
 app.get('/api/users/commanders/:id', usersdb.getCommanders);
+app.get('/api/users/carddata/:id', usersdb.getCardUsage);
 
 app.post('/api/cards', scryfalldb.getScryfallCardApi);
 app.post('/api/cards/all', scryfalldb.getAllOfCardApi);

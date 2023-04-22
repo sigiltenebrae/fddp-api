@@ -109,3 +109,57 @@ exports.getCommanders = (request, response) => {
         }
     })
 }
+
+exports.getCardUsage = (request, response) => {
+    const id = parseInt(request.params.id);
+    pool.query('SELECT * FROM decks WHERE owner = ' + id, (error, results) => {
+        if (error) {
+            console.log('Failed to load decks for user: ' + id);
+            return response.json([]);
+        }
+        else {
+            if (results && results.rows && results.rows.length != null && results.rows.length > 0) {
+                let deck_promises = [];
+                let card_dict = {};
+                for (let deck of results.rows) {
+                    deck_promises.push( new Promise((res) => {
+                        pool.query('SELECT name FROM deck_cards WHERE deckid = ' + deck.id, (e, r) => {
+                            if (e) {
+                                console.log('Error loading cards for deck: ' + deck.id);
+                                console.log(e);
+                                res();
+                            }
+                            else {
+                                if (r && r.rows && r.rows.length != null && r.rows.length > 0) {
+                                    for (let card of r.rows) {
+                                        if (card_dict[card.name] === undefined) {
+                                            card_dict[card.name] = 1;
+                                        }
+                                        else {
+                                            card_dict[card.name] ++;
+                                        }
+                                    }
+                                    res();
+                                }
+                                else {
+                                    res();
+                                }
+                            }
+                        })
+                    }))
+                }
+                Promise.all(deck_promises).then(() => {
+                    let out_counts = [];
+                    for (let [key, value] of Object.entries(card_dict)) {
+                        out_counts.push({name: key, count: value});
+                    }
+                    out_counts.sort((a, b) => (a.count < b.count)? 1: -1);
+                    return response.json(out_counts);
+                })
+            }
+            else {
+                return response.json([]);
+            }
+        }
+    })
+}
