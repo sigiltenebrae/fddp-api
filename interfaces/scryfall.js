@@ -446,6 +446,41 @@ let getCardImagesApi = (request, response) => {
                 }
             }
         }
+        else if (card.name.toLowerCase() === card_name.toLowerCase() + ' // ' + card_name.toLowerCase()) { //weird special double side secret lairs
+            out_card.name = card.name;
+            if (card.card_faces[0].image_uris && card.card_faces[0].image_uris.png) {
+                out_card.images.push({
+                    image: card.card_faces[0].image_uris.png,
+                    set_name: card.set_name,
+                    date: card.released_at
+                });
+            }
+            if (card.card_faces[1].image_uris && card.card_faces[1].image_uris.png) {
+                out_card.images.push({
+                    image: card.card_faces[1].image_uris.png,
+                    set_name: card.set_name,
+                    date: card.released_at
+                });
+            }
+        }
+        else if (card_name.toLowerCase() === card.name.toLowerCase().substring(0, card.name.indexOf(' //'))) { //tokens?
+            if (card.card_faces[0].image_uris && card.card_faces[0].image_uris.png) {
+                out_card.images.push({
+                    image: card.card_faces[0].image_uris.png,
+                    set_name: card.set_name,
+                    date: card.released_at
+                });
+            }
+        }
+        else if (card_name.toLowerCase() === card.name.toLowerCase().substring(card.name.indexOf(' //') + 4)) {
+            if (card.card_faces[1].image_uris && card.card_faces[1].image_uris.png) {
+                out_card.images.push({
+                    image: card.card_faces[1].image_uris.png,
+                    set_name: card.set_name,
+                    date: card.released_at
+                });
+            }
+        }
     }
     pool.query('SELECT * FROM custom_cards WHERE name = $1', [card_name], (error, results) => {
         if (error) {
