@@ -228,6 +228,7 @@ app.get('/api/users/carddata/:id', usersdb.getCardUsage);
 app.post('/api/cards', scryfalldb.getScryfallCardApi);
 app.post('/api/cards/all', scryfalldb.getAllOfCardApi);
 app.post('/api/cards/search', scryfalldb.searchCardApi);
+app.post('/api/cards/autocomplete', scryfalldb.autocompleteApi);
 app.post('/api/tokens/all', scryfalldb.getAllOfTokenApi);
 app.post('/api/cards/images', scryfalldb.getCardImagesApi);
 app.get('/api/planes', scryfalldb.getPlanesApi);

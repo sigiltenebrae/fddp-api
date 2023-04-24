@@ -176,6 +176,27 @@ function searchScryfallCard(card_name) {
     return card_data;
 }
 
+function autocompleteScryfallCard(card_name, options) {
+    let card_data = [];
+    for (let card of scryfalldata) {
+        if (card.name.toLowerCase().includes(card_name.toLowerCase())) {
+            if(!card_data.includes(card.name)) {
+                if (options && options.nontoken) {
+                    let types = card.type_line.replace(/[^a-zA-Z0-9 ]/g, '').split(' ').filter(element => element);
+                    if (!types.includes('Token')) {
+                        card_data.push(card.name);
+                    }
+                }
+                else {
+                    card_data.push(card.name);
+                }
+            }
+        }
+    }
+    card_data.sort((a, b) => (a < b)? 1: -1);
+    return card_data;
+}
+
 function getAllOfCardFormatted(card_name, search) {
     let card_data = [];
     for (let card of scryfalldata) {
@@ -406,6 +427,12 @@ let searchCardApi = (request, response) => {
     return response.json(searchScryfallCard(card_name));
 }
 
+let autocompleteApi = (request, response) => {
+    const card_name = request.body.name;
+    const options = request.body.options;
+    return response.json(autocompleteScryfallCard(card_name, options));
+}
+
 let getScryfallCardApi = (request, response) => {
     const card_name = request.body.name;
     //return response.json(getScryfallCard(card_name));
@@ -589,6 +616,7 @@ module.exports = {
     getAllCardImages,
     getAllOfCardApi,
     searchCardApi,
+    autocompleteApi,
     getScryfallCardById,
     getScryfallCardApi,
     getCardImagesApi,
