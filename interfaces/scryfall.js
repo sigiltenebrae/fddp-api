@@ -197,6 +197,11 @@ function autocompleteScryfallCard(card_name, options) {
         }
     }
     card_data.sort((a, b) => (a > b)? 1: -1);
+    if (options && options.max_length) {
+        if (card_dara.length > options.max_length) {
+            card_data = card_data.slice(0, options.max_length);
+        }
+    }
     return card_data;
 }
 
