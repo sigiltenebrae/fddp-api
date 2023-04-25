@@ -210,7 +210,10 @@ function updateThemesDB() {
 getArchidektDeck = (request, response) =>{
     const id = request.params.id;
     axios.get('https://archidekt.com/api/decks/' + id + '/').then( res => {
-        response.json(res.data);
+        return response.json(res.data);
+    }).catch(function (error) {
+        console.log(error);
+        return response.json(null);
     })
 }
 

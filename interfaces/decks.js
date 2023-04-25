@@ -68,6 +68,19 @@ let createDeck = (request, response) => {
                                     });
                             }
                         }
+                        if (deck.companions && deck.companions.length > 0) {
+                            for (let c_card of deck.companions) {
+                                pool.query('INSERT INTO deck_companions (deckid, name, image, back_image) VALUES($1, $2, $3, $4)',
+                                    [new_id, c_card.name, c_card.image, c_card.back_image],
+                                    (err, res) => {
+                                        if(err) {
+                                            console.log('Companion create failed for deck with id: ' + new_id);
+                                            console.log(err);
+                                            deck_errors.push(err);
+                                        }
+                                    });
+                            }
+                        }
                         console.log('deck created with id: ' + new_id);
                         return response.json({ id: new_id, errors: deck_errors });
                     }
@@ -197,7 +210,7 @@ let updateDeck = (request, response) => {
                                         [id, side_card.name, side_card.image, side_card.back_image, side_card.count],
                                         (err, res) => {
                                             if(err) {
-                                                console.log('Sideboard create failed for deck with id: ' + new_id);
+                                                console.log('Sideboard create failed for deck with id: ' + id);
                                                 console.log(err);
                                                 errors.push(err);
                                             }
@@ -211,7 +224,47 @@ let updateDeck = (request, response) => {
                                     pool.query('DELETE FROM deck_sideboard WHERE id = $1', [side_card.id],
                                         (err, res) => {
                                             if (err) {
-                                                console.log('Delete failed for token with id ' + side_card.id + ' in deck with id: ' + id);
+                                                console.log('Delete failed for sideboard card with id ' + side_card.id + ' in deck with id: ' + id);
+                                                console.log(err);
+                                                errors.push(err);
+                                            }
+                                        });
+                                }
+                            }
+                        }
+                        if (deck.companions && deck.companions.length > 0) {
+                            for (let c_card of deck.companions) {
+                                if (c_card.id) {
+                                    pool.query('UPDATE deck_companions SET name = $1, image = $2, back_image = $3, WHERE id = $4',
+                                        [c_card.name, c_card.image, c_card.back_image, c_card.id],
+                                        (err, res) => {
+                                            if (err) {
+                                                console.log('Companion update failed for deck with id: ' + id);
+                                                console.log(err);
+                                                errors.push(err);
+                                            }
+                                        });
+                                }
+                                else {
+                                    pool.query('INSERT INTO deck_companions (deckid, name, image, back_image) VALUES($1, $2, $3, $4)',
+                                        [id, c_card.name, c_card.image, c_card.back_image],
+                                        (err, res) => {
+                                            if(err) {
+                                                console.log('Companion create failed for deck with id: ' + id);
+                                                console.log(err);
+                                                errors.push(err);
+                                            }
+                                        });
+                                }
+                            }
+                        }
+                        if (deck.companions_delete && deck.companions_delete.length > 0) {
+                            for (let c_card of deck.companions_delete) {
+                                if (c_card.id) {
+                                    pool.query('DELETE FROM deck_companions WHERE id = $1', [c_card.id],
+                                        (err, res) => {
+                                            if (err) {
+                                                console.log('Delete failed for companion with id ' + c_card.id + ' in deck with id: ' + id);
                                                 console.log(err);
                                                 errors.push(err);
                                             }
@@ -561,14 +614,14 @@ function grabDeckForPlay(id) {
                                     }
                                     deck.themes = deck_themes;
                                     deck.tribes = deck_tribes;
-                                    pool.query('SELECT * FROM deck_sideboard WHERE deck_id = $1', [id], (sb_err, sb_res) => {
+                                    pool.query('SELECT * FROM deck_sideboard WHERE deckid = $1', [id], (sb_err, sb_res) => {
                                         if (sb_err) {
                                             console.log('error fetching sideboard for deck: ' + id);
                                             console.log(sb_err);
                                             resolve({deck: deck, errors: [er]});
                                         }
                                         else {
-                                            deck.sideboard = res.rows;
+                                            deck.sideboard = sb_res.rows;
                                             deck.sideboard.forEach((sbcard) => {
                                                 let sbcard_data = scryfalldb.getFormattedScryfallCard(sbcard.name, {nontoken: true});
                                                 sbcard.back_face = sbcard_data.back_face ? sbcard_data.back_face: false;
@@ -593,7 +646,41 @@ function grabDeckForPlay(id) {
                                                 sbcard.legality = sbcard_data.legality;
                                                 sbcard.cheapest = sbcard_data.cheapest;
                                             });
-                                            resolve(deck);
+                                            pool.query('SELECT * FROM deck_companions WHERE deckid = $1', [id], (c_err, c_res) => {
+                                                if (c_err) {
+                                                    console.log('error fetching companions for deck: ' + id);
+                                                    console.log(c_err);
+                                                    resolve({deck: deck, errors: [er]});
+                                                }
+                                                else {
+                                                    deck.companions = c_res.rows;
+                                                    deck.companions.forEach((ccard) => {
+                                                        let ccard_data = scryfalldb.getFormattedScryfallCard(ccard.name, {nontoken: true});
+                                                        ccard.back_face = ccard_data.back_face ? ccard_data.back_face: false;
+                                                        ccard.mana_cost = ccard_data.mana_cost ? ccard_data.mana_cost: [];
+                                                        ccard.color_identity = ccard_data.color_identity ? ccard_data.color_identity: [];
+                                                        ccard.back_mana_cost = ccard_data.back_mana_cost ? ccard_data.back_mana_cost: [];
+                                                        ccard.types = ccard_data.types ? ccard_data.types: [];
+                                                        ccard.back_types = ccard_data.back_types ? ccard_data.back_types: [];
+                                                        ccard.oracle_text = ccard_data.oracle_text ? ccard_data.oracle_text: '';
+                                                        ccard.back_oracle_text = ccard_data.back_oracle_text ? ccard_data.back_oracle_text: '';
+                                                        ccard.power = ccard_data.power != null && ccard_data.power !== '*' ? Number(ccard_data.power): ccard_data.power === '*' ? 0: null;
+                                                        ccard.back_power = ccard_data.back_power != null && ccard_data.back_power !== '*' ? Number(ccard_data.back_power): ccard_data.back_power === '*'? 0: null;
+                                                        ccard.toughness = ccard_data.toughness != null && ccard_data.toughness !== '*' ? Number(ccard_data.toughness): ccard_data.toughness === '*'? 0: null;
+                                                        ccard.back_toughness = ccard_data.back_toughness != null && ccard_data.back_toughness !== '*'? Number(ccard_data.back_toughness): ccard_data.back_toughness === '*' ? 0:  null;
+                                                        ccard.loyalty = ccard_data.loyalty != null ? Number(ccard_data.loyalty): null;
+                                                        ccard.back_loyalty = ccard_data.back_loyalty != null ? Number(ccard_data.back_loyalty): null;
+                                                        ccard.defense = ccard_data.defense != null ? Number(ccard_data.defense): null;
+                                                        ccard.back_defense = ccard_data.back_defense != null ? Number(ccard_data.back_defense): null;
+                                                        ccard.cmc = ccard_data.cmc != null ? Number(ccard_data.cmc): null;
+                                                        ccard.tokens = ccard_data.tokens ? ccard_data.tokens: [];
+                                                        ccard.gatherer = ccard_data.gatherer ? ccard_data.gatherer: null;
+                                                        ccard.legality = ccard_data.legality;
+                                                        ccard.cheapest = ccard_data.cheapest;
+                                                    });
+                                                    resolve(deck);
+                                                }
+                                            });
                                         }
                                     });
                                 });
