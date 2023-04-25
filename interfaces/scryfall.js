@@ -177,6 +177,9 @@ function searchScryfallCard(card_name) {
 }
 
 function autocompleteScryfallCard(card_name, options) {
+    if (card_name == null || card_name === '' || card_name === ' ') {
+        return [];
+    }
     let card_data = [];
     for (let card of scryfalldata) {
         if (card.name.toLowerCase().includes(card_name.toLowerCase())) {
