@@ -207,9 +207,19 @@ function updateThemesDB() {
     });
 }
 
-getArchidektDeck = (request, response) =>{
+getArchidektDeck = (request, response) => {
     const id = request.params.id;
     axios.get('https://archidekt.com/api/decks/' + id + '/').then( res => {
+        return response.json(res.data);
+    }).catch(function (error) {
+        console.log(error);
+        return response.json(null);
+    })
+}
+
+getMoxfieldDeck = (request, response) => {
+    const id = request.params.id;
+    axios.get('https://api2.moxfield.com/v3/decks/all/' + id).then( res => {
         return response.json(res.data);
     }).catch(function (error) {
         console.log(error);
@@ -243,6 +253,7 @@ app.post('/api/randomdeck/regular', randomdb.getCheapRandomDeck);
 app.post('/api/randomcommander/', randomdb.getRandomCommanderAPI);
 
 app.get('/api/archidekt/deck/:id', getArchidektDeck);
+app.get('/api/moxfield/deck/:id', getMoxfieldDeck);
 
 app.post('/api/decks', decksdb.createDeck);
 app.put('/api/decks/:id', decksdb.updateDeck);
