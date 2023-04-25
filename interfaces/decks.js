@@ -39,19 +39,34 @@ let createDeck = (request, response) => {
                                     }
                                 });
                         }
-                        for (let token of deck.tokens) {
-                            pool.query('INSERT INTO deck_tokens (deckid, name, image, type_line, oracle_text, power, toughness, w, u, b, r, g) ' +
-                                'VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)',
-                                [new_id, token.name, token.image, token.types.join(' '), token.oracle_text, token.power, token.toughness,
-                                    token.colors.includes("W"), token.colors.includes("U"), token.colors.includes("B"),
-                                    token.colors.includes("R"), token.colors.includes("G")],
-                                (err, res) => {
-                                    if (err) {
-                                        console.log('Token create failed for deck with id: ' + new_id);
-                                        console.log(err);
-                                        deck_errors.push(err);
-                                    }
-                                });
+                        if (deck.tokens && deck.tokens.length > 0) {
+                            for (let token of deck.tokens) {
+                                pool.query('INSERT INTO deck_tokens (deckid, name, image, type_line, oracle_text, power, toughness, w, u, b, r, g) ' +
+                                    'VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)',
+                                    [new_id, token.name, token.image, token.types.join(' '), token.oracle_text, token.power, token.toughness,
+                                        token.colors.includes("W"), token.colors.includes("U"), token.colors.includes("B"),
+                                        token.colors.includes("R"), token.colors.includes("G")],
+                                    (err, res) => {
+                                        if (err) {
+                                            console.log('Token create failed for deck with id: ' + new_id);
+                                            console.log(err);
+                                            deck_errors.push(err);
+                                        }
+                                    });
+                            }
+                        }
+                        if (deck.sideboard && deck.sideboard.length > 0) {
+                            for (let side_card of deck.sideboard) {
+                                pool.query('INSERT INTO deck_sideboard (deckid, name, image, back_image, count) VALUES($1, $2, $3, $4, $5)',
+                                    [new_id, side_card.name, side_card.image, side_card.back_image, side_card.count],
+                                    (err, res) => {
+                                        if(err) {
+                                            console.log('Sideboard create failed for deck with id: ' + new_id);
+                                            console.log(err);
+                                            deck_errors.push(err);
+                                        }
+                                    });
+                            }
                         }
                         console.log('deck created with id: ' + new_id);
                         return response.json({ id: new_id, errors: deck_errors });
@@ -107,33 +122,6 @@ let updateDeck = (request, response) => {
                                     });
                             }
                         }
-                        for (let token of deck.tokens) {
-                            if (token.id) {
-                                pool.query('UPDATE deck_tokens SET name = $1, image = $2 WHERE id = $3',
-                                    [token.name, token.image, token.id],
-                                    (err, res) => {
-                                        if (err) {
-                                            console.log('Token update failed for deck with id: ' + id);
-                                            console.log(err);
-                                            errors.push(err);
-                                        }
-                                    });
-                            }
-                            else {
-                                pool.query('INSERT INTO deck_tokens (deckid, name, image, type_line, oracle_text, power, toughness, w, u, b, r, g) ' +
-                                    'VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)',
-                                    [id, token.name, token.image, token.types.join(' '), token.oracle_text, token.power, token.toughness,
-                                        token.colors.includes("W"), token.colors.includes("U"), token.colors.includes("B"),
-                                        token.colors.includes("R"), token.colors.includes("G")],
-                                    (err, res) => {
-                                        if (err) {
-                                            console.log('Token create failed for deck with id: ' + id);
-                                            console.log(err);
-                                            errors.push(err);
-                                        }
-                                    });
-                            }
-                        }
                         if (deck.delete && deck.delete.length > 0) {
                             for (let card of deck.delete) {
                                 if (card.id) {
@@ -148,6 +136,35 @@ let updateDeck = (request, response) => {
                                 }
                             }
                         }
+                        if (deck.tokens && deck.tokens.length > 0) {
+                            for (let token of deck.tokens) {
+                                if (token.id) {
+                                    pool.query('UPDATE deck_tokens SET name = $1, image = $2 WHERE id = $3',
+                                        [token.name, token.image, token.id],
+                                        (err, res) => {
+                                            if (err) {
+                                                console.log('Token update failed for deck with id: ' + id);
+                                                console.log(err);
+                                                errors.push(err);
+                                            }
+                                        });
+                                }
+                                else {
+                                    pool.query('INSERT INTO deck_tokens (deckid, name, image, type_line, oracle_text, power, toughness, w, u, b, r, g) ' +
+                                        'VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)',
+                                        [id, token.name, token.image, token.types.join(' '), token.oracle_text, token.power, token.toughness,
+                                            token.colors.includes("W"), token.colors.includes("U"), token.colors.includes("B"),
+                                            token.colors.includes("R"), token.colors.includes("G")],
+                                        (err, res) => {
+                                            if (err) {
+                                                console.log('Token create failed for deck with id: ' + id);
+                                                console.log(err);
+                                                errors.push(err);
+                                            }
+                                        });
+                                }
+                            }
+                        }
                         if (deck.token_delete && deck.token_delete.length > 0) {
                             for (let token of deck.token_delete) {
                                 if (token.id) {
@@ -155,6 +172,46 @@ let updateDeck = (request, response) => {
                                         (err, res) => {
                                             if (err) {
                                                 console.log('Delete failed for token with id ' + token.id + ' in deck with id: ' + id);
+                                                console.log(err);
+                                                errors.push(err);
+                                            }
+                                        });
+                                }
+                            }
+                        }
+                        if (deck.sideboard && deck.sideboard.length > 0) {
+                            for (let side_card of deck.sideboard) {
+                                if (side_card.id) {
+                                    pool.query('UPDATE deck_sideboard SET name = $1, image = $2, back_image = $3, count = $4 WHERE id = $5',
+                                        [side_card.name, side_card.image, side_card.back_image, side_card.count, side_card.id],
+                                        (err, res) => {
+                                            if (err) {
+                                                console.log('Sideboard update failed for deck with id: ' + id);
+                                                console.log(err);
+                                                errors.push(err);
+                                            }
+                                        });
+                                }
+                                else {
+                                    pool.query('INSERT INTO deck_sideboard (deckid, name, image, back_image, count) VALUES($1, $2, $3, $4, $5)',
+                                        [id, side_card.name, side_card.image, side_card.back_image, side_card.count],
+                                        (err, res) => {
+                                            if(err) {
+                                                console.log('Sideboard create failed for deck with id: ' + new_id);
+                                                console.log(err);
+                                                errors.push(err);
+                                            }
+                                        });
+                                }
+                            }
+                        }
+                        if (deck.sideboard_delete && deck.sideboard_delete.length > 0) {
+                            for (let side_card of deck.sideboard_delete) {
+                                if (side_card.id) {
+                                    pool.query('DELETE FROM deck_sideboard WHERE id = $1', [side_card.id],
+                                        (err, res) => {
+                                            if (err) {
+                                                console.log('Delete failed for token with id ' + side_card.id + ' in deck with id: ' + id);
                                                 console.log(err);
                                                 errors.push(err);
                                             }
@@ -504,7 +561,41 @@ function grabDeckForPlay(id) {
                                     }
                                     deck.themes = deck_themes;
                                     deck.tribes = deck_tribes;
-                                    resolve(deck);
+                                    pool.query('SELECT * FROM deck_sideboard WHERE deck_id = $1', [id], (sb_err, sb_res) => {
+                                        if (sb_err) {
+                                            console.log('error fetching sideboard for deck: ' + id);
+                                            console.log(sb_err);
+                                            resolve({deck: deck, errors: [er]});
+                                        }
+                                        else {
+                                            deck.sideboard = res.rows;
+                                            deck.sideboard.forEach((sbcard) => {
+                                                let sbcard_data = scryfalldb.getFormattedScryfallCard(sbcard.name, {nontoken: true});
+                                                sbcard.back_face = sbcard_data.back_face ? sbcard_data.back_face: false;
+                                                sbcard.mana_cost = sbcard_data.mana_cost ? sbcard_data.mana_cost: [];
+                                                sbcard.color_identity = sbcard_data.color_identity ? sbcard_data.color_identity: [];
+                                                sbcard.back_mana_cost = sbcard_data.back_mana_cost ? sbcard_data.back_mana_cost: [];
+                                                sbcard.types = sbcard_data.types ? sbcard_data.types: [];
+                                                sbcard.back_types = sbcard_data.back_types ? sbcard_data.back_types: [];
+                                                sbcard.oracle_text = sbcard_data.oracle_text ? sbcard_data.oracle_text: '';
+                                                sbcard.back_oracle_text = sbcard_data.back_oracle_text ? sbcard_data.back_oracle_text: '';
+                                                sbcard.power = sbcard_data.power != null && sbcard_data.power !== '*' ? Number(sbcard_data.power): sbcard_data.power === '*' ? 0: null;
+                                                sbcard.back_power = sbcard_data.back_power != null && sbcard_data.back_power !== '*' ? Number(sbcard_data.back_power): sbcard_data.back_power === '*'? 0: null;
+                                                sbcard.toughness = sbcard_data.toughness != null && sbcard_data.toughness !== '*' ? Number(sbcard_data.toughness): sbcard_data.toughness === '*'? 0: null;
+                                                sbcard.back_toughness = sbcard_data.back_toughness != null && sbcard_data.back_toughness !== '*'? Number(sbcard_data.back_toughness): sbcard_data.back_toughness === '*' ? 0:  null;
+                                                sbcard.loyalty = sbcard_data.loyalty != null ? Number(sbcard_data.loyalty): null;
+                                                sbcard.back_loyalty = sbcard_data.back_loyalty != null ? Number(sbcard_data.back_loyalty): null;
+                                                sbcard.defense = sbcard_data.defense != null ? Number(sbcard_data.defense): null;
+                                                sbcard.back_defense = sbcard_data.back_defense != null ? Number(sbcard_data.back_defense): null;
+                                                sbcard.cmc = sbcard_data.cmc != null ? Number(sbcard_data.cmc): null;
+                                                sbcard.tokens = sbcard_data.tokens ? sbcard_data.tokens: [];
+                                                sbcard.gatherer = sbcard_data.gatherer ? sbcard_data.gatherer: null;
+                                                sbcard.legality = sbcard_data.legality;
+                                                sbcard.cheapest = sbcard_data.cheapest;
+                                            });
+                                            resolve(deck);
+                                        }
+                                    });
                                 });
                             }
                         });
@@ -715,7 +806,6 @@ module.exports = {
     deleteDeck,
     getDecksForUser,
     getDeck,
-    grabDeck,
     grabDecks,
     getDeckList,
     getThemesForDeck,
