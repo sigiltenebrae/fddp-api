@@ -106,12 +106,23 @@ function updateLegality(id) {
 
 function updateAllLegalities() {
     return new Promise((resolve) => {
-        console.log('updating deck legalities');
+        process.stdout.write('updating deck legalities');
         deckdb.grabDecks().then((decks_obj) => {
             if (decks_obj.deck_list) {
+                let deck_count = decks_obj.deck_list.length;
+                let complete_decks = 0;
                 let legality_promises = [];
                 for (let deck of decks_obj.deck_list) {
-                    legality_promises.push(updateLegality(deck.id));
+                    legality_promises.push(
+                        new Promise((resolve) => {
+                            (updateLegality(deck.id)).then(() => {
+                                complete_decks++;
+                                process.stdout.write("\r\x1b[K");
+                                process.stdout.write(Math.floor((complete_decks/deck_count) * 100));
+                                resolve();
+                            });
+                        })
+                    )
                 }
                 Promise.all(legality_promises).then(() => {
                     console.log('deck legalities updated')
