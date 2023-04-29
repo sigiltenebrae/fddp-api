@@ -163,3 +163,80 @@ exports.getCardUsage = (request, response) => {
         }
     })
 }
+
+exports.setDefaultImage = (request, response) => {
+    const userid = parseInt(request.params.id);
+    if (request.body && request.body.card) {
+        pool.query('INSERT INTO default_images (userid, name, image, back_image) VALUES ($1, $2, $3, $4)',
+            [userid, request.body.card.name, request.body.card.image, request.body.card.back_image], (err, res) => {
+                if (err) {
+                    console.log('Failed to set default image for: ' + request.body.card.name + ' for user ' + userid);
+                    return response.json({});
+                }
+                return response.json({});
+            })
+    }
+    else {
+        return response.json({});
+    }
+}
+
+exports.updateDefaultImage = (request, response) => {
+    const userid = parseInt(request.params.id);
+    if (request.body && request.body.card) {
+        pool.query('UPDATE default_images SET image = $1, back_image = $2 WHERE userid = $3 AND name = $4',
+            [request.body.card.image, request.body.card.back_image, userid, request.body.card.name], (err, res) => {
+                if(err) {
+                    console.log('Failed to update default image for: ' + request.body.card.name + ' for user ' + userid);
+                    return response.json({});
+                }
+                return response.json({});
+            });
+    }
+    else {
+        return response.json({});
+    }
+}
+
+exports.deleteDefaultImage = (request, response) => {
+    const userid = parseInt(request.params.id);
+    if (request.body && request.body.card) {
+        pool.query('DELETE FROM default_images WHERE userid = $1 AND name = $2', [userid, request.body.card.name], (err, res) => {
+            if (err) {
+                console.log('Failed to delete default image for: ' + request.body.card.name + ' for user ' + userid);
+                return response.json({});
+            }
+        })
+    }
+    else {
+        return response.json({});
+    }
+}
+
+exports.getDefaultImages = (request, response) => {
+    const userid = parseInt(request.params.id);
+    pool.query('SELECT * FROM default_images WHERE userid = $1', [userid], (err, res) => {
+        if (err) {
+            console.log('Failed to get default images for user ' + userid);
+            return response.json([]);
+        }
+        else {
+            return response.json(res.rows);
+        }
+    });
+}
+
+exports.getDefaultImage = (request, response) => {
+    const userid = parseInt(request.params.id);
+    if (request.body && request.body.card) {
+        pool.query('SELECT * FROM default_images WHERE userid = $1 AND name = $2', [userid, request.body.card.name], (err, res) => {
+            if (err) {
+                console.log('Failed to get default images for user ' + userid);
+                return response.json([]);
+            }
+            else {
+                return response.json(res.rows[0]);
+            }
+        });
+    }
+}
