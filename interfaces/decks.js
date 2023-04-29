@@ -161,11 +161,11 @@ let updateDeck = (request, response) => {
                                                     });
                                             }
                                             else {
-                                                pool.query('UPDATE deck_' + option + ' SET name = $1, image = $2, back_image = $3, WHERE id = $4',
+                                                pool.query('UPDATE deck_' + option + ' SET name = $1, image = $2, back_image = $3 WHERE id = $4',
                                                     [card.name, card.image, card.back_image, card.id],
                                                     (err, res) => {
                                                         if (err) {
-                                                            console.log('Card update (' + option + ') failed for deck with id: ' + id);
+                                                            console.log('Card update (' + option + ') with id: ' + card.id + ' failed for deck with id: ' + id);
                                                             console.log(err);
                                                             errors.push(err);
                                                         }
