@@ -39,8 +39,8 @@ let createDeck = (request, response) => {
                                                     console.log(err);
                                                     deck_errors.push(err);
                                                 }
-                                                if (results.rows && results.rows.length > 0) {
-                                                    let card_id = results.rows[0].id;
+                                                if (res.rows && res.rows.length > 0) {
+                                                    let card_id = res.rows[0].id;
                                                     if (zone === 'cards') {
                                                         pool.query('UPDATE deck_cards SET count = $1, iscommander = $2 WHERE id = $3', [card.count, card.iscommander, card_id],
                                                             (e, r) => {
@@ -192,7 +192,7 @@ let updateDeck = (request, response) => {
                                             else if (option === 'tokens') {
                                                 pool.query('INSERT INTO deck_tokens (deckid, name, image, type_line, oracle_text, power, toughness, w, u, b, r, g) ' +
                                                     'VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)',
-                                                    [id, card.name, token.image, card.types.join(' '), card.oracle_text, card.power, card.toughness,
+                                                    [id, card.name, card.image, card.types.join(' '), card.oracle_text, card.power, card.toughness,
                                                         card.colors.includes("W"), card.colors.includes("U"), card.colors.includes("B"),
                                                         card.colors.includes("R"), card.colors.includes("G")],
                                                     (err, res) => {
@@ -578,7 +578,7 @@ function grabDeckForPlay(id) {
                         }
                         deck.tokens = re.rows;
                         deck.tokens.forEach((token) => {
-                            token.types = token.type_line.replace(/[^a-zA-Z0-9 ]/g, '').split(' ').filter(element => element);
+                            token.types = token.type_line != null?  token.type_line.replace(/[^a-zA-Z0-9 ]/g, '').split(' ').filter(element => element): [];
                             token.power = token.power != null && token.power !== '*' ? Number(token.power) : token.power === '*' ? 0: null;
                             token.toughness = token.toughness != null && token.toughness !== '*' ? Number(token.toughness) : token.toughness === '*'? 0: null;
                             let colors = [];
