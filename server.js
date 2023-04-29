@@ -239,9 +239,8 @@ app.get('/api/users/commanders/:id', usersdb.getCommanders);
 app.get('/api/users/carddata/:id', usersdb.getCardUsage);
 app.post('/api/users/default_image/:id', usersdb.getDefaultImage);
 app.post('/api/users/default_images/:id', usersdb.getDefaultImages);
-app.post('/api/users/default_image/delete/:id', usersdb.deleteDefaultImage);
 app.post('/api/users/default_image/insert/:id', usersdb.setDefaultImage);
-app.post('/api/users/default_image/update/:id', usersdb.updateDefaultImage);
+app.post('/api/users/default_image/delete/:id', usersdb.deleteDefaultImage);
 
 app.post('/api/cards', scryfalldb.getScryfallCardApi);
 app.post('/api/cards/all', scryfalldb.getAllOfCardApi);
