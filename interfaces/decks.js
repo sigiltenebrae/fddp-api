@@ -26,7 +26,7 @@ let createDeck = (request, response) => {
                 let new_id = results.rows[0].id;
                 if (new_id > -1) {
                     let card_promises = [];
-                    for (let zone of ['cards', 'tokens', 'sideboard', 'companions', 'attractions', 'stickers']) {
+                    for (let zone of ['cards', 'tokens', 'sideboard', 'companions', 'contraptions', 'attractions', 'stickers']) {
                         if (deck[zone] && deck[zone].length > 0) {
                             for (let card of deck[zone]) {
                                 card_promises.push(
