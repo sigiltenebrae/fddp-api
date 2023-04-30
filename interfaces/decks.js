@@ -629,15 +629,94 @@ function grabDeckForPlay(id) {
 let getDeckForPlay = (request, response) => {
     const id = parseInt(request.params.id);
     grabDeckForPlay(id).then((deck) => {
-        let stickers = scryfalldb.getStickers();
-        deck.stickers = [];
+        deck.play_stickers = [];
+        if (deck.stickers.length < 10) {
+            let stickers = scryfalldb.getStickers({legal: true});
+            for (let sticker of deck.stickers) {
+                for (let i = 0; i < stickers.length; i++) {
+                    if (stickers[i].name === sticker.name) {
+                        stickers.splice(i, 1);
+                        i--;
+                    }
+                }
+            }
+            for (let i = 0; i < deck.stickers.length; i++) {
+                deck.play_stickers.push(deck.stickers[i]);
+            }
+            for (let i = deck.stickers.length; i < 10; i++) {
+                let ind = Math.floor(Math.random() * stickers.length);
+                let stick = stickers[ind];
+                deck.play_stickers.push(stick);
+                for (let j = 0; j < stickers.length; j++) {
+                    if (stickers[j].name === stick.name) {
+                        stickers.splice(j, 1);
+                        j--;
+                    }
+                }
+            }
+        }
+        let out_stickers = [];
         for (let i = 0; i < 3; i++) {
-            let ind = Math.floor(Math.random() * stickers.length);
-            deck.stickers.push(stickers[ind]);
-            stickers.splice(ind, 1);
+            let ind = Math.floor(Math.random() * deck.play_stickers.length);
+            out_stickers.push(deck.play_stickers[ind]);
+            deck.play_stickers.splice(ind, 1);
+        }
+        deck.play_stickers = out_stickers;
+
+        deck.play_attractions = [];
+        if (deck.attractions.length < 10) {
+            let attractions = scryfalldb.getAttractions({legal: true});
+            for (let attraction of deck.attractions) {
+                for (let i = 0; i < attractions.length; i++) {
+                    if (attractions[i].name === attraction.name) {
+                        attractions.splice(i, 1);
+                        i--;
+                    }
+                }
+            }
+            for (let i = 0; i < deck.attractions.length; i++) {
+                deck.play_attractions.push(deck.attractions[i]);
+            }
+            for (let i = deck.attractions.length; i < 10; i++) {
+                let ind = Math.floor(Math.random() * attractions.length);
+                let attr = attractions[ind];
+                deck.play_attractions.push(attr);
+                for (let j = 0; j < attractions.length; j++) {
+                    if (attractions[j].name === attr.name) {
+                        attractions.splice(j, 1);
+                        j--;
+                    }
+                }
+            }
+        }
+        deck.play_contraptions = [];
+        if (deck.contraptions.length < 15) {
+            let contraptions = scryfalldb.getContraptions();
+            for (let contraption of deck.contraptions) {
+                for (let i = 0; i < contraptions.length; i++) {
+                    if (contraptions[i].name === contraption.name) {
+                        contraptions.splice(i, 1);
+                        i--;
+                    }
+                }
+            }
+            for (let i = 0; i < deck.contraptions.length; i++) {
+                deck.play_contraptions.push(deck.contraptions[i]);
+            }
+            for (let i = deck.contraptions.length; i < 15; i++) {
+                let ind = Math.floor(Math.random() * contraptions.length);
+                let contr = contraptions[ind];
+                deck.play_contraptions.push(contr);
+                for (let j = 0; j < contraptions.length; j++) {
+                    if (contraptions[j].name === contr.name) {
+                        contraptions.splice(j, 1);
+                        j--;
+                    }
+                }
+            }
         }
         return response.json(deck);
-    })
+    });
 }
 
 function grabLastPlayed(deck_id) {

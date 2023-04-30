@@ -362,34 +362,67 @@ function getPlanes() {
     return planes;
 }
 
-function getStickers() {
+function getStickers(options) {
     let stickers = [];
     for (let card of scryfalldata) {
         if (card.type_line) {
             let types = card.type_line.replace(/[^a-zA-Z0-9 ]/g, '').split(' ').filter(element => element);
             if (types.includes('Stickers')) {
-                let out_card = formatScryfallCard(card)
-                out_card.image = card.image_uris != null && card.image_uris.png != null? card.image_uris.png: null;
-                stickers.push(out_card);
+                if (options != null && options.legal) {
+                    if (card.legalities.commander === 'legal') {
+                        let out_card = formatScryfallCard(card)
+                        out_card.image = card.image_uris != null && card.image_uris.png != null? card.image_uris.png: null;
+                        stickers.push(out_card);
+                    }
+                }
+                else {
+                    let out_card = formatScryfallCard(card)
+                    out_card.image = card.image_uris != null && card.image_uris.png != null? card.image_uris.png: null;
+                    stickers.push(out_card);
+                }
             }
         }
     }
     return stickers;
 }
 
-function getAttractions() {
+function getAttractions(options) {
     let attractions = [];
     for (let card of scryfalldata) {
         if (card.type_line) {
             let types = card.type_line.replace(/[^a-zA-Z0-9 ]/g, '').split(' ').filter(element => element);
             if (types.includes('Attraction')) {
-                let out_card = formatScryfallCard(card)
-                out_card.image = card.image_uris != null && card.image_uris.png != null? card.image_uris.png: null;
-                attractions.push(out_card);
+                if (options != null && options.legal) {
+                    if (card.legalities.commander === 'legal') {
+                        let out_card = formatScryfallCard(card)
+                        out_card.image = card.image_uris != null && card.image_uris.png != null? card.image_uris.png: null;
+                        attractions.push(out_card);
+                    }
+                }
+                else {
+                    let out_card = formatScryfallCard(card)
+                    out_card.image = card.image_uris != null && card.image_uris.png != null? card.image_uris.png: null;
+                    attractions.push(out_card);
+                }
             }
         }
     }
     return attractions;
+}
+
+function getContraptions(options) {
+    let contraptions = [];
+    for (let card of scryfalldata) {
+        if (card.type_line) {
+            let types = card.type_line.replace(/[^a-zA-Z0-9 ]/g, '').split(' ').filter(element => element);
+            if (types.includes('Contraption')) {
+                let out_card = formatScryfallCard(card)
+                out_card.image = card.image_uris != null && card.image_uris.png != null? card.image_uris.png: null;
+                contraptions.push(out_card);
+            }
+        }
+    }
+    return contraptions;
 }
 
 /**
@@ -604,11 +637,15 @@ let getPlanesApi = (request, response) => {
 }
 
 let getStickersApi = (request, response) => {
-    return response.json(getStickers());
+    return response.json(getStickers(null));
 }
 
 let getAttractionsApi = (request, response) => {
-    return response.json(getAttractions());
+    return response.json(getAttractions(null));
+}
+
+let getContraptionsApi = (request, response) => {
+    return response.json(getContraptions());
 }
 
 module.exports = {
@@ -632,5 +669,8 @@ module.exports = {
     getPlanesApi,
     getStickers,
     getStickersApi,
-    getAttractionsApi
+    getAttractions,
+    getAttractionsApi,
+    getContraptions,
+    getContraptionsApi
 }

@@ -582,32 +582,45 @@ function getRandomDeckForPlay(commanderdata, carddata, colors) {
     random_deck.sleeves = "";
     random_deck.cards = random_cards;
     random_deck.tokens = [];
+    let stickers = scryfalldb.getStickers();
+    random_deck.play_stickers = [];
+    for (let i = 0; i < 3; i++) {
+        let ind = Math.floor(Math.random() * stickers.length);
+        let stick = stickers[ind];
+        random_deck.play_stickers.push(stick);
+        for (let j = 0; j < stickers.length; j++) {
+            if (stickers[j].name === stick.name) {
+                stickers.splice(j, 1);
+                j--;
+            }
+        }
+    }
+    random_deck.play_attractions = [];
+    let attractions = scryfalldb.getAttractions();
+    for (let i = 0; i < 10; i++) {
+        let ind = Math.floor(Math.random() * attractions.length);
+        let attr = attractions[ind];
+        random_deck.play_attractions.push(attr);
+        for (let j = 0; j < attractions.length; j++) {
+            if (attractions[j].name === attr.name) {
+                attractions.splice(j, 1);
+                j--;
+            }
+        }
+    }
+    random_deck.play_contraptions = [];
     return random_deck;
 }
 
 exports.getCheapRandomDeck = (request, response) => {
     let colors = request.body && request.body.colors? request.body.colors: null;
     let deck = getRandomDeckForPlay(scryfalldb.getCheapCommanderData(), scryfalldb.getCheapData(), colors);
-    let stickers = scryfalldb.getStickers();
-    deck.stickers = [];
-    for (let i = 0; i < 3; i++) {
-        let ind = Math.floor(Math.random() * stickers.length);
-        deck.stickers.push(stickers[ind]);
-        stickers.splice(ind, 1);
-    }
     return response.json(deck);
 }
 
 exports.getRandomDeck = (request, response) => {
     let colors = request.body && request.body.colors? request.body.colors: null;
     let deck = getRandomDeckForPlay(scryfalldb.getCommanderData(), scryfalldb.getScryfallData(), colors);
-    let stickers = scryfalldb.getStickers();
-    deck.stickers = [];
-    for (let i = 0; i < 3; i++) {
-        let ind = Math.floor(Math.random() * stickers.length);
-        deck.stickers.push(stickers[ind]);
-        stickers.splice(ind, 1);
-    }
     return response.json(deck);
 }
 
