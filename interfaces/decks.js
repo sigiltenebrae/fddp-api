@@ -178,8 +178,8 @@ let updateDeck = (request, response) => {
                                     insert_promises.push(
                                         new Promise((resolve_insert) => {
                                             if (option === 'cards') {
-                                                pool.query('INSERT INTO deck_cards (deckid, name, image, count, iscommander) VALUES($1, $2, $3, $4, $5)',
-                                                    [id, card.name, card.image, card.count, card.iscommander],
+                                                pool.query('INSERT INTO deck_cards (deckid, name, image, back_image, count, iscommander) VALUES($1, $2, $3, $4, $5, $6)',
+                                                    [id, card.name, card.image, card.back_image, card.count, card.iscommander],
                                                     (err, res) => {
                                                         if (err) {
                                                             console.log('Card create failed for deck with id: ' + id);
