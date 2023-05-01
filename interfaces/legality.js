@@ -117,8 +117,7 @@ function updateAllLegalities() {
                         new Promise((resolve) => {
                             (updateLegality(deck.id)).then(() => {
                                 complete_decks++;
-                                process.stdout.write("\r\x1b[K");
-                                process.stdout.write(Math.floor((complete_decks/deck_count) * 100));
+                                console.log(Math.floor((complete_decks/deck_count) * 100) + '% complete');
                                 resolve();
                             });
                         })
