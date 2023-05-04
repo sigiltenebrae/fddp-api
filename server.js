@@ -243,6 +243,8 @@ app.post('/api/users/default_image/insert/:id', usersdb.setDefaultImage);
 app.post('/api/users/default_image/delete/:id', usersdb.deleteDefaultImage);
 
 app.post('/api/cards', scryfalldb.getScryfallCardApi);
+app.post('/api/cards/unformatted', scryfalldb.getUnformattedScryfallCardApi);
+app.post('/api/cards/id', scryfalldb.getScryfallCardByIdApi);
 app.post('/api/cards/all', scryfalldb.getAllOfCardApi);
 app.post('/api/cards/search', scryfalldb.searchCardApi);
 app.post('/api/cards/autocomplete', scryfalldb.autocompleteApi);

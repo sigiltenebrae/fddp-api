@@ -144,6 +144,7 @@ function getScryfallCardById(id) {
             return card;
         }
     }
+    return null;
 }
 
 /**
@@ -474,10 +475,20 @@ let autocompleteApi = (request, response) => {
     return response.json(autocompleteScryfallCard(card_name, options));
 }
 
+let getUnformattedScryfallCardApi = (request, response) => {
+    const card_name = request.body.name;
+    return response.json(getScryfallCard(card_name))
+}
+
 let getScryfallCardApi = (request, response) => {
     const card_name = request.body.name;
     //return response.json(getScryfallCard(card_name));
     return response.json(getFormattedScryfallCard(card_name));
+}
+
+let getScryfallCardByIdApi = (request, response) => {
+    const id = request.body.id;
+    return response.json(formatScryfallCard(getScryfallCardById(id)));
 }
 
 let getCardImagesApi = (request, response) => {
@@ -664,6 +675,8 @@ module.exports = {
     autocompleteApi,
     getScryfallCardById,
     getScryfallCardApi,
+    getUnformattedScryfallCardApi,
+    getScryfallCardByIdApi,
     getCardImagesApi,
     getAllOfTokenApi,
     getPlanesApi,
