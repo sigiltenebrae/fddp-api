@@ -193,8 +193,8 @@ let updateDeck = (request, response) => {
                                                 pool.query('INSERT INTO deck_tokens (deckid, name, image, type_line, oracle_text, power, toughness, w, u, b, r, g) ' +
                                                     'VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)',
                                                     [id, card.name, card.image, card.types.join(' '), card.oracle_text, card.power, card.toughness,
-                                                        card.colors.includes("W"), card.colors.includes("U"), card.colors.includes("B"),
-                                                        card.colors.includes("R"), card.colors.includes("G")],
+                                                        (card.colors != null && card.colors.includes("W")), (card.colors != null && card.colors.includes("U")), (card.colors != null && card.colors.includes("B")),
+                                                        (card.colors != null && card.colors.includes("R")), (card.colors != null && card.colors.includes("G"))],
                                                     (err, res) => {
                                                         if (err) {
                                                             console.log('Token create failed for deck with id: ' + id);
