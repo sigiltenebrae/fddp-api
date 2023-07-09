@@ -15,8 +15,8 @@ let createDeck = (request, response) => {
         console.log('creating deck');
         const deck = request.body.deck;
         let deck_errors = [];
-        pool.query('INSERT INTO decks (name, owner, sleeves, image, link, rating, active) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *',
-            [deck.name, deck.owner, deck.sleeves, deck.image, deck.link, deck.rating, deck.active],
+        pool.query('INSERT INTO decks (name, owner, sleeves, image, link, rating, active, colors) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *',
+            [deck.name, deck.owner, deck.sleeves, deck.image, deck.link, deck.rating, deck.active, JSON.stringify(deck.colors)],
             (error, results) => {
                 if (error) {
                     console.log('deck creation failed');
@@ -26,7 +26,7 @@ let createDeck = (request, response) => {
                 let new_id = results.rows[0].id;
                 if (new_id > -1) {
                     let card_promises = [];
-                    for (let zone of ['cards', 'tokens', 'sideboard', 'companions', 'contraptions', 'attractions', 'stickers']) {
+                    for (let zone of ['cards', 'commanders', 'tokens', 'sideboard', 'companions', 'contraptions', 'attractions', 'stickers']) {
                         if (deck[zone] && deck[zone].length > 0) {
                             for (let card of deck[zone]) {
                                 card_promises.push(
@@ -106,8 +106,8 @@ let updateDeck = (request, response) => {
     let errors = [];
     if (request.body && request.body.deck) {
         const deck = request.body.deck;
-        pool.query('UPDATE decks SET name = $1, owner = $2, sleeves = $3, image = $4, link = $5, rating = $6, active = $7, modified = now() WHERE id = $8',
-            [deck.name, deck.owner, deck.sleeves, deck.image, deck.link, deck.rating, deck.active, id],
+        pool.query('UPDATE decks SET name = $1, owner = $2, sleeves = $3, image = $4, link = $5, rating = $6, active = $7, colors = $8, modified = now() WHERE id = $9',
+            [deck.name, deck.owner, deck.sleeves, deck.image, deck.link, deck.rating, deck.active, JSON.stringify(deck.colors), id],
             (error, results) => {
                 if (error) {
                     console.log('Deck update failed for deck with id: ' + id);
@@ -118,7 +118,7 @@ let updateDeck = (request, response) => {
                     let update_promises = [];
                     let insert_promises = [];
                     let delete_promises = [];
-                    for (let option of ['cards', 'tokens', 'sideboard', 'companions', 'contraptions', 'attractions', 'stickers']) {
+                    for (let option of ['cards', 'commanders', 'tokens', 'sideboard', 'companions', 'contraptions', 'attractions', 'stickers']) {
                         if (deck[option] && deck[option].length > 0) {
                             for (let card of deck[option]) {
                                 if (card.id) {
@@ -130,6 +130,18 @@ let updateDeck = (request, response) => {
                                                     (err, res) => {
                                                         if (err) {
                                                             console.log('Card ' + option + ' update failed for card with id: ' + card.id + 'in deck with id: ' + id);
+                                                            console.log(err);
+                                                            errors.push(err);
+                                                        }
+                                                        resolve_update();
+                                                    });
+                                            }
+                                            else if (option === 'commanders') {
+                                                pool.query('UPDATE deck_commanders SET name = $1, image = $2, back_image = $3 WHERE id = $4',
+                                                    [card.name, card.image, card.back_image, card.id],
+                                                    (err, res) => {
+                                                        if (err) {
+                                                            console.log('Commander ' + option + ' update failed for card with id: ' + card.id + 'in deck with id: ' + id);
                                                             console.log(err);
                                                             errors.push(err);
                                                         }
@@ -183,6 +195,18 @@ let updateDeck = (request, response) => {
                                                     (err, res) => {
                                                         if (err) {
                                                             console.log('Card create failed for deck with id: ' + id);
+                                                            console.log(err);
+                                                            errors.push(err);
+                                                        }
+                                                        resolve_insert();
+                                                    });
+                                            }
+                                            if (option === 'commanders') {
+                                                pool.query('INSERT INTO deck_commanders (deckid, name, image, back_image) VALUES($1, $2, $3, $4)',
+                                                    [id, card.name, card.image, card.back_image],
+                                                    (err, res) => {
+                                                        if (err) {
+                                                            console.log('Commander create failed for deck with id: ' + id);
                                                             console.log(err);
                                                             errors.push(err);
                                                         }
@@ -298,6 +322,7 @@ let getDecksForUser = (request, response) => {
                    for (let deck_data of results.rows) {
                        let deck = deck_data;
                        deck.legality = JSON.parse(deck_data.legality);
+                       deck.colors = JSON.parse(deck_data.colors)
                        pool.query('SELECT * FROM deck_cards WHERE deckid = $1', [deck.id],
                            (err, res) => {
                                if (err) {
@@ -342,14 +367,23 @@ function grabDeck(id) {
             if (results.rows.length > 0) {
                 let deck = results.rows[0];
                 deck.legality = JSON.parse(deck.legality);
+                deck.colors = JSON.parse(deck.colors);
                 pool.query('SELECT * FROM deck_cards WHERE deckid = $1', [id], (err, res) => {
                     if (err) {
                         console.log('Error getting cards for deck: ' + id);
                         console.log(err);
                         resolve({deck: deck, errors: [err]});
                     }
-                    deck.cards = res.rows;
-                    resolve({deck: deck});
+                    pool.query('SELECT * FROM deck_commanders WHERE deckid = $1', [id], (err2, res2) => {
+                        if (err2) {
+                            console.log('Error getting commanders for deck: ' + id);
+                            console.log(err);
+                            resolve({deck: deck, errors: [err]});
+                        }
+                        deck.cards = res.rows;
+                        deck.commanders = res2.rows;
+                        resolve({deck: deck});
+                    })
                 })
             }
         })
@@ -368,6 +402,7 @@ function grabDecks() {
                 let deck_list = results.rows;
                 deck_list.forEach((deck) => {
                     deck.legality = JSON.parse(deck.legality);
+                    deck.colors = JSON.parse(deck.colors);
                 })
                 resolve({deck_list: deck_list});
             }
@@ -528,10 +563,11 @@ function grabDeckForPlay(id) {
             if (results.rows.length > 0) {
                 let deck = results.rows[0];
                 deck.legality = JSON.parse(deck.legality);
+                deck.colors = JSON.parse(deck.colors);
 
 
                 let card_promises = [];
-                for (let option of ['cards', 'sideboard', 'companions', 'contraptions', 'attractions', 'stickers']) {
+                for (let option of ['cards', 'commanders', 'sideboard', 'companions', 'contraptions', 'attractions', 'stickers']) {
                     card_promises.push( new Promise((resolve_card) => {
                         pool.query('SELECT * FROM deck_' + option + ' WHERE deckid = $1', [id], (err, res) => {
                             if (err) {
@@ -764,24 +800,17 @@ function grabLastPlayed(deck_id) {
 
 function grabDeckBasic(deck_data) {
     return new Promise((resolve) => {
-        pool.query('SELECT * FROM deck_cards WHERE deckid = $1 AND iscommander', [deck_data.id],
+        pool.query('SELECT * FROM deck_commanders WHERE deckid = $1', [deck_data.id],
             (err, res) => {
                 if (err) {
                     console.log('Error getting cards for deck: ' + deck_data.id);
                     console.log(err);
                     errors.push(err);
-                    deck_data.commander = [];
-                    deck_data.colors = [];
+                    deck_data.commanders = [];
                 } else {
-                    deck_data.commander = res.rows;
-                    deck_data.colors = [];
-                    for (let card of deck_data.commander) {
+                    deck_data.commanders = res.rows;
+                    for (let card of deck_data.commanders) {
                         let scryfall_card = scryfalldb.getFormattedScryfallCard(card.name);
-                        for (let mana of scryfall_card.color_identity) {
-                            if (mana === 'W' || mana === 'U' || mana === 'B' || mana === 'R' || mana === 'G') {
-                                deck_data.colors.push(mana);
-                            }
-                        }
                     }
                 }
 
@@ -864,6 +893,7 @@ let getDecksBasic = (request, response) => {
                         deck_data_promises.push(new Promise((resolve, reject) => {
                             grabDeckBasic(deck_data).then(() => {
                                 deck_data.legality = JSON.parse(deck_data.legality);
+                                deck_data.colors = JSON.parse(deck_data.colors);
                                 grabLastPlayed(deck_data.id).then((lp) => {
                                     deck_data.last_played = lp;
                                     decks.push(deck_data);
