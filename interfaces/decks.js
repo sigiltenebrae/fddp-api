@@ -101,6 +101,54 @@ let createDeck = (request, response) => {
     }
 }
 
+let fixColorDB = () => {
+    pool.query('SELECT * FROM decks', (error, results) => {
+        if (error) {
+            console.log(error)
+        }
+        else {
+            if (results.rows && results.rows.length > 0) {
+                let deck_promises = [];
+                for (let deck of results.rows) {
+                    deck_promises.push(new Promise((ree) => {
+                        pool.query('SELECT * FROM deck_commanders WHERE deckid = ' + deck.id, (error2, results2) => {
+                            if (error2) {
+                                console.log(error2);
+                                ree();
+                            }
+                            else {
+                                if (results2.rows && results2.rows.length > 0) {
+                                    let colors = [];
+                                    for (let commander of results2.rows) {
+                                        console.log('handling ' + commander.name);
+                                        let card = scryfalldb.getFormattedScryfallCard(commander.name);
+                                        for (let color of card.color_identity) {
+                                            if (!colors.includes(color)) {
+                                                colors.push(color);
+                                            }
+                                        }
+                                        console.log(colors);
+                                    }
+                                    pool.query('UPDATE decks SET colors = $1 WHERE id = $2', [JSON.stringify(colors), deck.id], (error3, results3) => {
+                                       if (error3) {
+                                           console.log(error3);
+                                       }
+                                       ree();
+                                    });
+                                }
+                                else {
+                                    ree();
+                                }
+                            }
+                        })
+                    }));
+                }
+                Promise.all(deck_promises).then(() => {console.log('done')});
+            }
+        }
+    });
+}
+
 let updateDeck = (request, response) => {
     const id = parseInt(request.params.id);
     let errors = [];
@@ -937,5 +985,6 @@ module.exports = {
     getDeckForPlay,
     grabDeckForPlay,
     getDecksBasic,
-    getLastPlayed
+    getLastPlayed,
+    fixColorDB
 }
