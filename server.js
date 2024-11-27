@@ -217,9 +217,22 @@ getArchidektDeck = (request, response) => {
     })
 }
 
+/**
+ * User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:132.0) Gecko/20100101 Firefox/132.0
+ * referer: https://www.moxfield.com/
+ */
+
 getMoxfieldDeck = (request, response) => {
     const id = request.params.id;
-    axios.get('https://api2.moxfield.com/v3/decks/all/' + id).then( res => {
+    axios.get(
+        'https://api2.moxfield.com/v3/decks/all/' + id,
+        {
+            headers: {
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:132.0) Gecko/20100101 Firefox/132.0",
+                "referer": "https://www.moxfield.com/"
+            }
+        }
+    ).then( res => {
         return response.json(res.data);
     }).catch(function (error) {
         console.log(error);
