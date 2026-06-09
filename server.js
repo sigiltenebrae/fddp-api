@@ -1,13 +1,26 @@
-const express = require('express');
-const cors = require('cors');
-const bodyParser = require('body-parser');
-const https = require("https");
-const fs = require('fs');
-const axios = require('axios');
-const StreamArray = require('stream-json/streamers/StreamArray');
+import axios from "axios";
+import bodyParser from "body-parser";
+import cors from "cors";
+import express from "express";
+import fs from "node:fs";
+import https from "node:https";
+import pg from "pg";
+import {streamArray} from 'stream-json/streamers/stream-array.js';
+import config from './config/db.config.js';
+import scryfalldb from './interfaces/scryfall.js';
+import decksdb from './interfaces/decks.js';
+import gamesdb from './interfaces/games.js';
+import usersdb from './interfaces/users.js';
+import customsdb from './interfaces/custom_cards.js';
+import bansdb from './interfaces/ban_list.js';
+import authdb from './interfaces/auth.js';
+import randomdb from './interfaces/randomander.js';
+import themesdb from './interfaces/themes.js';
+import legalitydb from './interfaces/legality.js';
+import edhrecdb from './interfaces/edhrec.js';
 
-const config = require('./config/db.config');
-const Pool = require('pg').Pool
+const { Pool } = pg;
+
 const pool = new Pool({
     user: config.USER,
     host: config.HOST,
@@ -15,18 +28,6 @@ const pool = new Pool({
     password: config.PASSWORD,
     port: 5432,
 });
-
-const scryfalldb = require('./interfaces/scryfall');
-const decksdb = require('./interfaces/decks');
-const gamesdb = require('./interfaces/games');
-const usersdb = require('./interfaces/users');
-const customsdb = require('./interfaces/custom_cards');
-const bansdb = require('./interfaces/ban_list');
-const authdb = require('./interfaces/auth');
-const randomdb = require('./interfaces/randomander');
-const themesdb = require('./interfaces/themes');
-const legalitydb = require('./interfaces/legality');
-const edhrecdb = require('./interfaces/edhrec');
 
 const app = express();
 const port = 2999;
@@ -49,7 +50,7 @@ function loadScryfallFile() {
     return new Promise((resolve, reject) => {
         const cards = [];
         fs.createReadStream('assets/default-cards.json')
-            .pipe(StreamArray.withParser())
+            .pipe(streamArray.withParser())
             .on('data', ({ value }) => cards.push(value))
             .on('end', () => resolve(cards))
             .on('error', reject);
