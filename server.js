@@ -4,6 +4,7 @@ const bodyParser = require('body-parser');
 const https = require("https");
 const fs = require('fs');
 const axios = require('axios');
+const StreamArray = require('stream-json/streamers/StreamArray');
 
 const config = require('./config/db.config');
 const Pool = require('pg').Pool
@@ -44,6 +45,17 @@ app.post('/', (request, response) => {
 });
 
 
+function loadScryfallFile() {
+    return new Promise((resolve, reject) => {
+        const cards = [];
+        fs.createReadStream('assets/default-cards.json')
+            .pipe(StreamArray.withParser())
+            .on('data', ({ value }) => cards.push(value))
+            .on('end', () => resolve(cards))
+            .on('error', reject);
+    });
+}
+
 function updateDB() {
     return new Promise ((resolve) => {
             axios.get('https://api.scryfall.com/bulk-data').then( res => {
@@ -64,14 +76,15 @@ function updateDB() {
                         update_file.on("finish", () => {
                             update_file.close();
                             console.log('scryfall update downloaded');
-                            let rawscryfalldata = fs.readFileSync('assets/default-cards.json');
-                            scryfalldb.setScryfallData(JSON.parse(rawscryfalldata));
-                            scryfalldb.loadCommanderData();
-                            scryfalldb.loadCheapData(0.5);
-                            scryfalldb.loadCheapCommanders();
-                            updateThemesDB().then(() => {
-                                legalitydb.updateAllLegalities().then(() => {
-                                    resolve();
+                            loadScryfallFile().then(cards => {
+                                scryfalldb.setScryfallData(cards);
+                                scryfalldb.loadCommanderData();
+                                scryfalldb.loadCheapData(0.5);
+                                scryfalldb.loadCheapCommanders();
+                                updateThemesDB().then(() => {
+                                    legalitydb.updateAllLegalities().then(() => {
+                                        resolve();
+                                    });
                                 });
                             });
                         });
@@ -85,13 +98,14 @@ function updateDB() {
                 }
                 if (fs.existsSync('assets/default-cards.json')) {
                     console.log('using old db');
-                    let rawscryfalldata = fs.readFileSync('assets/default-cards.json');
-                    scryfalldb.setScryfallData(JSON.parse(rawscryfalldata));
-                    scryfalldb.loadCommanderData();
-                    scryfalldb.loadCheapData(0.5);
-                    scryfalldb.loadCheapCommanders();
-                    updateThemesDB().then(() => {
-                        resolve();
+                    loadScryfallFile().then(cards => {
+                        scryfalldb.setScryfallData(cards);
+                        scryfalldb.loadCommanderData();
+                        scryfalldb.loadCheapData(0.5);
+                        scryfalldb.loadCheapCommanders();
+                        updateThemesDB().then(() => {
+                            resolve();
+                        });
                     });
                 }
                 else {
@@ -327,13 +341,14 @@ if (fs.existsSync('assets/default-cards.json')) {
         });
     }
     else {
-        let rawscryfalldata = fs.readFileSync('assets/default-cards.json');
-        scryfalldb.setScryfallData(JSON.parse(rawscryfalldata));
-        scryfalldb.loadCommanderData();
-        scryfalldb.loadCheapData(0.5);
-        scryfalldb.loadCheapCommanders();
-        app.listen(port, () => {
-            console.log(`App running on port ${port}.`);
+        loadScryfallFile().then(cards => {
+            scryfalldb.setScryfallData(cards);
+            scryfalldb.loadCommanderData();
+            scryfalldb.loadCheapData(0.5);
+            scryfalldb.loadCheapCommanders();
+            app.listen(port, () => {
+                console.log(`App running on port ${port}.`);
+            });
         });
     }
 }
