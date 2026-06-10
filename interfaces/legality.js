@@ -1,19 +1,19 @@
-const scryfalldb = require('./scryfall');
-const deckdb = require('./decks');
-const banlistdb = require('./ban_list');
+import * as scryfalldb from './scryfall';
+import * as deckdb from './decks';
+import * as banlistdb from './ban_list';
 
-const config = require("../config/db.config.js");
-const {response} = require("express");
-const Pool = require('pg').Pool
+import "dotenv/config.js";
+import pg from "pg";
+const { Pool } = pg;
 const pool = new Pool({
-    user: config.USER,
-    host: config.HOST,
-    database: config.DB,
-    password: config.PASSWORD,
-    port: 5432,
+    "host":     process.env.POSTGRES_HOST,
+    "database": process.env.POSTGRES_DB,
+    "user":     process.env.POSTGRES_USER,
+    "password": process.env.POSTGRES_PASSWORD,
+    "port":     5432,
 });
 
-let getLegality = (request, response) => {
+export function getLegality(request, response) {
     const id = parseInt(request.params.id);
     console.log('updating legality for deck: ' + id);
     updateLegality(id).then((legality) => {
@@ -21,7 +21,7 @@ let getLegality = (request, response) => {
     });
 }
 
-let getAllLegalities = (request, response) => {
+export function getAllLegalities(request, response) {
     updateAllLegalities().then(() => {
         return response.json({message: 'all legalities checked'});
     })
@@ -130,10 +130,4 @@ function updateAllLegalities() {
             }
         });
     });
-}
-
-module.exports = {
-    getLegality,
-    getAllLegalities,
-    updateAllLegalities
 }
