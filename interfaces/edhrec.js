@@ -1,4 +1,4 @@
-const axios = require('axios');
+import *  as axios from 'axios';
 
 function getEdhrecCardString(card_str) {
     let edhrec_name = card_str.toLowerCase();
@@ -42,7 +42,7 @@ function getEdhrecThemes(commander1, commander2) {
     })
 }
 
-let getEdhrecThemesApi = (request, response) => {
+export function getEdhrecThemesApi(request, response) {
     if(request.body && request.body.commander) {
         if (request.body.commander2) {
             getEdhrecThemes(request.body.commander, request.body.commander2).then((theme_data) => {
