@@ -1,12 +1,13 @@
-const config = require("../config/db.config.js");
-const {request, response} = require("express");
-const Pool = require('pg').Pool
+
+import "dotenv/config.js";
+import pg from "pg";
+const { Pool } = pg;
 const pool = new Pool({
-    user: config.USER,
-    host: config.HOST,
-    database: config.DB,
-    password: config.PASSWORD,
-    port: 5432,
+    "host":     process.env.POSTGRES_HOST,
+    "database": process.env.POSTGRES_DB,
+    "user":     process.env.POSTGRES_USER,
+    "password": process.env.POSTGRES_PASSWORD,
+    "port":     5432,
 });
 
 function grabBanList() {
@@ -22,7 +23,7 @@ function grabBanList() {
     })
 }
 
-let getBanList = (request, response) => {
+export function getBanList(request, response) {
     grabBanList().then((list) => {
         return response.json(list);
     })
@@ -41,13 +42,13 @@ function grabBanTypes() {
     })
 }
 
-let getBanTypes = (request, response) => {
+export function getBanTypes(request, response) {
     grabBanTypes().then((types) => {
         return response.json(types);
     })
 }
 
-let banCard = (request, response) => {
+export function banCard(request, response) {
     if (request.body && request.body.card) {
         console.log('adding ban for card: ' + request.body.card.name);
         pool.query('INSERT INTO ban_list (name, ban_type) VALUES ($1, $2)', [request.body.card.name, request.body.card.ban_type], (error, results) => {
@@ -61,7 +62,7 @@ let banCard = (request, response) => {
     }
 }
 
-let removeBan = (request, response) => {
+export function removeBan(request, response) {
     if (request.body && request.body.card) {
         pool.query('DELETE FROM ban_list WHERE name = $1', [request.body.card.name], (error, results) => {
             if (error) {
@@ -75,7 +76,7 @@ let removeBan = (request, response) => {
     }
 }
 
-let setBanImage = (request, response) => {
+export function setBanImage(request, response) {
     if (request.body && request.body.card) {
         pool.query('UPDATE ban_list SET image = $1 WHERE name = $2', [request.body.card.image, request.body.card.name],
             (error, results) => {
@@ -85,14 +86,4 @@ let setBanImage = (request, response) => {
                 return response.json({});
             });
     }
-}
-
-module.exports = {
-    getBanList,
-    getBanTypes,
-    grabBanList,
-    grabBanTypes,
-    banCard,
-    removeBan,
-    setBanImage
 }
