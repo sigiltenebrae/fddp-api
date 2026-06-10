@@ -1,4 +1,4 @@
-import * as scryfalldb from './scryfall';
+import * as scryfalldb from './scryfall.js';
 
 /**
  * Returns a formatted card with a randomly selected image with the given card name
