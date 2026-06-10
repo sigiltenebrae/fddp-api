@@ -1,15 +1,18 @@
-const config = require("../config/db.config.js");
-const scryfalldb = require('./scryfall');
-const Pool = require('pg').Pool
+import * as scryfalldb from './scryfall';
+
+import "dotenv/config.js";
+import pg from "pg";
+const { Pool } = pg;
 const pool = new Pool({
-    user: config.USER,
-    host: config.HOST,
-    database: config.DB,
-    password: config.PASSWORD,
-    port: 5432,
+    "host":     process.env.POSTGRES_HOST,
+    "database": process.env.POSTGRES_DB,
+    "user":     process.env.POSTGRES_USER,
+    "password": process.env.POSTGRES_PASSWORD,
+    "port":     5432,
 });
 
-let createDeck = (request, response) => {
+
+export function createDeck(request, response) {
     console.log('attempting to create deck');
     if (request.body && request.body.deck) {
         console.log('creating deck');
@@ -101,7 +104,7 @@ let createDeck = (request, response) => {
     }
 }
 
-let fixColorDB = () => {
+export function fixColorDB() {
     pool.query('SELECT * FROM decks', (error, results) => {
         if (error) {
             console.log(error)
@@ -149,7 +152,7 @@ let fixColorDB = () => {
     });
 }
 
-let updateDeck = (request, response) => {
+export function updateDeck(request, response) {
     const id = parseInt(request.params.id);
     let errors = [];
     if (request.body && request.body.deck) {
@@ -340,7 +343,7 @@ let updateDeck = (request, response) => {
     }
 }
 
-let deleteDeck = (request, response) => {
+export function deleteDeck(request, response) {
     const id = parseInt(request.params.id);
     pool.query('DELETE FROM decks WHERE id = $1', [id],
         (error, results) => {
@@ -354,7 +357,7 @@ let deleteDeck = (request, response) => {
         });
 }
 
-let getDecksForUser = (request, response) => {
+export function getDecksForUser(request, response) {
     const userid = parseInt(request.params.id);
     let errors = [];
     pool.query('SELECT * FROM decks WHERE owner = $1', [userid],
@@ -395,7 +398,7 @@ let getDecksForUser = (request, response) => {
         })
 }
 
-let getDeck = (request, response) => {
+export function getDeck(request, response) {
     const id = parseInt(request.params.id);
     grabDeck(id).then((deck) => {
         return response.json(deck);
@@ -458,13 +461,13 @@ function grabDecks() {
     })
 }
 
-let getDeckList = (request, response) => {
+export function getDeckList(request, response) {
     grabDecks().then((decks) => {
         return response.json(decks);
     })
 }
 
-let getThemesForDeck = (request, response) => {
+export function getThemesForDeck(request, response) {
     if (request.body && request.body.deck_id) {
         const deck_id = request.body.deck_id;
         pool.query('SELECT * FROM deck_themes WHERE deck_id = $1', [deck_id], (theme_err, theme_res) => {
@@ -510,7 +513,7 @@ function tribeInList(theme, list) {
     return false;
 }
 
-let updateDeckThemes = (request, response) => {
+export function updateDeckThemes(request, response) {
     if (request.body && request.body.themes && request.body.tribes) {
         const deck_id = parseInt(request.params.id);
         const new_themes = request.body.themes;
@@ -710,7 +713,7 @@ function grabDeckForPlay(id) {
     })
 }
 
-let getDeckForPlay = (request, response) => {
+export function getDeckForPlay(request, response) {
     const id = parseInt(request.params.id);
     grabDeckForPlay(id).then((deck) => {
         deck.play_stickers = [];
@@ -916,7 +919,7 @@ function grabDeckBasic(deck_data) {
     })
 }
 
-let getDecksBasic = (request, response) => {
+export function getDecksBasic(request, response) {
     let userid = null
     if (request.params.id) {
         userid = parseInt(request.params.id);
@@ -960,7 +963,7 @@ let getDecksBasic = (request, response) => {
         });
 }
 
-let getLastPlayed = (request, response) => {
+export function getLastPlayed(request, response) {
     if (request.params.id) {
         let deck_id = parseInt(request.params.id);
         grabLastPlayed(deck_id).then((lp) => {
@@ -970,21 +973,4 @@ let getLastPlayed = (request, response) => {
     else {
         return response.json({last_played: null});
     }
-}
-
-module.exports = {
-    createDeck,
-    updateDeck,
-    deleteDeck,
-    getDecksForUser,
-    getDeck,
-    grabDecks,
-    getDeckList,
-    getThemesForDeck,
-    updateDeckThemes,
-    getDeckForPlay,
-    grabDeckForPlay,
-    getDecksBasic,
-    getLastPlayed,
-    fixColorDB
 }
