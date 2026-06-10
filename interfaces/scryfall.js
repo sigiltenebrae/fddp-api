@@ -1,12 +1,12 @@
-const config = require("../config/db.config.js");
-const {response} = require("express");
-const Pool = require('pg').Pool
+import "dotenv/config.js";
+import pg from "pg";
+const { Pool } = pg;
 const pool = new Pool({
-    user: config.USER,
-    host: config.HOST,
-    database: config.DB,
-    password: config.PASSWORD,
-    port: 5432,
+    "host":     process.env.POSTGRES_HOST,
+    "database": process.env.POSTGRES_DB,
+    "user":     process.env.POSTGRES_USER,
+    "password": process.env.POSTGRES_PASSWORD,
+    "port":     5432,
 });
 
 let scryfalldata = null;
@@ -459,39 +459,39 @@ function getAllCardImages(card_name) {
     return images;
 }
 
-let getAllOfCardApi = (request, response) => {
+export function getAllOfCardApi(request, response) {
     const card_name = request.body.name;
     return response.json(getAllOfCard(card_name));
 }
 
-let searchCardApi = (request, response) => {
+export function searchCardApi(request, response) {
     const card_name = request.body.name;
     return response.json(searchScryfallCard(card_name));
 }
 
-let autocompleteApi = (request, response) => {
+export function autocompleteApi(request, response) {
     const card_name = request.body.name;
     const options = request.body.options;
     return response.json(autocompleteScryfallCard(card_name, options));
 }
 
-let getUnformattedScryfallCardApi = (request, response) => {
+export function getUnformattedScryfallCardApi(request, response) {
     const card_name = request.body.name;
     return response.json(getScryfallCard(card_name))
 }
 
-let getScryfallCardApi = (request, response) => {
+export function getScryfallCardApi(request, response) {
     const card_name = request.body.name;
     //return response.json(getScryfallCard(card_name));
     return response.json(getFormattedScryfallCard(card_name));
 }
 
-let getScryfallCardByIdApi = (request, response) => {
+export function getScryfallCardByIdApi(request, response) {
     const id = request.body.id;
     return response.json(formatScryfallCard(getScryfallCardById(id)));
 }
 
-let getCardImagesApi = (request, response) => {
+export function getCardImagesApi(request, response) {
     const card_name = request.body.name;
     console.log('Getting images for: ' + card_name);
     let out_card = {};
@@ -600,7 +600,7 @@ let getCardImagesApi = (request, response) => {
 /**
  * Gets all instances of a token in Scryfall and the local db
  */
-let getAllOfTokenApi = (request, response) => {
+export function getAllOfTokenApi(request, response) {
     const card_name = request.body.name;
     const search = request.body.search != null? request.body.search: false;
     let card_data = getAllOfCardFormatted(card_name, search);
@@ -643,47 +643,18 @@ let getAllOfTokenApi = (request, response) => {
     });
 }
 
-let getPlanesApi = (request, response) => {
+export function getPlanesApi(request, response) {
     return response.json(getPlanes());
 }
 
-let getStickersApi = (request, response) => {
+export function getStickersApi = (request, response) {
     return response.json(getStickers(null));
 }
 
-let getAttractionsApi = (request, response) => {
+export function getAttractionsApi(request, response) {
     return response.json(getAttractions(null));
 }
 
-let getContraptionsApi = (request, response) => {
+export function getContraptionsApi(request, response) {
     return response.json(getContraptions());
-}
-
-module.exports = {
-    loadCommanderData,
-    loadCheapCommanders,
-    loadCheapData,
-    getScryfallData,
-    setScryfallData,
-    getCommanderData,
-    getCheapData,
-    getCheapCommanderData,
-    getFormattedScryfallCard,
-    getAllCardImages,
-    getAllOfCardApi,
-    searchCardApi,
-    autocompleteApi,
-    getScryfallCardById,
-    getScryfallCardApi,
-    getUnformattedScryfallCardApi,
-    getScryfallCardByIdApi,
-    getCardImagesApi,
-    getAllOfTokenApi,
-    getPlanesApi,
-    getStickers,
-    getStickersApi,
-    getAttractions,
-    getAttractionsApi,
-    getContraptions,
-    getContraptionsApi
 }
