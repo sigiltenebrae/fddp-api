@@ -51,7 +51,7 @@ function loadScryfallFile() {
     return new Promise((resolve, reject) => {
         const cards = [];
         fs.createReadStream('assets/default-cards.json')
-            .pipe(streamArray.withParser())
+            .pipe(streamArray.withParserAsStream())
             .on('data', ({ value }) => cards.push(value))
             .on('end', () => resolve(cards))
             .on('error', reject);

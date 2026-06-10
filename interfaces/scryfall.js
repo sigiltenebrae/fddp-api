@@ -1,5 +1,7 @@
 import "dotenv/config.js";
+
 import pg from "pg";
+
 const { Pool } = pg;
 const pool = new Pool({
     "host":     process.env.POSTGRES_HOST,
@@ -14,30 +16,30 @@ let commanderdata = null;
 let scryfalldata_cheap = null;
 let commanderdata_cheap = null;
 
-function getScryfallData() {
+export function getScryfallData() {
     return scryfalldata;
 }
 
-function setScryfallData(data) {
+export function setScryfallData(data) {
     scryfalldata = data;
 }
 
-function getCommanderData() {
+export function getCommanderData() {
     return commanderdata;
 }
 
-function getCheapData() {
+export function getCheapData() {
     return scryfalldata_cheap;
 }
 
-function getCheapCommanderData() {
+export function getCheapCommanderData() {
     return commanderdata_cheap;
 }
 
 /**
  * Loads a commanderdata array of all legal commanders found in the scryfalldata array
  */
-function loadCommanderData() {
+export function loadCommanderData() {
     commanderdata = [];
     for (let card of scryfalldata) {
         let toAdd = false;
@@ -72,7 +74,7 @@ function loadCommanderData() {
 /**
  * Loads a scryfalldata_cheap array of all cards with a sale price below the given value
  */
-function loadCheapData(max_cost) {
+export function loadCheapData(max_cost) {
     scryfalldata_cheap = [];
     for (let card of scryfalldata) {
         if (card.prices != null && card.prices) {
@@ -97,7 +99,7 @@ function loadCheapData(max_cost) {
 /**
  * Loads a commanderdata_cheap array of all legal commanders found in the scryfalldata_cheap array
  */
-function loadCheapCommanders() {
+export function loadCheapCommanders() {
     commanderdata_cheap = [];
     for (let card of scryfalldata_cheap) {
         if (card.type_line != null && card.type_line.includes("Legendary") && card.type_line.includes("Creature")) {
@@ -125,7 +127,7 @@ function loadCheapCommanders() {
  * @param card_name string name of the card to get
  * @returns {any}
  */
-function getScryfallCard(card_name) {
+export function getScryfallCard(card_name) {
     for (let card of scryfalldata) {
         if (card.name.toLowerCase() === card_name.toLowerCase()) {
             return card;
@@ -138,7 +140,7 @@ function getScryfallCard(card_name) {
  * @param id int id of the card to get
  * @returns {any}
  */
-function getScryfallCardById(id) {
+export function getScryfallCardById(id) {
     for (let card of scryfalldata) {
         if (card.id === id) {
             return card;
@@ -152,7 +154,7 @@ function getScryfallCardById(id) {
  * @param card_name
  * @returns [{any}]
  */
-function getAllOfCard(card_name) {
+export function getAllOfCard(card_name) {
     let card_data = [];
     for (let card of scryfalldata) {
         if (card.name.toLowerCase() === card_name.toLowerCase()) {
@@ -167,7 +169,7 @@ function getAllOfCard(card_name) {
  * @param card_name
  * @returns {*[]}
  */
-function searchScryfallCard(card_name) {
+export function searchScryfallCard(card_name) {
     let card_data = [];
     for (let card of scryfalldata) {
         if (card.name.toLowerCase().includes(card_name.toLowerCase())) {
@@ -177,7 +179,7 @@ function searchScryfallCard(card_name) {
     return card_data;
 }
 
-function autocompleteScryfallCard(card_name, options) {
+export function autocompleteScryfallCard(card_name, options) {
     if (card_name == null || card_name === '' || card_name === ' ') {
         return [];
     }
@@ -206,7 +208,7 @@ function autocompleteScryfallCard(card_name, options) {
     return card_data;
 }
 
-function getAllOfCardFormatted(card_name, search) {
+export function getAllOfCardFormatted(card_name, search) {
     let card_data = [];
     for (let card of scryfalldata) {
         if (
@@ -234,7 +236,7 @@ function getAllOfCardFormatted(card_name, search) {
  * @param card_name
  * @returns number
  */
-function getCheapestCost(card_name) {
+export function getCheapestCost(card_name) {
     let cards = getAllOfCard(card_name);
     let cheapest = 99999999;
     for (let card of cards) {
@@ -251,7 +253,7 @@ function getCheapestCost(card_name) {
  * @param options options object. nontoken only supported value.
  * @returns {any}
  */
-function getFormattedScryfallCard(card_name, options) {
+export function getFormattedScryfallCard(card_name, options) {
     for (let card of scryfalldata) {
         if (card.name.toLowerCase() === card_name.toLowerCase()) {
             if (options && options.nontoken) {
@@ -268,7 +270,7 @@ function getFormattedScryfallCard(card_name, options) {
     return {};
 }
 
-function formatScryfallCard(card) {
+export function formatScryfallCard(card) {
     let out_card = {};
     out_card.images = [];
     out_card.back_images = [];
@@ -350,7 +352,7 @@ function formatScryfallCard(card) {
  * Returns an array of all cards in the db with the type 'Plane'
  * @returns [{any}]
  */
-function getPlanes() {
+export function getPlanes() {
     let planes = [];
     for (let card of scryfalldata) {
         if (card.type_line) {
@@ -363,7 +365,7 @@ function getPlanes() {
     return planes;
 }
 
-function getStickers(options) {
+export function getStickers(options) {
     let stickers = [];
     for (let card of scryfalldata) {
         if (card.type_line) {
@@ -387,7 +389,7 @@ function getStickers(options) {
     return stickers;
 }
 
-function getAttractions(options) {
+export function getAttractions(options) {
     let attractions = [];
     for (let card of scryfalldata) {
         if (card.type_line) {
@@ -411,7 +413,7 @@ function getAttractions(options) {
     return attractions;
 }
 
-function getContraptions(options) {
+export function getContraptions(options) {
     let contraptions = [];
     for (let card of scryfalldata) {
         if (card.type_line) {
@@ -431,7 +433,7 @@ function getContraptions(options) {
  * @param card_name
  * @returns [{any}]
  */
-function getAllCardImages(card_name) {
+export function getAllCardImages(card_name) {
     let images = [];
     for (let card of scryfalldata) {
         if (card_name.toLowerCase() === card.name.toLowerCase()) {
