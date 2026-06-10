@@ -1,4 +1,4 @@
-import * as scryfalldb from './scryfall';
+import * as scryfalldb from './scryfall.js';
 
 import "dotenv/config.js";
 import pg from "pg";
