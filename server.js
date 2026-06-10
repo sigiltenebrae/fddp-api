@@ -8,7 +8,6 @@ import fs from "node:fs";
 import https from "node:https";
 import pg from "pg";
 import {streamArray} from 'stream-json/streamers/stream-array.js';
-import * as config from './config/db.config.js';
 import * as scryfalldb from './interfaces/scryfall.js';
 import * as decksdb from './interfaces/decks.js';
 import * as gamesdb from './interfaces/games.js';
