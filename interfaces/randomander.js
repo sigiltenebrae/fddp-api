@@ -1,4 +1,4 @@
-const scryfalldb = require('./scryfall');
+import * as scryfalldb from './scryfall';
 
 /**
  * Returns a formatted card with a randomly selected image with the given card name
@@ -612,19 +612,19 @@ function getRandomDeckForPlay(commanderdata, carddata, colors) {
     return random_deck;
 }
 
-exports.getCheapRandomDeck = (request, response) => {
+export function getCheapRandomDeck(request, response) {
     let colors = request.body && request.body.colors? request.body.colors: null;
     let deck = getRandomDeckForPlay(scryfalldb.getCheapCommanderData(), scryfalldb.getCheapData(), colors);
     return response.json(deck);
 }
 
-exports.getRandomDeck = (request, response) => {
+export function getRandomDeck(request, response) {
     let colors = request.body && request.body.colors? request.body.colors: null;
     let deck = getRandomDeckForPlay(scryfalldb.getCommanderData(), scryfalldb.getScryfallData(), colors);
     return response.json(deck);
 }
 
-exports.getRandomCommanderAPI = (request, response) => {
+export function getRandomCommanderAPI(request, response) {
     if (request.body && request.body.colors) {
         return response.json(getRandomCommander(scryfalldb.getCommanderData(), request.body.colors));
     }
