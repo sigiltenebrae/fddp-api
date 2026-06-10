@@ -69,7 +69,3 @@ export function getEdhrecThemesApi(request, response) {
         return response.json([]);
     }
 }
-
-module.exports = {
-    getEdhrecThemesApi,
-}
