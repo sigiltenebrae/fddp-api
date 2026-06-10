@@ -1,6 +1,6 @@
-import * as scryfalldb from './scryfall';
-import * as deckdb from './decks';
-import * as banlistdb from './ban_list';
+import * as scryfalldb from './scryfall.js';
+import * as deckdb from './decks.js';
+import * as banlistdb from './ban_list.js';
 
 import "dotenv/config.js";
 import pg from "pg";
