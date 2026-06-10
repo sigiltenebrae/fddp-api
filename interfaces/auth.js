@@ -1,7 +1,7 @@
 import "dotenv/config.js";
 
 import * as jwt from "jsonwebtoken";
-import * as bcrypt = from "bcryptjs";
+import * as bcrypt from "bcryptjs";
 
 import pg from "pg";
 
