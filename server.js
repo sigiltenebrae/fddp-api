@@ -223,7 +223,7 @@ function updateThemesDB() {
     });
 }
 
-getArchidektDeck = (request, response) => {
+function getArchidektDeck(request, response) {
     const id = request.params.id;
     axios.get('https://archidekt.com/api/decks/' + id + '/').then( res => {
         return response.json(res.data);
@@ -238,7 +238,7 @@ getArchidektDeck = (request, response) => {
  * referer: https://www.moxfield.com/
  */
 
-getMoxfieldDeck = (request, response) => {
+function getMoxfieldDeck(request, response) {
     const id = request.params.id;
     axios.get(
         'https://api2.moxfield.com/v3/decks/all/' + id,
