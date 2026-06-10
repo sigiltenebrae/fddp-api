@@ -647,7 +647,7 @@ export function getPlanesApi(request, response) {
     return response.json(getPlanes());
 }
 
-export function getStickersApi = (request, response) {
+export function getStickersApi(request, response) {
     return response.json(getStickers(null));
 }
 
