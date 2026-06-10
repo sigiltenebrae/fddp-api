@@ -2,3 +2,4 @@
 /node_modules/*
 /assets/default-cards.json
 .env
+package-lock.json
