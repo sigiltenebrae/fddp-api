@@ -1,15 +1,15 @@
-const config = require("../config/db.config.js");
-const {request, response} = require("express");
-const Pool = require('pg').Pool
+import "dotenv/config.js";
+import pg from "pg";
+const { Pool } = pg;
 const pool = new Pool({
-    user: config.USER,
-    host: config.HOST,
-    database: config.DB,
-    password: config.PASSWORD,
-    port: 5432,
+    "host":     process.env.POSTGRES_HOST,
+    "database": process.env.POSTGRES_DB,
+    "user":     process.env.POSTGRES_USER,
+    "password": process.env.POSTGRES_PASSWORD,
+    "port":     5432,
 });
 
-exports.getUsers = (request, response) => {
+export function getUsers(request, response) {
     pool.query('SELECT * FROM users', (error, results) => {
         if (error) {
             console.log('Error getting users');
@@ -26,7 +26,7 @@ exports.getUsers = (request, response) => {
     });
 }
 
-exports.getUser = (request, response) => {
+export function getUser(request, response) {
     const id = parseInt(request.params.id);
     pool.query('SELECT * FROM users WHERE id = ' + id, (error, results) => {
         if (error) {
@@ -44,7 +44,7 @@ exports.getUser = (request, response) => {
     });
 }
 
-exports.updateProfile = (request, response) => {
+export function updateProfile(request, response) {
     const id = parseInt(request.params.id);
     if (request.body && request.body.user) {
         const user = request.body.user;
@@ -62,7 +62,7 @@ exports.updateProfile = (request, response) => {
     }
 }
 
-exports.getCommanders = (request, response) => {
+export function getCommanders(request, response) {
     const id = parseInt(request.params.id);
     pool.query('SELECT * FROM decks WHERE owner = ' + id, (error, results) => {
         if (error) {
@@ -110,7 +110,7 @@ exports.getCommanders = (request, response) => {
     })
 }
 
-exports.getCardUsage = (request, response) => {
+export function getCardUsage(request, response) {
     const id = parseInt(request.params.id);
     pool.query('SELECT * FROM decks WHERE owner = ' + id, (error, results) => {
         if (error) {
@@ -164,7 +164,7 @@ exports.getCardUsage = (request, response) => {
     })
 }
 
-exports.setDefaultImage = (request, response) => {
+export function setDefaultImage(request, response) {
     const userid = parseInt(request.params.id);
     if (request.body && request.body.card) {
         pool.query('SELECT * FROM default_images WHERE userid = $1 AND name = $2', [userid, request.body.card.name], (er, re) => {
@@ -195,7 +195,7 @@ exports.setDefaultImage = (request, response) => {
     }
 }
 
-exports.deleteDefaultImage = (request, response) => {
+export function deleteDefaultImage(request, response) {
     const userid = parseInt(request.params.id);
     if (request.body && request.body.card) {
         pool.query('DELETE FROM default_images WHERE userid = $1 AND name = $2', [userid, request.body.card.name], (err, res) => {
@@ -210,7 +210,7 @@ exports.deleteDefaultImage = (request, response) => {
     }
 }
 
-exports.getDefaultImages = (request, response) => {
+export function getDefaultImages(request, response) {
     const userid = parseInt(request.params.id);
     pool.query('SELECT * FROM default_images WHERE userid = $1', [userid], (err, res) => {
         if (err) {
@@ -223,7 +223,7 @@ exports.getDefaultImages = (request, response) => {
     });
 }
 
-exports.getDefaultImage = (request, response) => {
+export function getDefaultImage(request, response) {
     const userid = parseInt(request.params.id);
     if (request.body && request.body.card_name) {
         pool.query('SELECT * FROM default_images WHERE userid = $1 AND name = $2', [userid, request.body.card_name], (err, res) => {
