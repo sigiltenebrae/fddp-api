@@ -1,15 +1,15 @@
-const config = require("../config/db.config.js");
-const {request, response} = require("express");
-const Pool = require('pg').Pool
+import "dotenv/config.js";
+import pg from "pg";
+const { Pool } = pg;
 const pool = new Pool({
-    user: config.USER,
-    host: config.HOST,
-    database: config.DB,
-    password: config.PASSWORD,
-    port: 5432,
+    "host":     process.env.POSTGRES_HOST,
+    "database": process.env.POSTGRES_DB,
+    "user":     process.env.POSTGRES_USER,
+    "password": process.env.POSTGRES_PASSWORD,
+    "port":     5432,
 });
 
-exports.getGameTypes = (request, response) => {
+export function getGameTypes(request, response) {
     pool.query('SELECT * FROM game_types',
         (error, results) => {
             if (error) {
@@ -28,7 +28,7 @@ exports.getGameTypes = (request, response) => {
         });
 }
 
-exports.getGames = (request, response) => {
+export function getGames(request, response) {
     pool.query('SELECT * FROM games ORDER BY id DESC',
         (error, results) => {
             if (error) {
@@ -68,7 +68,7 @@ exports.getGames = (request, response) => {
         });
 }
 
-exports.getGamesNoTest = (request, response) => {
+export function getGamesNoTest(request, response) {
     pool.query('SELECT * FROM games WHERE type != 6 ORDER BY id DESC',
         (error, results) => {
             if (error) {
@@ -108,7 +108,7 @@ exports.getGamesNoTest = (request, response) => {
         });
 }
 
-exports.getActiveGames = (request, response) => {
+export function getActiveGames(request, response) {
     pool.query('SELECT * FROM games WHERE active = true',
         (error, results) => {
             if (error) {
@@ -127,7 +127,7 @@ exports.getActiveGames = (request, response) => {
         });
 }
 
-exports.getGameById = (request, response) => {
+export function getGameById(request, response) {
     const id = parseInt(request.params.id);
 
     pool.query('SELECT * FROM games where id = $1', [id],
@@ -146,7 +146,7 @@ exports.getGameById = (request, response) => {
         });
 }
 
-exports.createGame = (request, response) => {
+export function createGame(request, response) {
     if (request.body && request.body.game) {
         console.log('creating game');
         const game = request.body.game;
@@ -171,7 +171,7 @@ exports.createGame = (request, response) => {
     }
 }
 
-exports.startGame = (request, response) => {
+export function startGame(request, response) {
     const id = parseInt(request.params.id);
     pool.query('UPDATE games SET started = now() WHERE id = $1', [id],
         (error, results) => {
@@ -187,7 +187,7 @@ exports.startGame = (request, response) => {
         });
 }
 
-exports.updateGame = (request, response) => {
+export function updateGame(request, response) {
     if (request.body && request.body.game) {
         const game = request.body.game;
         console.log('updating game ' + game.id);
@@ -207,7 +207,7 @@ exports.updateGame = (request, response) => {
     }
 }
 
-exports.getGameResults = (request, response) => {
+export function getGameResults(request, response) {
     const id = parseInt(request.params.id);
     pool.query('SELECT * FROM game_results WHERE game_id = $1', [id], (error, results) => {
         if (error) {
@@ -224,7 +224,7 @@ exports.getGameResults = (request, response) => {
     });
 }
 
-exports.updateGameResults = (request, response) => {
+export function updateGameResults(request, response) {
     if (request.body && request.body.results) {
         const res = request.body.results;
         let result_promises = [];
