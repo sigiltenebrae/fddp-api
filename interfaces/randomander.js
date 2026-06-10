@@ -536,7 +536,7 @@ function getBasicsForDeck(deck) {
  * Generate the random deck using the given commanderdata and carddata
  * @returns [any]
  */
-function getRandomDeck(commanderdata, carddata, colors) {
+function getRandomDeck2(commanderdata, carddata, colors) {
 
     let temp_commanders = getRandomCommander(commanderdata, colors);
     let random_commander = temp_commanders[0];
@@ -574,7 +574,7 @@ function getRandomDeck(commanderdata, carddata, colors) {
  * @returns {any}
  */
 function getRandomDeckForPlay(commanderdata, carddata, colors) {
-    let random_cards = getRandomDeck(commanderdata, carddata, colors);
+    let random_cards = getRandomDeck2(commanderdata, carddata, colors);
     let random_deck = {};
     random_deck.id = -1;
     random_deck.name = "Random Deck"
