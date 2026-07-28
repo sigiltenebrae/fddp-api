@@ -58,6 +58,50 @@ function loadScryfallFile() {
     });
 }
 
+function downloadToFile(url, destPath) {
+    return new Promise((resolve, reject) => {
+        const file = fs.createWriteStream(destPath);
+        const request = https.get(url, (response) => {
+            if (response.statusCode !== 200) {
+                response.resume();
+                reject(new Error(`Unexpected status code ${response.statusCode} downloading scryfall data`));
+                return;
+            }
+            response.on('error', reject);
+            response.pipe(file);
+        });
+        request.on('error', reject);
+        file.on('error', reject);
+        file.on('finish', () => file.close(() => resolve()));
+    });
+}
+
+function loadAndApplyScryfallData() {
+    return loadScryfallFile().then(cards => {
+        scryfalldb.setScryfallData(cards);
+        scryfalldb.loadCommanderData();
+        scryfalldb.loadCheapData(0.5);
+        scryfalldb.loadCheapCommanders();
+    });
+}
+
+function useExistingDbOrGiveUp(resolve) {
+    if (fs.existsSync('assets/default-cards.json')) {
+        console.log('using old db');
+        loadAndApplyScryfallData()
+            .then(() => updateThemesDB())
+            .then(() => resolve())
+            .catch(loadError => {
+                console.log('existing scryfall db is unreadable, starting without card data');
+                console.log(loadError);
+                resolve();
+            });
+    }
+    else {
+        resolve();
+    }
+}
+
 function updateDB() {
     return new Promise ((resolve) => {
             axios.get('https://api.scryfall.com/bulk-data').then( res => {
@@ -72,25 +116,25 @@ function updateDB() {
                     if (!fs.existsSync('assets')){
                         fs.mkdirSync('assets');
                     }
-                    const update_file = fs.createWriteStream("assets/default-cards.json");
-                    const update_request = https.get(update_url, function(response) {
-                        response.pipe(update_file);
-                        update_file.on("finish", () => {
-                            update_file.close();
-                            console.log('scryfall update downloaded');
-                            loadScryfallFile().then(cards => {
-                                scryfalldb.setScryfallData(cards);
-                                scryfalldb.loadCommanderData();
-                                scryfalldb.loadCheapData(0.5);
-                                scryfalldb.loadCheapCommanders();
-                                updateThemesDB().then(() => {
-                                    legalitydb.updateAllLegalities().then(() => {
-                                        resolve();
-                                    });
-                                });
-                            });
-                        });
-                    });
+                    const tmp_path = 'assets/default-cards.json.tmp';
+                    downloadToFile(update_url, tmp_path).then(() => {
+                        console.log('scryfall update downloaded');
+                        fs.renameSync(tmp_path, 'assets/default-cards.json');
+                        return loadAndApplyScryfallData();
+                    }).then(() => updateThemesDB())
+                      .then(() => legalitydb.updateAllLegalities())
+                      .then(() => resolve())
+                      .catch(error => {
+                          console.log('error downloading or reading scryfall update');
+                          console.log(error);
+                          if (fs.existsSync(tmp_path)) {
+                              fs.unlinkSync(tmp_path);
+                          }
+                          useExistingDbOrGiveUp(resolve);
+                      });
+                }
+                else {
+                    resolve();
                 }
             }).catch(function (error) {
                 console.log('error updating the local scryfall db');
@@ -98,21 +142,7 @@ function updateDB() {
                 if (error.response && error.response.data) {
                     console.log(error.response.data);
                 }
-                if (fs.existsSync('assets/default-cards.json')) {
-                    console.log('using old db');
-                    loadScryfallFile().then(cards => {
-                        scryfalldb.setScryfallData(cards);
-                        scryfalldb.loadCommanderData();
-                        scryfalldb.loadCheapData(0.5);
-                        scryfalldb.loadCheapCommanders();
-                        updateThemesDB().then(() => {
-                            resolve();
-                        });
-                    });
-                }
-                else {
-                    resolve();
-                }
+                useExistingDbOrGiveUp(resolve);
             });
         });
 }
@@ -343,13 +373,17 @@ if (fs.existsSync('assets/default-cards.json')) {
         });
     }
     else {
-        loadScryfallFile().then(cards => {
-            scryfalldb.setScryfallData(cards);
-            scryfalldb.loadCommanderData();
-            scryfalldb.loadCheapData(0.5);
-            scryfalldb.loadCheapCommanders();
+        loadAndApplyScryfallData().then(() => {
             app.listen(port, () => {
                 console.log(`App running on port ${port}.`);
+            });
+        }).catch(error => {
+            console.log('existing scryfall db is unreadable, forcing a fresh download');
+            console.log(error);
+            updateDB().then(() => {
+                app.listen(port, () => {
+                    console.log(`App running on port ${port}.`);
+                });
             });
         });
     }
