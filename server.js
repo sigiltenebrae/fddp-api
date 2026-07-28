@@ -85,11 +85,21 @@ function loadAndApplyScryfallData() {
     });
 }
 
+function updateThemesAndLegalities() {
+    return updateThemesDB().catch(error => {
+        console.log('error syncing themes with edhrec, continuing without it');
+        console.log(error);
+    }).then(() => legalitydb.updateAllLegalities()).catch(error => {
+        console.log('error updating deck legalities, continuing without it');
+        console.log(error);
+    });
+}
+
 function useExistingDbOrGiveUp(resolve) {
     if (fs.existsSync('assets/default-cards.json')) {
         console.log('using old db');
         loadAndApplyScryfallData()
-            .then(() => updateThemesDB())
+            .then(() => updateThemesAndLegalities())
             .then(() => resolve())
             .catch(loadError => {
                 console.log('existing scryfall db is unreadable, starting without card data');
@@ -121,10 +131,9 @@ function updateDB() {
                         console.log('scryfall update downloaded');
                         fs.renameSync(tmp_path, 'assets/default-cards.json');
                         return loadAndApplyScryfallData();
-                    }).then(() => updateThemesDB())
-                      .then(() => legalitydb.updateAllLegalities())
-                      .then(() => resolve())
-                      .catch(error => {
+                    }).then(() => {
+                        return updateThemesAndLegalities().then(() => resolve());
+                    }).catch(error => {
                           console.log('error downloading or reading scryfall update');
                           console.log(error);
                           if (fs.existsSync(tmp_path)) {
