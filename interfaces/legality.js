@@ -104,7 +104,7 @@ function updateLegality(id) {
     });
 }
 
-function updateAllLegalities() {
+export function updateAllLegalities() {
     return new Promise((resolve) => {
         process.stdout.write('updating deck legalities');
         deckdb.grabDecks().then((decks_obj) => {
