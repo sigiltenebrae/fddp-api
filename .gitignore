@@ -1,6 +1,7 @@
 /.idea/*
 /node_modules/*
-/assets/default-cards.json
+/assets/default-cards.jsonl
 .env
 package-lock.json
 fddp.code-workspace
+assets/default-cards.json

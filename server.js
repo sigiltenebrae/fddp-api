@@ -6,8 +6,9 @@ import cors from "cors";
 import express from "express";
 import fs from "node:fs";
 import https from "node:https";
+import readline from "node:readline";
+import zlib from "node:zlib";
 import pg from "pg";
-import {streamArray} from 'stream-json/streamers/stream-array.js';
 import * as scryfalldb from './interfaces/scryfall.js';
 import * as decksdb from './interfaces/decks.js';
 import * as gamesdb from './interfaces/games.js';
@@ -50,17 +51,42 @@ app.post('/', (request, response) => {
 function loadScryfallFile() {
     return new Promise((resolve, reject) => {
         const cards = [];
-        fs.createReadStream('assets/default-cards.json')
-            .pipe(streamArray.withParserAsStream())
-            .on('data', ({ value }) => cards.push(value))
-            .on('end', () => resolve(cards))
-            .on('error', reject);
+        let failed = false;
+        const rl = readline.createInterface({
+            input: fs.createReadStream('assets/default-cards.jsonl'),
+            crlfDelay: Infinity,
+        });
+        rl.on('line', (line) => {
+            if (failed) {
+                return;
+            }
+            const trimmed = line.trim();
+            if (trimmed === '') {
+                return;
+            }
+            try {
+                cards.push(JSON.parse(trimmed));
+            }
+            catch (error) {
+                failed = true;
+                rl.close();
+                reject(error);
+            }
+        });
+        rl.on('close', () => {
+            if (!failed) {
+                resolve(cards);
+            }
+        });
+        rl.on('error', reject);
     });
 }
 
-function downloadToFile(url, destPath) {
+function downloadAndDecompressJsonl(url, destPath) {
     return new Promise((resolve, reject) => {
         const file = fs.createWriteStream(destPath);
+        const gunzip = zlib.createGunzip();
+        gunzip.on('error', reject);
         const request = https.get(url, (response) => {
             if (response.statusCode !== 200) {
                 response.resume();
@@ -68,7 +94,7 @@ function downloadToFile(url, destPath) {
                 return;
             }
             response.on('error', reject);
-            response.pipe(file);
+            response.pipe(gunzip).pipe(file);
         });
         request.on('error', reject);
         file.on('error', reject);
@@ -96,7 +122,7 @@ function updateThemesAndLegalities() {
 }
 
 function useExistingDbOrGiveUp(resolve) {
-    if (fs.existsSync('assets/default-cards.json')) {
+    if (fs.existsSync('assets/default-cards.jsonl')) {
         console.log('using old db');
         loadAndApplyScryfallData()
             .then(() => updateThemesAndLegalities())
@@ -118,7 +144,7 @@ function updateDB() {
                 let update_url = '';
                 for (let bulk of res.data.data) {
                     if (bulk.type === 'default_cards') {
-                        update_url = bulk.download_uri;
+                        update_url = bulk.jsonl_download_uri;
                         break;
                     }
                 }
@@ -126,10 +152,10 @@ function updateDB() {
                     if (!fs.existsSync('assets')){
                         fs.mkdirSync('assets');
                     }
-                    const tmp_path = 'assets/default-cards.json.tmp';
-                    downloadToFile(update_url, tmp_path).then(() => {
+                    const tmp_path = 'assets/default-cards.jsonl.tmp';
+                    downloadAndDecompressJsonl(update_url, tmp_path).then(() => {
                         console.log('scryfall update downloaded');
-                        fs.renameSync(tmp_path, 'assets/default-cards.json');
+                        fs.renameSync(tmp_path, 'assets/default-cards.jsonl');
                         return loadAndApplyScryfallData();
                     }).then(() => {
                         return updateThemesAndLegalities().then(() => resolve());
@@ -370,9 +396,9 @@ app.get('/api/legality/all/force', legalitydb.getAllLegalities);
 
 app.post('/api/edhrec/cmdrthemes', edhrecdb.getEdhrecThemesApi);
 
-if (fs.existsSync('assets/default-cards.json')) {
+if (fs.existsSync('assets/default-cards.jsonl')) {
     console.log('db file exists');
-    let mtime = fs.statSync("assets/default-cards.json").mtime
+    let mtime = fs.statSync("assets/default-cards.jsonl").mtime
     if ((Math.abs(Date.now() - mtime) / 1000) > (60 * 60 * 24)) {
         console.log('db file too old, updating');
         updateDB().then(() => {
@@ -400,7 +426,7 @@ if (fs.existsSync('assets/default-cards.json')) {
 else {
     console.log('db file missing');
     updateDB().then(() => {
-        if (fs.existsSync('assets/default-cards.json')) {
+        if (fs.existsSync('assets/default-cards.jsonl')) {
             app.listen(port, () => {
                 console.log(`App running on port ${port}.`);
             });
